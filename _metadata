@@ -1,0 +1,10 @@
+{
+  "author" : "Zancuno",
+  "description" : "A Mod used to automatically adapt an armor to your species body type.",
+  "friendlyName" : "ArmorAdapt",
+  "link" : "",
+  "name" : "ArmorAdapt",
+  "requires" : ["lucario"],
+  "steamContentId" : "",
+  "tags" : "Character Improvements",
+  "version" : "1.4.3.1.0"}

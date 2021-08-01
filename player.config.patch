@@ -1,0 +1,3 @@
+[
+{ "op" : "add", "path" : "/deploymentConfig/scripts/-", "value" : "/scripts/ArmorAdapt/armorAdaptPlayerHandler.lua" }
+]
