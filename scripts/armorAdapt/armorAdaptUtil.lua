@@ -18,8 +18,8 @@ end
 
 function armorAdapt.generateAdaptedPlayerHeadItem(adaptArmorPlayerItem, species, bodyType)
 
-	adaptArmorPlayerItem.parameters.maleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/head.png", species, root.itemConfig(adaptArmorPlayerItem).config.itemName, bodyType)
-	adaptArmorPlayerItem.parameters.femaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/head.png", species, root.itemConfig(adaptArmorPlayerItem).config.itemName, bodyType)
+	adaptArmorPlayerItem.parameters.headMaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/head.png", species, root.itemConfig(adaptArmorPlayerItem).config.itemName, bodyType)
+	adaptArmorPlayerItem.parameters.headFemaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/head.png", species, root.itemConfig(adaptArmorPlayerItem).config.itemName, bodyType)
 	adaptArmorPlayerItem.parameters.mask = string.format("/items/armors/armorAdapt/%s/%s/%s/mask.png", species, root.itemConfig(adaptArmorPlayerItem).config.itemName, bodyType)
 	
 	adaptArmorPlayerItem.parameters.itemTags = { "armorAdapted", species, bodyType }
@@ -44,8 +44,8 @@ end
 
 function armorAdapt.generateAdaptedPlayerPantsItem(adaptArmorPlayerItem, species, bodyType)
 
-	adaptArmorPlayerItem.parameters.maleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/pantsm.png", species, root.itemConfig(adaptArmorPlayerItem).config.itemName, bodyType)
-	adaptArmorPlayerItem.parameters.femaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/pantsf.png", species, root.itemConfig(adaptArmorPlayerItem).config.itemName, bodyType)
+	adaptArmorPlayerItem.parameters.pantsMaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/pantsm.png", species, root.itemConfig(adaptArmorPlayerItem).config.itemName, bodyType)
+	adaptArmorPlayerItem.parameters.pantsFemaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/pantsf.png", species, root.itemConfig(adaptArmorPlayerItem).config.itemName, bodyType)
 
 	
 	adaptArmorPlayerItem.parameters.itemTags = { "armorAdapted", species, bodyType }
@@ -55,8 +55,8 @@ end
 
 function armorAdapt.generateAdaptedPlayerBackItem(adaptArmorPlayerItem, species, bodyType)
 
-	adaptArmorPlayerItem.parameters.maleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/back.png", species, root.itemConfig(adaptArmorPlayerItem).config.itemName, bodyType)
-	adaptArmorPlayerItem.parameters.femaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/back.png", species, root.itemConfig(adaptArmorPlayerItem).config.itemName, bodyType)
+	adaptArmorPlayerItem.parameters.backMaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/back.png", species, root.itemConfig(adaptArmorPlayerItem).config.itemName, bodyType)
+	adaptArmorPlayerItem.parameters.backFemaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/back.png", species, root.itemConfig(adaptArmorPlayerItem).config.itemName, bodyType)
 	
 	adaptArmorPlayerItem.parameters.itemTags = { "armorAdapted", species, bodyType }
 
@@ -65,8 +65,8 @@ end
 
 function armorAdapt.generateAdaptedNpcHeadItem(adaptArmorPlayerItem, species, bodyType)
 
-	adaptArmorNpcItem.parameters.maleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/head.png", species, root.itemConfig(adaptArmorNpcItem).config.itemName, bodyType)
-	adaptArmorNpcItem.parameters.femaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/head.png", species, root.itemConfig(adaptArmorNpcItem).config.itemName, bodyType)
+	adaptArmorNpcItem.parameters.headMaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/head.png", species, root.itemConfig(adaptArmorNpcItem).config.itemName, bodyType)
+	adaptArmorNpcItem.parameters.headFemaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/head.png", species, root.itemConfig(adaptArmorNpcItem).config.itemName, bodyType)
 	adaptArmorNpcItem.parameters.mask = string.format("/items/armors/armorAdapt/%s/%s/%s/mask.png", species, root.itemConfig(adaptArmorNpcItem).config.itemName, bodyType)
 	
 	adaptArmorNpcItem.parameters.itemTags = { "armorAdapted", species, bodyType }
@@ -91,8 +91,8 @@ end
 
 function armorAdapt.generateAdaptedNpcPantsItem(adaptArmorPlayerItem, species, bodyType)
 
-	adaptArmorNpcItem.parameters.maleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/pantsm.png", species, root.itemConfig(adaptArmorNpcItem).config.itemName, bodyType)
-	adaptArmorNpcItem.parameters.femaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/pantsf.png", species, root.itemConfig(adaptArmorNpcItem).config.itemName, bodyType)
+	adaptArmorNpcItem.parameters.pantsMaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/pantsm.png", species, root.itemConfig(adaptArmorNpcItem).config.itemName, bodyType)
+	adaptArmorNpcItem.parameters.pantsFemaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/pantsf.png", species, root.itemConfig(adaptArmorNpcItem).config.itemName, bodyType)
 
 	
 	adaptArmorNpcItem.parameters.itemTags = { "armorAdapted", species, bodyType }
@@ -102,8 +102,8 @@ end
 
 function armorAdapt.generateAdaptedNpcBackItem(adaptArmorNpcItem, species, bodyType)
 
-	adaptArmorNpcItem.parameters.maleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/back.png", species, root.itemConfig(adaptArmorNpcItem).config.itemName, bodyType)
-	adaptArmorNpcItem.parameters.femaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/back.png", species, root.itemConfig(adaptArmorNpcItem).config.itemName, bodyType)
+	adaptArmorNpcItem.parameters.backMaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/back.png", species, root.itemConfig(adaptArmorNpcItem).config.itemName, bodyType)
+	adaptArmorNpcItem.parameters.backFemaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/back.png", species, root.itemConfig(adaptArmorNpcItem).config.itemName, bodyType)
 	
 	adaptArmorNpcItem.parameters.itemTags = { "armorAdapted", species, bodyType }
 
