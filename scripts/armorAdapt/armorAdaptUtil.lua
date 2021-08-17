@@ -16,13 +16,67 @@ function armorAdapt.compareArmorTables(a, b)
 	end
 end
 
+function armorAdapt.runPlayerAdapt(baseItem, key, species, bodyType)
+	if root.itemConfig(baseItem).parameters.itemTags ~= nil and root.itemConfig(baseItem).parameters.itemTags[2] == species and root.itemConfig(baseItem).parameters.itemTags[3] == bodyType then
+		adaptArmorPlayerItem = baseItem
+		return adaptArmorPlayerItem
+	elseif root.itemConfig(baseItem).parameters.itemTags == nil or root.itemConfig(baseItem).parameters.itemTags[2] ~= species or root.itemConfig(baseItem).parameters.itemTags[3] ~= bodyType then 
+		armorAdapt.showPlayerItemLog(baseArmorItem)
+		local adaptArmorPlayerItem = copy(baseItem)
+		if key == 1 or key == 2 then
+			adaptArmorPlayerItem = armorAdapt.generateAdaptedPlayerHeadItem(adaptArmorPlayerItem, species, bodyType)
+			armorAdapt.showPlayerBuildLog(baseItem, adaptArmorPlayerItem)
+			return adaptArmorPlayerItem
+		elseif key == 3 or key == 4 then
+			adaptArmorPlayerItem = armorAdapt.generateAdaptedPlayerChestItem(adaptArmorPlayerItem, species, bodyType)
+			armorAdapt.showPlayerBuildLog(baseItem, adaptArmorPlayerItem)
+			return adaptArmorPlayerItem
+		elseif key == 5 or key == 6 then
+			adaptArmorPlayerItem = armorAdapt.generateAdaptedPlayerPantsItem(adaptArmorPlayerItem, species, bodyType)
+			armorAdapt.showPlayerBuildLog(baseItem, adaptArmorPlayerItem)
+			return adaptArmorPlayerItem
+		else
+			adaptArmorPlayerItem = armorAdapt.generateAdaptedPlayerBackItem(adaptArmorPlayerItem, species, bodyType)
+			armorAdapt.showPlayerBuildLog(baseItem, adaptArmorPlayerItem)
+			return adaptArmorPlayerItem
+		end
+	end
+end
+
+function armorAdapt.runNpcAdapt(baseItem, key, species, bodyType)
+	if root.itemConfig(baseItem).parameters.itemTags ~= nil and root.itemConfig(baseItem).parameters.itemTags[2] == species and root.itemConfig(baseItem).parameters.itemTags[3] == bodyType then
+		adaptArmorNpcItem = baseItem
+		return adaptArmorNpcItem
+	elseif root.itemConfig(baseItem).parameters.itemTags == nil or root.itemConfig(baseItem).parameters.itemTags[2] ~= species or root.itemConfig(baseItem).parameters.itemTags[3] ~= bodyType then 
+		armorAdapt.showNpcItemLog(baseArmorItem)
+		local adaptArmorNpcItem = copy(baseItem)
+		if key == 1 or key == 2 then
+			adaptArmorNpcItem = armorAdapt.generateAdaptedNpcHeadItem(adaptArmorNpcItem, species, bodyType)
+			armorAdapt.showNpcBuildLog(baseItem, adaptArmorNpcItem)
+			return adaptArmorNpcItem
+		elseif key == 3 or key == 4 then
+			adaptArmorNpcItem = armorAdapt.generateAdaptedNpcChestItem(adaptArmorNpcItem, species, bodyType)
+			armorAdapt.showNpcBuildLog(baseItem, adaptArmorNpcItem)
+			return adaptArmorNpcItem
+		elseif key == 5 or key == 6 then
+			adaptArmorNpcItem = armorAdapt.generateAdaptedNpcPantsItem(adaptArmorNpcItem, species, bodyType)
+			armorAdapt.showNpcBuildLog(baseItem, adaptArmorNpcItem)
+			return adaptArmorNpcItem
+		else
+			adaptArmorNpcItem = armorAdapt.generateAdaptedNpcBackItem(adaptArmorNpcItem, species, bodyType)
+			armorAdapt.showNpcBuildLog(baseItem, adaptArmorNpcItem)
+			return adaptArmorNpcItem
+		end
+	end
+end
+
 function armorAdapt.generateAdaptedPlayerHeadItem(adaptArmorPlayerItem, species, bodyType)
 
-	adaptArmorPlayerItem.parameters.headMaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/head.png", species, root.itemConfig(adaptArmorPlayerItem).config.itemName, bodyType)
-	adaptArmorPlayerItem.parameters.headFemaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/head.png", species, root.itemConfig(adaptArmorPlayerItem).config.itemName, bodyType)
+	adaptArmorPlayerItem.parameters.maleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/head.png", species, root.itemConfig(adaptArmorPlayerItem).config.itemName, bodyType)
+	adaptArmorPlayerItem.parameters.femaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/head.png", species, root.itemConfig(adaptArmorPlayerItem).config.itemName, bodyType)
 	adaptArmorPlayerItem.parameters.mask = string.format("/items/armors/armorAdapt/%s/%s/%s/mask.png", species, root.itemConfig(adaptArmorPlayerItem).config.itemName, bodyType)
 	
-	adaptArmorPlayerItem.parameters.itemTags = { "armorAdapted", species, bodyType }
+	adaptArmorPlayerItem.parameters.itemTags = { "armorAdapted", species, bodyType, "head" }
 
 	return adaptArmorPlayerItem
 end
@@ -37,44 +91,44 @@ function armorAdapt.generateAdaptedPlayerChestItem(adaptArmorPlayerItem, species
 
 	adaptArmorPlayerItem.parameters.femaleFrames = { body = femaleChestBody, frontSleeve = frontArmFrames, backSleeve = backArmFrames }
 	
-	adaptArmorPlayerItem.parameters.itemTags = { "armorAdapted", species, bodyType }
+	adaptArmorPlayerItem.parameters.itemTags = { "armorAdapted", species, bodyType, "chest" }
 
 	return adaptArmorPlayerItem
 end
 
 function armorAdapt.generateAdaptedPlayerPantsItem(adaptArmorPlayerItem, species, bodyType)
 
-	adaptArmorPlayerItem.parameters.pantsMaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/pantsm.png", species, root.itemConfig(adaptArmorPlayerItem).config.itemName, bodyType)
-	adaptArmorPlayerItem.parameters.pantsFemaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/pantsf.png", species, root.itemConfig(adaptArmorPlayerItem).config.itemName, bodyType)
+	adaptArmorPlayerItem.parameters.maleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/pantsm.png", species, root.itemConfig(adaptArmorPlayerItem).config.itemName, bodyType)
+	adaptArmorPlayerItem.parameters.femaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/pantsf.png", species, root.itemConfig(adaptArmorPlayerItem).config.itemName, bodyType)
 
 	
-	adaptArmorPlayerItem.parameters.itemTags = { "armorAdapted", species, bodyType }
+	adaptArmorPlayerItem.parameters.itemTags = { "armorAdapted", species, bodyType, "pants" }
 
 	return adaptArmorPlayerItem
 end
 
 function armorAdapt.generateAdaptedPlayerBackItem(adaptArmorPlayerItem, species, bodyType)
 
-	adaptArmorPlayerItem.parameters.backMaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/back.png", species, root.itemConfig(adaptArmorPlayerItem).config.itemName, bodyType)
-	adaptArmorPlayerItem.parameters.backFemaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/back.png", species, root.itemConfig(adaptArmorPlayerItem).config.itemName, bodyType)
+	adaptArmorPlayerItem.parameters.maleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/back.png", species, root.itemConfig(adaptArmorPlayerItem).config.itemName, bodyType)
+	adaptArmorPlayerItem.parameters.femaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/back.png", species, root.itemConfig(adaptArmorPlayerItem).config.itemName, bodyType)
 	
-	adaptArmorPlayerItem.parameters.itemTags = { "armorAdapted", species, bodyType }
+	adaptArmorPlayerItem.parameters.itemTags = { "armorAdapted", species, bodyType, "back" }
 
 	return adaptArmorPlayerItem
 end
 
-function armorAdapt.generateAdaptedNpcHeadItem(adaptArmorPlayerItem, species, bodyType)
+function armorAdapt.generateAdaptedNpcHeadItem(adaptArmorNpcItem, species, bodyType)
 
-	adaptArmorNpcItem.parameters.headMaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/head.png", species, root.itemConfig(adaptArmorNpcItem).config.itemName, bodyType)
-	adaptArmorNpcItem.parameters.headFemaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/head.png", species, root.itemConfig(adaptArmorNpcItem).config.itemName, bodyType)
+	adaptArmorNpcItem.parameters.maleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/head.png", species, root.itemConfig(adaptArmorNpcItem).config.itemName, bodyType)
+	adaptArmorNpcItem.parameters.femaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/head.png", species, root.itemConfig(adaptArmorNpcItem).config.itemName, bodyType)
 	adaptArmorNpcItem.parameters.mask = string.format("/items/armors/armorAdapt/%s/%s/%s/mask.png", species, root.itemConfig(adaptArmorNpcItem).config.itemName, bodyType)
 	
-	adaptArmorNpcItem.parameters.itemTags = { "armorAdapted", species, bodyType }
+	adaptArmorNpcItem.parameters.itemTags = { "armorAdapted", species, bodyType, "head" }
 
 	return adaptArmorNpcItem
 end
 
-function armorAdapt.generateAdaptedNpcChestItem(adaptArmorPlayerItem, species, bodyType)
+function armorAdapt.generateAdaptedNpcChestItem(adaptArmorNpcItem, species, bodyType)
 
 	maleChestBody = string.format("/items/armors/armorAdapt/%s/%s/%s/chestm.png", species, root.itemConfig(adaptArmorNpcItem).config.itemName, bodyType)
 	femaleChestBody = string.format("/items/armors/armorAdapt/%s/%s/%s/chestf.png", species, root.itemConfig(adaptArmorNpcItem).config.itemName, bodyType)
@@ -84,28 +138,28 @@ function armorAdapt.generateAdaptedNpcChestItem(adaptArmorPlayerItem, species, b
 
 	adaptArmorNpcItem.parameters.femaleFrames = { body = femaleChestBody, frontSleeve = frontArmFrames, backSleeve = backArmFrames }
 	
-	adaptArmorNpcItem.parameters.itemTags = { "armorAdapted", species, bodyType }
+	adaptArmorNpcItem.parameters.itemTags = { "armorAdapted", species, bodyType, "chest" }
 
 	return adaptArmorNpcItem
 end
 
-function armorAdapt.generateAdaptedNpcPantsItem(adaptArmorPlayerItem, species, bodyType)
+function armorAdapt.generateAdaptedNpcPantsItem(adaptArmorNpcItem, species, bodyType)
 
-	adaptArmorNpcItem.parameters.pantsMaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/pantsm.png", species, root.itemConfig(adaptArmorNpcItem).config.itemName, bodyType)
-	adaptArmorNpcItem.parameters.pantsFemaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/pantsf.png", species, root.itemConfig(adaptArmorNpcItem).config.itemName, bodyType)
+	adaptArmorNpcItem.parameters.maleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/pantsm.png", species, root.itemConfig(adaptArmorNpcItem).config.itemName, bodyType)
+	adaptArmorNpcItem.parameters.femaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/pantsf.png", species, root.itemConfig(adaptArmorNpcItem).config.itemName, bodyType)
 
 	
-	adaptArmorNpcItem.parameters.itemTags = { "armorAdapted", species, bodyType }
+	adaptArmorNpcItem.parameters.itemTags = { "armorAdapted", species, bodyType, "pants" }
 
 	return adaptArmorNpcItem
 end
 
 function armorAdapt.generateAdaptedNpcBackItem(adaptArmorNpcItem, species, bodyType)
 
-	adaptArmorNpcItem.parameters.backMaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/back.png", species, root.itemConfig(adaptArmorNpcItem).config.itemName, bodyType)
-	adaptArmorNpcItem.parameters.backFemaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/back.png", species, root.itemConfig(adaptArmorNpcItem).config.itemName, bodyType)
+	adaptArmorNpcItem.parameters.maleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/back.png", species, root.itemConfig(adaptArmorNpcItem).config.itemName, bodyType)
+	adaptArmorNpcItem.parameters.femaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/back.png", species, root.itemConfig(adaptArmorNpcItem).config.itemName, bodyType)
 	
-	adaptArmorNpcItem.parameters.itemTags = { "armorAdapted", species, bodyType }
+	adaptArmorNpcItem.parameters.itemTags = { "armorAdapted", species, bodyType, "back" }
 
 	return adaptArmorNpcItem
 end
@@ -199,4 +253,60 @@ function armorAdapt.getLucarioBodyType(bodyTable)
 	
 	return bodyTable
 
+end
+
+function armorAdapt.showPlayerItemLog(item)
+	if root.assetJson("/scripts/armorAdapt/armorAdapt.config:showPlayerSupportedItem") == true then
+		sb.logInfo("[Armor Adapt][Player Handler]: The name for the suported item is %s", root.itemConfig(item).config.itemName)
+		sb.logInfo("[Armor Adapt][Player Handler]: The parameters for the suported item are %s", root.itemConfig(item).parameters)
+
+	end
+end
+
+function armorAdapt.showPlayerBuildLog(baseItem, adaptItem)
+	if root.assetJson("/scripts/armorAdapt/armorAdapt.config:showPlayerBuildInfo") == true then
+		sb.logInfo("[Armor Adapt][Player Handler]: The tags of the base item are %s", root.itemConfig(baseItem).config.itemTags)
+		sb.logInfo("[Armor Adapt][Player Handler]: The male frames of the base item are %s", root.itemConfig(baseItem).config.maleFrames)
+		sb.logInfo("[Armor Adapt][Player Handler]: The female frames of the base item are %s", root.itemConfig(baseItem).config.femaleFrames)
+		sb.logInfo("[Armor Adapt][Player Handler]: The mask of the base item is %s", root.itemConfig(baseItem).config.mask)
+
+		sb.logInfo("[Armor Adapt][Player Handler]: Adapted item tags are %s", adaptItem.parameters.itemTags)
+		sb.logInfo("[Armor Adapt][Player Handler]: Adapted item male frames are %s", 	adaptItem.parameters.maleFrames)
+		sb.logInfo("[Armor Adapt][Player Handler]: Adapted item female frames are %s", adaptItem.parameters.femaleFrames)
+		sb.logInfo("[Armor Adapt][Player Handler]: Adapted item mask is %s", adaptItem.parameters.mask)
+	end
+end
+
+function armorAdapt.showPlayerCompletionLog(item, species, bodytype)
+	if root.assetJson("/scripts/armorAdapt/armorAdapt.config:showPlayerBuildCompletion") == true then
+		sb.logInfo("[Armor Adapt][Player Handler]: Item %s has sucessfully been adapted to the species %s and the body type %s", root.itemConfig(item).config.itemName, species, bodyType)
+	end
+end
+
+function armorAdapt.showNpcItemLog(item)
+	if root.assetJson("/scripts/armorAdapt/armorAdapt.config:showNpcSupportedItem") == true then
+		sb.logInfo("[Armor Adapt][NPC Handler]: The name for the suported item is %s", root.itemConfig(item).config.itemName)
+		sb.logInfo("[Armor Adapt][NPC Handler]: The parameters for the suported item are %s", root.itemConfig(item).parameters)
+
+	end
+end
+
+function armorAdapt.showNpcBuildLog(baseItem, adaptItem)
+	if root.assetJson("/scripts/armorAdapt/armorAdapt.config:showNpcBuildInfo") == true then
+		sb.logInfo("[Armor Adapt][NPC Handler]: The tags of the base item are %s", root.itemConfig(baseItem).config.itemTags)
+		sb.logInfo("[Armor Adapt][NPC Handler]: The male frames of the base item are %s", root.itemConfig(baseItem).config.maleFrames)
+		sb.logInfo("[Armor Adapt][NPC Handler]: The female frames of the base item are %s", root.itemConfig(baseItem).config.femaleFrames)
+		sb.logInfo("[Armor Adapt][NPC Handler]: The mask of the base item is %s", root.itemConfig(baseItem).config.mask)
+
+		sb.logInfo("[Armor Adapt][NPC Handler]: Adapted item tags are %s", adaptItem.parameters.itemTags)
+		sb.logInfo("[Armor Adapt][NPC Handler]: Adapted item male frames are %s", 	adaptItem.parameters.maleFrames)
+		sb.logInfo("[Armor Adapt][NPC Handler]: Adapted item female frames are %s", adaptItem.parameters.femaleFrames)
+		sb.logInfo("[Armor Adapt][NPC Handler]: Adapted item mask is %s", adaptItem.parameters.mask)
+	end
+end
+
+function armorAdapt.showNpcCompletionLog(item, species, bodytype)
+	if root.assetJson("/scripts/armorAdapt/armorAdapt.config:showNpcBuildCompletion") == true then
+		sb.logInfo("[Armor Adapt][NPC Handler]: Item %s has sucessfully been adapted to the species %s and the body type %s", root.itemConfig(item).config.itemName, species, bodyType)
+	end
 end

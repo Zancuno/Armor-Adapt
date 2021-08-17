@@ -1,0 +1,96 @@
+///////////// || [ Armor Adapt ] || \\\\\\\\\\\\\
+
+Compatibility:
+
+Intro: 
+Welcome to armor adapt and thank you for joining in this experience. This mod was built with the intention of allowing race mods to easily share clothing between each other. The added plus is that the requirement of this mod (completely optional) can even reduce the amount of items and recipes you have to make for your mod.
+
+So what does Armor Adapt Require of you?
+You need to first patch your species into the config for this mod located in /scripts/armorAdapt/armorAdapt.config.
+
+How you will patch, is already provided in templates inside this mod.
+Rules:
+
+Vanilla Body Type:
+This means that your species uses the standard vanilla body shape. Your head is around the same size; you have no top ears, horns or other head features that break the vanilla outline. Your body does not have anything that breaks the normal vanilla outline. You keep to the same arm positions.
+
+Your species could be easily confused with vanilla or can wear any vanilla clothing without problems. Use standardSpeciesPatch_Template.txt as your guide to patching.
+
+Your species will be recognized as "standard" withing the script so if you are adding new items images from your race to armor adapt, your folder structure for the images will be
+/items/armors/armorAdapt/standard/<itemName>/Default/(put in your images)
+
+Armor adapt relies upon this specific path in order to display the correct images. <itemName> has to be the itemName specified in your (head, chest, pants, back) file as the script pulls that item name to make the path. 
+
+If there does so happen to be another mod that gives your species a "custom body" then details on how to work compatibility will have to be discussed with the Armor Adapt Dev(s). An additional patch might be needed. Your race will no longer be considered "Vanilla Body type"
+
+If your mod uses color changes to alter the body of your species, you will have to discuss with the Armor Adapt Dev(s) about making compatibility for the changed look. An additional patch might be needed. Your race will no longer be considered "Vanilla Body type"
+
+Custom Body Type:
+This means that the body of your species does not follow the vanilla body shape at all or barely away from it. If you have a vanilla body shape but have ears, horns, and other head body parts, then they would count as custom body type species.
+
+Your species will be recognized by their own species name so you will use customSpeciesPatch_Template.txt as your guide on how to patch your species into Armor Adapt.
+
+Custom Body Species are best fot for Armor Adapt and have many options.
+
+If your Custom Body Species has alternate looks by changing the colors in character creation to change the body or there are mods out there that change the body shape (humanoid, lamia, taur, other body changing mods); then get in contact with the Armor Adapt Dev(s) for compatibility on how to make those alternate body types.
+
+Alternate body types is a feature of Armor Adapt, meant to go much further than simply matching your species but also granting a much more perfect fit.
+
+When adding the folders to your mod to make compatibility for Armor Adapt in case of items your mod adds, your pathing will be
+/items/armors/armorAdapt/<species>/<itemName>/<bodyType>/(put in your images)
+
+<species> refers to the name of your species listed in your /species/<species>.species files.
+
+<itemName> has to be the itemName specified in your (head, chest, pants, back) file as the script pulls that item name to make the path. 
+
+<bodyType> is either Default if no other alternate body types exist or different folders for each of the body types. Contact the Armor Adapt Dev(s) to make compatibility to detect the different body types.
+
+If you have any vanilla body style outfits for items either in your clothing mod pack or your race mod that doesn't exist in vanilla, be sure to add the appropiate folders (see above) and images to the "standard" species folder so vanilla races can have your clothing/armor change it's look to fit them.
+
+////////Making it Work\\\\\\\\\
+If you are wanting your items to be affected by armor adapt, you will need to add our builder into the files for the clothing/armor items (.head, .chest, .pants, .back files)
+You will need to add "builder" : "/armorAdapt/armorAdaptBuilder.lua", to your items.
+
+This script has been made to be safely put inside your mod files without any crashes if armor adapt is not installed. In fact!! If you uninstall Armor Adapt, the items with this builder will revert to a state before Armor Adapt even touched it! HANDY!
+
+You can grab a copy of the builder by copying the /armorAdapt/ folder in this mod and pasting it into yours in the same spot. This is not stealing, this is part of the compatibility.
+
+Once everything is set up, your items should start changing their looks. They are even set up to be able to pass back and forth between different species and they still adapt to the new owner.
+
+If you don't want to make images for every item in existence, that is okay and was though of. We have fallback measures in the builder script just for this situation.
+
+So if you are a race mod developer, you will need to add a few folder if not under the "standard" category.
+
+/items/armors/armorAdapt/default/<species>
+That is the first folder required. In this folder, you want to place a set of images for all of the different sprite sheets head, chest, pants, and back would call for. This is your fallback measure if there do not exist default images for the different body types. Say a new body type is added to Armor Adapt for your species without images for them in most cases.
+
+After this inside this folder you need to make more. Make a folder for every body type your species has and name them according with the names you worked out with the Armor Adapt Dev(s). If you do not have multiple body types, then you'll only need a "Default" folder.
+
+Inside these folder(s) will contain all of the possible images needed for any type (head, chest, pants, back) for the bodyTypes you need. These will be the defaults that fit the species perfectly if they have different body types or if only Default, the perfect fit for your one body type.
+
+These are your fallback images in case images are not made for something yet. Choose images that you feel will best fit your species as placeholders, these may be seen a lot.
+
+
+
+////////Transforming Effects\\\\\\\\\
+__________WARNING ADVANCED___________
+
+Armor Adapt does provide a system for further utility.
+
+This system uses status effects to make new body types.
+The way it works is that it takes the body type of your player/npc currently and adds the status effect name to the end of it.
+
+So say on a standard race, and your status effect is called "super", the body type would become Defaultsuper
+
+This is what the folder would need to be named by ../armorAdapt/standard/<itemName>/Defaultsuper/(put your images in)
+
+While Armor Adapt cannot animate armor, it can allow you to switch the images of your armor by having a status effect active.
+This can be used to have transforming armor, powered up armor, or just any armor that you want to have a different form for your personal reasons. maybe you even want a goku hair item to go super sayien if a status effect is applied. This makes it possible.
+
+For how to make this function, refer to transformationStatusScript_template.txt on what you need to do to make your status effect trigger the system to swap images.
+
+You will also need to patch your status effect that causes these changes to the config file for Armor Adapt, which a template on how to do so is trabsformationStatusPatch_Template.txt.
+
+Closing:
+
+Hopefully this document has given you enough info to understand how Armor Adapt works and how to make compatibility. The many templates provided will hopefully make things far easier. A wiki on the github page will be in the works eventually. Although if info is missing or clarification is needed, reach out to one of the Armor Adapt Dev(s).

@@ -1,0 +1,8 @@
+{
+  "name" : "armorAdapt_resetTrigger",
+
+  "effectConfig" : {},
+  "defaultDuration" : 2,
+
+  "animationConfig" : "armorAdaptReset.animation"
+}

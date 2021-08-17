@@ -1,0 +1,16 @@
+function init()
+armorAdaptCheck = root.assetJson("/cinematics/apex/intro.cinematic.disabled:muteMusic")
+	if armorAdaptCheck == false then
+		world.sendEntityMessage(entity.id(), "applyStatusEffect", "armorAdapt_resetTrigger")
+	end
+end
+
+function update(dt)
+	--[[Insert your usual code in init, update, and uninit per usual. The additional checks and messages will only trigger if armor adapt is installed and if so, will activate the sequence to transform the items]]
+end
+
+function uninit()
+	if armorAdaptCheck == false then
+		world.sendEntityMessage(entity.id(), "applyStatusEffect", "armorAdapt_resetTrigger")
+	end
+end

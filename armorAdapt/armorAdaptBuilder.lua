@@ -3,27 +3,38 @@ require "/scripts/util.lua"
 function build(directory, config, parameters, level, seed)
 	armorAdaptCheck = root.assetJson("/cinematics/apex/intro.cinematic.disabled:muteMusic")
 	if armorAdaptCheck == false then
-		if parameters.maleFrames or parameters.femaleFrames ~= nil then
+		if parameters.itemTags ~= nil and parameters.itemTags[4] == "chest" then
 		config = util.mergeTable({ }, config)
 		local maleFrames = parameters.maleFrames
 		local femaleFrames = parameters.femaleFrames
 
 
 		if type(config.maleFrames or config.femaleFrames) == "table" then
-			if type(maleFrames) == "string" then
-				maleFrames = { body = maleFrames }
-			end
-			if type(femaleFrames) == "string" then
-				femaleFrames = { body = femaleFrames }
-			end
-
 			if root.imageSize(femaleFrames.body)[1] <= 64 then
-				maleFrames.body = string.format("/items/armors/armorAdapt/default/%s/%s/chestm.png", parameters.itemTags[2], parameters.itemTags[3])
-				maleFrames.frontSleeve = string.format("/items/armors/armorAdapt/default/%s/%s/fsleeve.png", parameters.itemTags[2], parameters.itemTags[3])
-				maleFrames.backSleeve = string.format("/items/armors/armorAdapt/default/%s/%s/bsleeve.png", parameters.itemTags[2], parameters.itemTags[3])
-				femaleFrames.body = string.format("/items/armors/armorAdapt/default/%s/%s/chestf.png", parameters.itemTags[2], parameters.itemTags[3])
-				femaleFrames.frontSleeve = string.format("/items/armors/armorAdapt/default/%s/%s/fsleeve.png", parameters.itemTags[2], parameters.itemTags[3])
-				femaleFrames.backSleeve = string.format("/items/armors/armorAdapt/default/%s/%s/blseeve.png", parameters.itemTags[2], parameters.itemTags[3])
+				if root.imageSize(string.format("/items/armors/armorAdapt/default/%s/%s/chestm.png", parameters.itemTags[2], parameters.itemTags[3]))[1] <= 64 then
+					if root.imageSize(string.format("/items/armors/armorAdapt/default/%s/chestm.png", parameters.itemTags[2]))[1] <=64 then
+						maleFrames.body = config.maleFrames.body
+						maleFrames.frontSleeve = config.maleFrames.frontSleeve
+						maleFrames.backSleeve = config.maleFrames.backSleeve
+						femaleFrames.body = config.femaleFrames.body
+						femaleFrames.frontSleeve = config.femaleFrames.frontSleeve
+						femaleFrames.backSleeve = config.femaleFrames.backSleeve
+					else
+						maleFrames.body = string.format("/items/armors/armorAdapt/default/%s/chestm.png", parameters.itemTags[2])
+						maleFrames.frontSleeve = string.format("/items/armors/armorAdapt/default/%s/fsleeve.png", parameters.itemTags[2])
+						maleFrames.backSleeve = string.format("/items/armors/armorAdapt/default/%s/bsleeve.png", parameters.itemTags[2])
+						femaleFrames.body = string.format("/items/armors/armorAdapt/default/%s/chestf.png", parameters.itemTags[2])
+						femaleFrames.frontSleeve = string.format("/items/armors/armorAdapt/default/%s/fsleeve.png", parameters.itemTags[2])
+						femaleFrames.backSleeve = string.format("/items/armors/armorAdapt/default/%s/bsleeve.png", parameters.itemTags[2])
+					end
+				else	
+					maleFrames.body = string.format("/items/armors/armorAdapt/default/%s/%s/chestm.png", parameters.itemTags[2], parameters.itemTags[3])
+					maleFrames.frontSleeve = string.format("/items/armors/armorAdapt/default/%s/%s/fsleeve.png", parameters.itemTags[2], parameters.itemTags[3])
+					maleFrames.backSleeve = string.format("/items/armors/armorAdapt/default/%s/%s/bsleeve.png", parameters.itemTags[2], parameters.itemTags[3])
+					femaleFrames.body = string.format("/items/armors/armorAdapt/default/%s/%s/chestf.png", parameters.itemTags[2], parameters.itemTags[3])
+					femaleFrames.frontSleeve = string.format("/items/armors/armorAdapt/default/%s/%s/fsleeve.png", parameters.itemTags[2], parameters.itemTags[3])
+					femaleFrames.backSleeve = string.format("/items/armors/armorAdapt/default/%s/%s/bsleeve.png", parameters.itemTags[2], parameters.itemTags[3])
+				end
 			else
 				maleFrames.body = maleFrames.body
 				maleFrames.frontSleeve = maleFrames.frontSleeve 
@@ -38,48 +49,86 @@ function build(directory, config, parameters, level, seed)
 		config.femaleFrames = femaleFrames 
 		end
 	
-		if parameters.headMaleFrames or parameters.headFemaleFrames ~= nil then
+		if parameters.itemTags ~= nil and parameters.itemTags[4] == "head" then
 		config = util.mergeTable({ }, config)
 		local mask = parameters.mask 
-		local headMaleFrames = parameters.headMaleFrames
-		local headFemaleFrames = parameters.headFemaleFrames
+		local maleFrames = parameters.maleFrames
+		local femaleFrames = parameters.femaleFrames
 			if root.imageSize(mask)[1] <= 43 then
 				config.mask = mask
 			elseif root.imageSize(mask)[1] > 43 then
-				config.mask = string.format("/items/armors/armorAdapt/default/%s/%s/mask.png", parameters.itemTags[2], parameters.itemTags[3])
+				if root.imageSize(string.format("/items/armors/armorAdapt/default/%s/%s/mask.png", parameters.itemTags[2], parameters.itemTags[3]))[1] > 43 then
+					if root.imageSize(string.format("/items/armors/armorAdapt/default/%s/mask.png", parameters.itemTags[2]))[1] > 43 then
+						config.mask = config.mask
+					else
+						config.mask = string.format("/items/armors/armorAdapt/default/%s/mask.png", parameters.itemTags[2])
+					end
+				else
+					config.mask = string.format("/items/armors/armorAdapt/default/%s/%s/mask.png", parameters.itemTags[2], parameters.itemTags[3])
+				end
 			end
-			if root.imageSize(headMaleFrames)[1] <= 64 then
-				config.maleFrames = string.format("/items/armors/armorAdapt/default/%s/%s/head.png", parameters.itemTags[2], parameters.itemTags[3])
-				config.femaleFrames = string.format("/items/armors/armorAdapt/default/%s/%s/head.png", parameters.itemTags[2], parameters.itemTags[3])
+			if root.imageSize(maleFrames)[1] <= 64 then
+				if root.imageSize(string.format("/items/armors/armorAdapt/default/%s/%s/head.png", parameters.itemTags[2], parameters.itemTags[3]))[1] <= 64 then
+					if root.imageSize(string.format("/items/armors/armorAdapt/default/%s/head.png", parameters.itemTags[2]))[1] <= 64 then
+						config.maleFrames = config.maleFrames
+						config.femaleFrames = config.femaleFrames
+					else
+						config.maleFrames = string.format("/items/armors/armorAdapt/default/%s/head.png", parameters.itemTags[2])
+						config.femaleFrames = string.format("/items/armors/armorAdapt/default/%s/head.png", parameters.itemTags[2])
+					end
+				else
+					config.maleFrames = string.format("/items/armors/armorAdapt/default/%s/%s/head.png", parameters.itemTags[2], parameters.itemTags[3])
+					config.femaleFrames = string.format("/items/armors/armorAdapt/default/%s/%s/head.png", parameters.itemTags[2], parameters.itemTags[3])
+				end
 			else
-				config.maleFrames = headMaleFrames
-				config.femaleFrames = headFemaleFrames
+				config.maleFrames = maleFrames
+				config.femaleFrames = femaleFrames
 			end
 		end
 		
-		if parameters.pantsMaleFrames or parameters.pantsFemaleFrames ~= nil then
+		if parameters.itemTags ~= nil and parameters.itemTags[4] == "pants" then
 		config = util.mergeTable({ }, config)
-		local pantsMaleFrames = parameters.pantsMaleFrames
-		local pantsFemaleFrames = parameters.pantsFemaleFrames
-			if root.imageSize(pantsMaleFrames)[1] <= 64 then
-				config.maleFrames = string.format("/items/armors/armorAdapt/default/%s/%s/pantsm.png", parameters.itemTags[2], parameters.itemTags[3])
-				config.femaleFrames = string.format("/items/armors/armorAdapt/default/%s/%s/pantsf.png", parameters.itemTags[2], parameters.itemTags[3])
+		local maleFrames = parameters.maleFrames
+		local femaleFrames = parameters.femaleFrames
+			if root.imageSize(maleFrames)[1] <= 64 then
+				if root.imageSize(string.format("/items/armors/armorAdapt/default/%s/%s/pantsm.png", parameters.itemTags[2], parameters.itemTags[3]))[1] <= 64 then
+					if root.imageSize(string.format("/items/armors/armorAdapt/default/%s/pantsm.png", parameters.itemTags[2]))[1] <= 64 then
+						config.maleFrames = config.maleFrames
+						config.femaleFrames = config.femaleFrames
+					else
+						config.maleFrames = string.format("/items/armors/armorAdapt/default/%s/pantsm.png", parameters.itemTags[2])
+						config.femaleFrames = string.format("/items/armors/armorAdapt/default/%s/pantsf.png", parameters.itemTags[2])
+					end
+				else
+					config.maleFrames = string.format("/items/armors/armorAdapt/default/%s/%s/pantsm.png", parameters.itemTags[2], parameters.itemTags[3])
+					config.femaleFrames = string.format("/items/armors/armorAdapt/default/%s/%s/pantsf.png", parameters.itemTags[2], parameters.itemTags[3])
+				end
 			else
-				config.maleFrames = pantsMaleFrames
-				config.femaleFrames = pantsFemaleFrames
+				config.maleFrames = maleFrames
+				config.femaleFrames = femaleFrames
 			end
 		end
 		
-		if parameters.backMaleFrames or parameters.backFemaleFrames ~= nil then
+		if parameters.itemTags ~= nil and parameters.itemTags[4] == "back" then
 		config = util.mergeTable({ }, config)
-		local backMaleFrames = parameters.backMaleFrames
-		local backFemaleFrames = parameters.backFemaleFrames
-			if root.imageSize(pantsMaleFrames)[1] <= 64 then
-				config.maleFrames = string.format("/items/armors/armorAdapt/default/%s/%s/back.png", parameters.itemTags[2], parameters.itemTags[3])
-				config.femaleFrames = string.format("/items/armors/armorAdapt/default/%s/%s/back.png", parameters.itemTags[2], parameters.itemTags[3])
+		local maleFrames = parameters.maleFrames
+		local femaleFrames = parameters.femaleFrames
+			if root.imageSize(maleFrames)[1] <= 64 then
+				if root.imageSize(string.format("/items/armors/armorAdapt/default/%s/%s/back.png", parameters.itemTags[2], parameters.itemTags[3]))[1] <= 64 then
+					if root.imageSize(string.format("/items/armors/armorAdapt/default/%s/back.png", parameters.itemTags[2]))[1] <= 64 then
+						config.maleFrames = config.maleFrames
+						config.femaleFrames = config.femaleFrames
+					else
+						config.maleFrames = string.format("/items/armors/armorAdapt/default/%s/back.png", parameters.itemTags[2])
+						config.femaleFrames = string.format("/items/armors/armorAdapt/default/%s/back.png", parameters.itemTags[2])
+					end
+				else
+					config.maleFrames = string.format("/items/armors/armorAdapt/default/%s/%s/back.png", parameters.itemTags[2], parameters.itemTags[3])
+					config.femaleFrames = string.format("/items/armors/armorAdapt/default/%s/%s/back.png", parameters.itemTags[2], parameters.itemTags[3])
+				end
 			else
-				config.maleFrames = backMaleFrames
-				config.femaleFrames = backFemaleFrames
+				config.maleFrames = maleFrames
+				config.femaleFrames = femaleFrames
 			end
 		end
 		return config, parameters

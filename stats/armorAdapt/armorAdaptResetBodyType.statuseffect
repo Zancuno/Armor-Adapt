@@ -1,0 +1,10 @@
+{
+  "name" : "armorAdapt_resetBody",
+
+  "effectConfig" : {},
+  "defaultDuration" : 10,
+  
+  "scripts" : [ "armorAdaptResetBodyType.lua" ],
+
+  "animationConfig" : "armorAdaptResetBodyType.animation"
+}

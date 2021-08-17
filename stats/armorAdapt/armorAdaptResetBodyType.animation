@@ -1,0 +1,12 @@
+{
+  "lights" : {
+    "glow" : {
+      "active" : true,
+      "position" : [0, 0],
+      "color" : [10, 10, 10]
+    }
+  },
+  "sounds" : {
+	"botSound" : ["/sfx/interface/crafting_sewing.ogg"]
+  }
+}
