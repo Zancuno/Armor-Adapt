@@ -1,0 +1,10 @@
+{
+  "name" : "armorAdapt_Override",
+
+  "effectConfig" : {},
+  "defaultDuration" : 10,
+  
+  "scripts" : [ "armorAdaptOverride.lua" ],
+
+  "animationConfig" : "armorAdaptOverride.animation"
+}

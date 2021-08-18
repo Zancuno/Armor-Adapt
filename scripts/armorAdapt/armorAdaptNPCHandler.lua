@@ -6,6 +6,8 @@ baseInit()
 adaptSpecies = root.assetJson("/scripts/armorAdapt/armorAdapt.config")
 adaptDebug = root.assetJson("/scripts/armorAdapt/armorAdapt.config")
 adaptEffects = root.assetJson("/scripts/armorAdapt/armorAdapt.config:armorAdaptEffects")
+adaptSpeciesEffects = root.assetJson("/scripts/armorAdapt/armorAdapt.config:armorAdaptSpeciesEffects")
+adaptOverrideEffects = root.assetJson("/scripts/armorAdapt/armorAdapt.config:armorAdaptOverrideEffects")
 played = { 0, 0, 0, 0 }
 bodyTable = { "Default", "Standard", "None", "None", "None" }
 slotTable = { "head", "headCosmetic", "chest", "chestCosmetic", "legs", "legsCosmetic", "back", "backCosmetic" }
@@ -34,6 +36,8 @@ adaptLoopTimer = 10
 	end
 storageArmorTable = { "null", "null", "null", "null", "null", "null", "null", "null" }
 changed = true
+hideBody = false
+storageNPCSpecies = self.npcSpecies
 end
 
 
@@ -76,6 +80,31 @@ function update(dt)
 			if status.uniqueStatusEffectActive(effect) then
 				bodyType = string.format("%s%s", bodyType, effect)
 				sb.logInfo("Effect is %s", bodyType)
+			else
+				bodyType = "Default"
+			end
+
+		end
+		
+		for _, speciesEffect in ipairs(adaptSpeciesEffects) do
+			if status.uniqueStatusEffectActive(speciesEffect) then
+				self.npcSpecies = string.format("%s%s", self.npcSpecies, speciesEffect)
+				--sb.logInfo("Effect is %s", species)
+			else
+				self.npcSpecies = storageNPCSpecies
+			end
+
+		end
+		
+		for _, overEffect in ipairs(adaptOverrideEffects) do
+			if status.uniqueStatusEffectActive(overEffect) then
+				self.npcSpecies = overEffect
+				bodyType = "Default"
+				hideBody = true
+				--sb.logInfo("Effect is %s", species)
+			else
+				hideBody = false
+				self.npcSpecies = storageNPCSpecies
 			end
 
 		end
@@ -90,7 +119,7 @@ function update(dt)
 			if equippedArmorTimer <= 0 then
 				if adaptNpcArmor[1] ~= nil then
 					baseArmorItem = adaptNpcArmor[1]
-					adaptArmorNpcItem = armorAdapt.runNpcAdapt(baseArmorItem, 1, self.npcSpecies, bodyType)
+					adaptArmorNpcItem = armorAdapt.runNpcAdapt(baseArmorItem, 1, self.npcSpecies, bodyType, hideBody)
 					if adaptArmorNpcItem ~= nil then
 						--sb.logInfo("is %s nil?", adaptArmorNpcItem)
 						npc.setItemSlot(slotTable[1], adaptArmorNpcItem)
@@ -106,7 +135,7 @@ function update(dt)
 				end
 				if adaptNpcArmor[2] ~= nil then
 					baseArmorItem = adaptNpcArmor[2]
-					adaptArmorNpcItem = armorAdapt.runNpcAdapt(baseArmorItem, 2, self.npcSpecies, bodyType)
+					adaptArmorNpcItem = armorAdapt.runNpcAdapt(baseArmorItem, 2, self.npcSpecies, bodyType, hideBody)
 					if adaptArmorNpcItem ~= nil then
 						npc.setItemSlot(slotTable[2], adaptArmorNpcItem)
 						armorAdapt.showNpcCompletionLog(adaptArmorNpcItem, self.npcSpecies, bodytype)
@@ -121,7 +150,7 @@ function update(dt)
 				end
 				if adaptNpcArmor[3] ~= nil then
 					baseArmorItem = adaptNpcArmor[3]
-					adaptArmorNpcItem = armorAdapt.runNpcAdapt(baseArmorItem, 3, self.npcSpecies, bodyType)
+					adaptArmorNpcItem = armorAdapt.runNpcAdapt(baseArmorItem, 3, self.npcSpecies, bodyType, hideBody)
 					if adaptArmorNpcItem ~= nil then
 						npc.setItemSlot(slotTable[3], adaptArmorNpcItem)
 						armorAdapt.showNpcCompletionLog(adaptArmorNpcItem, self.npcSpecies, bodytype)
@@ -136,7 +165,7 @@ function update(dt)
 				end
 				if adaptNpcArmor[4] ~= nil then
 					baseArmorItem = adaptNpcArmor[4]
-					adaptArmorNpcItem = armorAdapt.runNpcAdapt(baseArmorItem, 4, self.npcSpecies, bodyType)
+					adaptArmorNpcItem = armorAdapt.runNpcAdapt(baseArmorItem, 4, self.npcSpecies, bodyType, hideBody)
 					if adaptArmorNpcItem ~= nil then
 						npc.setItemSlot(slotTable[4], adaptArmorNpcItem)
 						armorAdapt.showNpcCompletionLog(adaptArmorNpcItem, self.npcSpecies, bodytype)
@@ -151,7 +180,7 @@ function update(dt)
 				end
 				if adaptNpcArmor[5] ~= nil then
 					baseArmorItem = adaptNpcArmor[5]
-					adaptArmorNpcItem = armorAdapt.runNpcAdapt(baseArmorItem, 5, self.npcSpecies, bodyType)
+					adaptArmorNpcItem = armorAdapt.runNpcAdapt(baseArmorItem, 5, self.npcSpecies, bodyType, hideBody)
 					if adaptArmorNpcItem ~= nil then
 						npc.setItemSlot(slotTable[5], adaptArmorNpcItem)
 						armorAdapt.showNpcCompletionLog(adaptArmorNpcItem, self.npcSpecies, bodytype)
@@ -166,7 +195,7 @@ function update(dt)
 				end
 				if adaptNpcArmor[6] ~= nil then
 					baseArmorItem = adaptNpcArmor[6]
-					adaptArmorNpcItem = armorAdapt.runNpcAdapt(baseArmorItem, 6, self.npcSpecies, bodyType)
+					adaptArmorNpcItem = armorAdapt.runNpcAdapt(baseArmorItem, 6, self.npcSpecies, bodyType, hideBody)
 					if adaptArmorNpcItem ~= nil then
 						npc.setItemSlot(slotTable[6], adaptArmorNpcItem)
 						armorAdapt.showNpcCompletionLog(adaptArmorNpcItem, self.npcSpecies, bodytype)
@@ -181,7 +210,7 @@ function update(dt)
 				end
 				if adaptNpcArmor[7] ~= nil then
 					baseArmorItem = adaptNpcArmor[7]
-					adaptArmorNpcItem = armorAdapt.runNpcAdapt(baseArmorItem, 7, self.npcSpecies, bodyType)
+					adaptArmorNpcItem = armorAdapt.runNpcAdapt(baseArmorItem, 7, self.npcSpecies, bodyType, hideBody)
 					if adaptArmorNpcItem ~= nil then
 						npc.setItemSlot(slotTable[7], adaptArmorNpcItem)
 						armorAdapt.showNpcCompletionLog(adaptArmorNpcItem, self.npcSpecies, bodytype)
@@ -196,7 +225,7 @@ function update(dt)
 				end
 				if adaptNpcArmor[8] ~= nil then
 					baseArmorItem = adaptNpcArmor[8]
-					adaptArmorNpcItem = armorAdapt.runNpcAdapt(baseArmorItem, 8, self.npcSpecies, bodyType)
+					adaptArmorNpcItem = armorAdapt.runNpcAdapt(baseArmorItem, 8, self.npcSpecies, bodyType, hideBody)
 					if adaptArmorNpcItem ~= nil then
 						npc.setItemSlot(slotTable[8], adaptArmorNpcItem)
 						armorAdapt.showNpcCompletionLog(adaptArmorNpcItem, self.npcSpecies, bodytype)

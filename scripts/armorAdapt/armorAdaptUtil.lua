@@ -16,8 +16,12 @@ function armorAdapt.compareArmorTables(a, b)
 	end
 end
 
-function armorAdapt.runPlayerAdapt(baseItem, key, species, bodyType)
-	if root.itemConfig(baseItem).parameters.itemTags ~= nil and root.itemConfig(baseItem).parameters.itemTags[2] == species and root.itemConfig(baseItem).parameters.itemTags[3] == bodyType then
+function armorAdapt.runPlayerAdapt(baseItem, key, species, bodyType, hideBody)
+	adaptDirectivesMin = root.assetJson("/scripts/armorAdapt/armorAdapt.config:adaptDirectivesMin")
+	if root.itemConfig(baseItem).parameters.directives ~= nil and string.len(root.itemConfig(baseItem).parameters.directives) >= adaptDirectivesMin then
+		adaptArmorNpcItem = baseItem
+		return adaptArmorNpcItem
+	elseif root.itemConfig(baseItem).parameters.itemTags ~= nil and root.itemConfig(baseItem).parameters.itemTags[2] == species and root.itemConfig(baseItem).parameters.itemTags[3] == bodyType then
 		adaptArmorPlayerItem = baseItem
 		return adaptArmorPlayerItem
 	elseif root.itemConfig(baseItem).parameters.itemTags == nil or root.itemConfig(baseItem).parameters.itemTags[2] ~= species or root.itemConfig(baseItem).parameters.itemTags[3] ~= bodyType then 
@@ -32,7 +36,7 @@ function armorAdapt.runPlayerAdapt(baseItem, key, species, bodyType)
 			armorAdapt.showPlayerBuildLog(baseItem, adaptArmorPlayerItem)
 			return adaptArmorPlayerItem
 		elseif key == 5 or key == 6 then
-			adaptArmorPlayerItem = armorAdapt.generateAdaptedPlayerPantsItem(adaptArmorPlayerItem, species, bodyType)
+			adaptArmorPlayerItem = armorAdapt.generateAdaptedPlayerPantsItem(adaptArmorPlayerItem, species, bodyType, hideBody)
 			armorAdapt.showPlayerBuildLog(baseItem, adaptArmorPlayerItem)
 			return adaptArmorPlayerItem
 		else
@@ -43,8 +47,12 @@ function armorAdapt.runPlayerAdapt(baseItem, key, species, bodyType)
 	end
 end
 
-function armorAdapt.runNpcAdapt(baseItem, key, species, bodyType)
-	if root.itemConfig(baseItem).parameters.itemTags ~= nil and root.itemConfig(baseItem).parameters.itemTags[2] == species and root.itemConfig(baseItem).parameters.itemTags[3] == bodyType then
+function armorAdapt.runNpcAdapt(baseItem, key, species, bodyType, hideBody)
+	adaptDirectivesMin = root.assetJson("/scripts/armorAdapt/armorAdapt.config:adaptDirectivesMin")
+	if root.itemConfig(baseItem).parameters.directives ~= nil and string.len(root.itemConfig(baseItem).parameters.directives) >= adaptDirectivesMin then
+		adaptArmorNpcItem = baseItem
+		return adaptArmorNpcItem
+	elseif root.itemConfig(baseItem).parameters.itemTags ~= nil and root.itemConfig(baseItem).parameters.itemTags[2] == species and root.itemConfig(baseItem).parameters.itemTags[3] == bodyType then
 		adaptArmorNpcItem = baseItem
 		return adaptArmorNpcItem
 	elseif root.itemConfig(baseItem).parameters.itemTags == nil or root.itemConfig(baseItem).parameters.itemTags[2] ~= species or root.itemConfig(baseItem).parameters.itemTags[3] ~= bodyType then 
@@ -59,7 +67,7 @@ function armorAdapt.runNpcAdapt(baseItem, key, species, bodyType)
 			armorAdapt.showNpcBuildLog(baseItem, adaptArmorNpcItem)
 			return adaptArmorNpcItem
 		elseif key == 5 or key == 6 then
-			adaptArmorNpcItem = armorAdapt.generateAdaptedNpcPantsItem(adaptArmorNpcItem, species, bodyType)
+			adaptArmorNpcItem = armorAdapt.generateAdaptedNpcPantsItem(adaptArmorNpcItem, species, bodyType, hideBody)
 			armorAdapt.showNpcBuildLog(baseItem, adaptArmorNpcItem)
 			return adaptArmorNpcItem
 		else
@@ -96,13 +104,16 @@ function armorAdapt.generateAdaptedPlayerChestItem(adaptArmorPlayerItem, species
 	return adaptArmorPlayerItem
 end
 
-function armorAdapt.generateAdaptedPlayerPantsItem(adaptArmorPlayerItem, species, bodyType)
+function armorAdapt.generateAdaptedPlayerPantsItem(adaptArmorPlayerItem, species, bodyType, hideBody)
 
 	adaptArmorPlayerItem.parameters.maleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/pantsm.png", species, root.itemConfig(adaptArmorPlayerItem).config.itemName, bodyType)
 	adaptArmorPlayerItem.parameters.femaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/pantsf.png", species, root.itemConfig(adaptArmorPlayerItem).config.itemName, bodyType)
 
-	
-	adaptArmorPlayerItem.parameters.itemTags = { "armorAdapted", species, bodyType, "pants" }
+	if hideBody == false then
+		adaptArmorPlayerItem.parameters.itemTags = { "armorAdapted", species, bodyType, "pants" }
+	else
+		adaptArmorPlayerItem.parameters.itemTags = { "armorAdapted", species, bodyType, "pants", "hideBody" }
+	end
 
 	return adaptArmorPlayerItem
 end
@@ -143,14 +154,16 @@ function armorAdapt.generateAdaptedNpcChestItem(adaptArmorNpcItem, species, body
 	return adaptArmorNpcItem
 end
 
-function armorAdapt.generateAdaptedNpcPantsItem(adaptArmorNpcItem, species, bodyType)
+function armorAdapt.generateAdaptedNpcPantsItem(adaptArmorNpcItem, species, bodyType, hideBody)
 
 	adaptArmorNpcItem.parameters.maleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/pantsm.png", species, root.itemConfig(adaptArmorNpcItem).config.itemName, bodyType)
 	adaptArmorNpcItem.parameters.femaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/pantsf.png", species, root.itemConfig(adaptArmorNpcItem).config.itemName, bodyType)
 
-	
-	adaptArmorNpcItem.parameters.itemTags = { "armorAdapted", species, bodyType, "pants" }
-
+	if hideBody == false then
+		adaptArmorNpcItem.parameters.itemTags = { "armorAdapted", species, bodyType, "pants" }
+	else 
+		adaptArmorNpcItem.parameters.itemTags = { "armorAdapted", species, bodyType, "pants", "hideBody" }
+	end
 	return adaptArmorNpcItem
 end
 
@@ -193,10 +206,12 @@ function armorAdapt.generateNpcArmorTable(adaptNpcArmor)
 end
 
 function armorAdapt.getSpeciesBodyTable(species)
-	if species == "lucario" then
+	if species == "standard" then
+		bodyTable = { "Default", "standard", "None", "None", "None" }
+		return bodyTable
+	elseif species == "lucario" then
 		bodyTable = armorAdapt.getLucarioBodyType()
-		
-	return bodyTable
+		return bodyTable
 	end
 end
 

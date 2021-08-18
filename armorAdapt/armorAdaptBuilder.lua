@@ -10,15 +10,15 @@ function build(directory, config, parameters, level, seed)
 
 
 		if type(config.maleFrames or config.femaleFrames) == "table" then
-			if root.imageSize(femaleFrames.body)[1] <= 64 then
+			if root.imageSize(maleFrames.body)[1] <= 64 then
 				if root.imageSize(string.format("/items/armors/armorAdapt/default/%s/%s/chestm.png", parameters.itemTags[2], parameters.itemTags[3]))[1] <= 64 then
 					if root.imageSize(string.format("/items/armors/armorAdapt/default/%s/chestm.png", parameters.itemTags[2]))[1] <=64 then
-						maleFrames.body = config.maleFrames.body
-						maleFrames.frontSleeve = config.maleFrames.frontSleeve
-						maleFrames.backSleeve = config.maleFrames.backSleeve
-						femaleFrames.body = config.femaleFrames.body
-						femaleFrames.frontSleeve = config.femaleFrames.frontSleeve
-						femaleFrames.backSleeve = config.femaleFrames.backSleeve
+						config.maleFrames.body = config.maleFrames.body
+						config.maleFrames.frontSleeve = config.maleFrames.frontSleeve
+						config.maleFrames.backSleeve = config.maleFrames.backSleeve
+						config.femaleFrames.body = config.femaleFrames.body
+						config.femaleFrames.frontSleeve = config.femaleFrames.frontSleeve
+						config.femaleFrames.backSleeve = config.femaleFrames.backSleeve
 					else
 						maleFrames.body = string.format("/items/armors/armorAdapt/default/%s/chestm.png", parameters.itemTags[2])
 						maleFrames.frontSleeve = string.format("/items/armors/armorAdapt/default/%s/fsleeve.png", parameters.itemTags[2])
@@ -90,6 +90,9 @@ function build(directory, config, parameters, level, seed)
 		config = util.mergeTable({ }, config)
 		local maleFrames = parameters.maleFrames
 		local femaleFrames = parameters.femaleFrames
+			if parameters.itemTags ~= nil and parameters.itemTags[5] ~= nil and parameters.itemTags[5] == "hideBody" then
+				config.hideBody = true
+			end
 			if root.imageSize(maleFrames)[1] <= 64 then
 				if root.imageSize(string.format("/items/armors/armorAdapt/default/%s/%s/pantsm.png", parameters.itemTags[2], parameters.itemTags[3]))[1] <= 64 then
 					if root.imageSize(string.format("/items/armors/armorAdapt/default/%s/pantsm.png", parameters.itemTags[2]))[1] <= 64 then
