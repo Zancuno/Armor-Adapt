@@ -2,7 +2,7 @@
   "name" : "armorAdapt_Override",
 
   "effectConfig" : {},
-  "defaultDuration" : 10,
+  "defaultDuration" : 100,
   
   "scripts" : [ "armorAdaptOverride.lua" ],
 

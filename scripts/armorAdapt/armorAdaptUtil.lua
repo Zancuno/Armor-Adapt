@@ -20,6 +20,7 @@ function armorAdapt.runPlayerAdapt(baseItem, key, species, bodyType, hideBody)
 	adaptDirectivesMin = root.assetJson("/scripts/armorAdapt/armorAdapt.config:adaptDirectivesMin")
 	if root.itemConfig(baseItem).parameters.directives ~= nil and string.len(root.itemConfig(baseItem).parameters.directives) >= adaptDirectivesMin then
 		adaptArmorNpcItem = baseItem
+		sb.logInfo("[Armor Adapt][Player Handler]: Custom Directives based item detected, skipping conversion.")
 		return adaptArmorNpcItem
 	elseif root.itemConfig(baseItem).parameters.itemTags ~= nil and root.itemConfig(baseItem).parameters.itemTags[2] == species and root.itemConfig(baseItem).parameters.itemTags[3] == bodyType then
 		adaptArmorPlayerItem = baseItem
@@ -51,6 +52,7 @@ function armorAdapt.runNpcAdapt(baseItem, key, species, bodyType, hideBody)
 	adaptDirectivesMin = root.assetJson("/scripts/armorAdapt/armorAdapt.config:adaptDirectivesMin")
 	if root.itemConfig(baseItem).parameters.directives ~= nil and string.len(root.itemConfig(baseItem).parameters.directives) >= adaptDirectivesMin then
 		adaptArmorNpcItem = baseItem
+		sb.logInfo("[Armor Adapt][NPC Handler]: Custom Directives based item detected, skipping conversion.")
 		return adaptArmorNpcItem
 	elseif root.itemConfig(baseItem).parameters.itemTags ~= nil and root.itemConfig(baseItem).parameters.itemTags[2] == species and root.itemConfig(baseItem).parameters.itemTags[3] == bodyType then
 		adaptArmorNpcItem = baseItem
