@@ -1,46 +1,51 @@
 require "/scripts/armorAdapt/armorAdaptUtil.lua"
-
+local baseInit = init or function() end
+local baseUpdate = update or function() end
+local baseUnInit = uninit or function() end
 function init()
-adaptSpecies = root.assetJson("/scripts/armorAdapt/armorAdapt.config")
-adaptDebug = root.assetJson("/scripts/armorAdapt/armorAdapt.config")
-adaptEffects = root.assetJson("/scripts/armorAdapt/armorAdapt.config:armorAdaptEffects")
-adaptSpeciesEffects = root.assetJson("/scripts/armorAdapt/armorAdapt.config:armorAdaptSpeciesEffects")
-adaptOverrideEffects = root.assetJson("/scripts/armorAdapt/armorAdapt.config:armorAdaptOverrideEffects")
-played = { 0, 0, 0, 0 }
-bodyTable = { "Default", "Standard", "None", "None", "None" }
-slotTable = { "head", "headCosmetic", "chest", "chestCosmetic", "legs", "legsCosmetic", "back", "backCosmetic" }
-bodyType = bodyTable[1]
-bodyShape = bodyTable[2]
-bodyAccessory = bodyTable[3]
-bodyAlt = bodyTable[4]
-bodyOther = bodyTable[5]
-for _,standardSpecies in ipairs(adaptSpecies.vanillaBodySpecies) do
-	if player.species() == standardSpecies then
-		self.playerSpecies = "standard"
+	baseInit()
+	adaptSpecies = root.assetJson("/scripts/armorAdapt/armorAdapt.config")
+	adaptDebug = root.assetJson("/scripts/armorAdapt/armorAdapt.config")
+	adaptEffects = root.assetJson("/scripts/armorAdapt/armorAdapt.config:armorAdaptEffects")
+	adaptSpeciesEffects = root.assetJson("/scripts/armorAdapt/armorAdapt.config:armorAdaptSpeciesEffects")
+	adaptOverrideEffects = root.assetJson("/scripts/armorAdapt/armorAdapt.config:armorAdaptOverrideEffects")
+	played = { 0, 0, 0, 0 }
+	bodyTable = { "Default", "Standard", "None", "None", "None" }
+	slotTable = { "head", "headCosmetic", "chest", "chestCosmetic", "legs", "legsCosmetic", "back", "backCosmetic" }
+	bodyType = bodyTable[1]
+	bodyShape = bodyTable[2]
+	bodyAccessory = bodyTable[3]
+	bodyAlt = bodyTable[4]
+	bodyOther = bodyTable[5]
+	for _,standardSpecies in ipairs(adaptSpecies.vanillaBodySpecies) do
+		if player.species() == standardSpecies then
+			self.playerSpecies = "standard"
+		end
 	end
-end
-for _,customSpecies in ipairs(adaptSpecies.customBodySpecies) do
-	if player.species() == customSpecies then
-		self.playerSpecies = player.species()
-	else
-		self.playerSpecies = "standard"
+	for _,customSpecies in ipairs(adaptSpecies.customBodySpecies) do
+		if player.species() == customSpecies then
+			self.playerSpecies = player.species()
+		else
+			self.playerSpecies = "standard"
+		end
 	end
-end
-equippedArmorTimer = 10
-adaptLoopTimer = 10
-	if adaptDebug.showStartUp == true then
-		sb.logInfo("[Armor Adapt][Player Handler]: Initializing Armor Adapt System")
-		sb.logInfo("[Armor Adapt][Player Handler]: Starting equipment check for adaptable items.")
-	end
-storageArmorTable = { "null", "null", "null", "null", "null", "null", "null", "null" }
-changed = true
-hideBody = false
-storagePlayerSpecies = self.playerSpecies
+	equippedArmorTimer = 10
+	adaptLoopTimer = 10
+		if adaptDebug.showStartUp == true then
+			sb.logInfo("[Armor Adapt][Player Handler]: Initializing Armor Adapt System")
+			sb.logInfo("[Armor Adapt][Player Handler]: Starting equipment check for adaptable items.")
+		end
+	storageArmorTable = { "null", "null", "null", "null", "null", "null", "null", "null" }
+	changed = true
+	hideBody = false
+	entityType = "player"
+	storagePlayerSpecies = self.playerSpecies
 end
 
 
 
 function update(dt)
+	baseUpdate(dt)
 	adaptPlayerArmor = armorAdapt.generatePlayerArmorTable()
 	if armorAdapt.compareArmorTables(adaptPlayerArmor, storageArmorTable) == false then
 		changed = false
@@ -77,7 +82,6 @@ function update(dt)
 		for _, effect in ipairs(adaptEffects) do
 			if status.uniqueStatusEffectActive(effect) then
 				bodyType = string.format("%s%s", bodyType, effect)
-				--sb.logInfo("Effect is %s", bodyType)
 			end
 
 		end
@@ -85,7 +89,6 @@ function update(dt)
 		for _, speciesEffect in ipairs(adaptSpeciesEffects) do
 			if status.uniqueStatusEffectActive(speciesEffect) then
 				self.playerSpecies = string.format("%s%s", self.playerSpecies, speciesEffect)
-				--sb.logInfo("Effect is %s", species)
 			else
 				self.playerSpecies = storagePlayerSpecies
 			end
@@ -97,7 +100,6 @@ function update(dt)
 				self.playerSpecies = overEffect
 				bodyType = "Default"
 				hideBody = true
-				--sb.logInfo("Effect is %s", species)
 			else
 				hideBody = false
 				self.playerSpecies = storagePlayerSpecies
@@ -111,16 +113,13 @@ function update(dt)
 		end
 		for k,slot in ipairs(slotTable) do
 			equippedArmorTimer = equippedArmorTimer - dt
-			--sb.logInfo("A detected item index is %s", adaptPlayerArmor[k])
 			if equippedArmorTimer <= 0 then
-			--sb.logInfo("Timer has Expired")
 				if adaptPlayerArmor[1] ~= nil then
 					baseArmorItem = adaptPlayerArmor[1]
-					adaptArmorPlayerItem = armorAdapt.runPlayerAdapt(baseArmorItem, 1, self.playerSpecies, bodyType, hideBody)
+					adaptArmorPlayerItem = armorAdapt.runArmorAdapt(baseArmorItem, 1, self.playerSpecies, bodyType, hideBody, entityType)
 					if adaptArmorPlayerItem ~= nil then
-						--sb.logInfo("is %s nil?", adaptArmorPlayerItem)
 						player.setEquippedItem(slotTable[1], adaptArmorPlayerItem)
-						armorAdapt.showPlayerCompletionLog(adaptArmorPlayerItem, self.playerSpecies, bodyType)
+						armorAdapt.showCompletionLog(adaptArmorPlayerItem, self.playerSpecies, bodyType, entityType)
 						storageArmorTable[1] = adaptArmorPlayerItem
 						played[4] = 0
 						equippedArmorTimer = 10
@@ -132,10 +131,10 @@ function update(dt)
 				end
 				if adaptPlayerArmor[2] ~= nil then
 					baseArmorItem = adaptPlayerArmor[2]
-					adaptArmorPlayerItem = armorAdapt.runPlayerAdapt(baseArmorItem, 2, self.playerSpecies, bodyType, hideBody)
+					adaptArmorPlayerItem = armorAdapt.runArmorAdapt(baseArmorItem, 2, self.playerSpecies, bodyType, hideBody, entityType)
 					if adaptArmorPlayerItem ~= nil then
 						player.setEquippedItem(slotTable[2], adaptArmorPlayerItem)
-						armorAdapt.showPlayerCompletionLog(adaptArmorPlayerItem, self.playerSpecies, bodyType)
+						armorAdapt.showCompletionLog(adaptArmorPlayerItem, self.playerSpecies, bodyType, entityType)
 						storageArmorTable[2] = adaptArmorPlayerItem
 						played[4] = 0
 						equippedArmorTimer = 10
@@ -147,10 +146,10 @@ function update(dt)
 				end
 				if adaptPlayerArmor[3] ~= nil then
 					baseArmorItem = adaptPlayerArmor[3]
-					adaptArmorPlayerItem = armorAdapt.runPlayerAdapt(baseArmorItem, 3, self.playerSpecies, bodyType, hideBody)
+					adaptArmorPlayerItem = armorAdapt.runArmorAdapt(baseArmorItem, 3, self.playerSpecies, bodyType, hideBody, entityType)
 					if adaptArmorPlayerItem ~= nil then
 						player.setEquippedItem(slotTable[3], adaptArmorPlayerItem)
-						armorAdapt.showPlayerCompletionLog(adaptArmorPlayerItem, self.playerSpecies, bodyType)
+						armorAdapt.showCompletionLog(adaptArmorPlayerItem, self.playerSpecies, bodyType, entityType)
 						storageArmorTable[3] = adaptArmorPlayerItem
 						played[4] = 0
 						equippedArmorTimer = 10
@@ -162,10 +161,10 @@ function update(dt)
 				end
 				if adaptPlayerArmor[4] ~= nil then
 					baseArmorItem = adaptPlayerArmor[4]
-					adaptArmorPlayerItem = armorAdapt.runPlayerAdapt(baseArmorItem, 4, self.playerSpecies, bodyType, hideBody)
+					adaptArmorPlayerItem = armorAdapt.runArmorAdapt(baseArmorItem, 4, self.playerSpecies, bodyType, hideBody, entityType)
 					if adaptArmorPlayerItem ~= nil then
 						player.setEquippedItem(slotTable[4], adaptArmorPlayerItem)
-						armorAdapt.showPlayerCompletionLog(adaptArmorPlayerItem, self.playerSpecies, bodyType)
+						armorAdapt.showCompletionLog(adaptArmorPlayerItem, self.playerSpecies, bodyType, entityType)
 						storageArmorTable[4] = adaptArmorPlayerItem
 						played[4] = 0
 						equippedArmorTimer = 10
@@ -177,10 +176,10 @@ function update(dt)
 				end
 				if adaptPlayerArmor[5] ~= nil then
 					baseArmorItem = adaptPlayerArmor[5]
-					adaptArmorPlayerItem = armorAdapt.runPlayerAdapt(baseArmorItem, 5, self.playerSpecies, bodyType, hideBody)
+					adaptArmorPlayerItem = armorAdapt.runArmorAdapt(baseArmorItem, 5, self.playerSpecies, bodyType, hideBody, entityType)
 					if adaptArmorPlayerItem ~= nil then
 						player.setEquippedItem(slotTable[5], adaptArmorPlayerItem)
-						armorAdapt.showPlayerCompletionLog(adaptArmorPlayerItem, self.playerSpecies, bodyType)
+						armorAdapt.showCompletionLog(adaptArmorPlayerItem, self.playerSpecies, bodyType, entityType)
 						storageArmorTable[5] = adaptArmorPlayerItem
 						played[4] = 0
 						equippedArmorTimer = 10
@@ -192,10 +191,10 @@ function update(dt)
 				end
 				if adaptPlayerArmor[6] ~= nil then
 					baseArmorItem = adaptPlayerArmor[6]
-					adaptArmorPlayerItem = armorAdapt.runPlayerAdapt(baseArmorItem, 6, self.playerSpecies, bodyType, hideBody)
+					adaptArmorPlayerItem = armorAdapt.runArmorAdapt(baseArmorItem, 6, self.playerSpecies, bodyType, hideBody, entityType)
 					if adaptArmorPlayerItem ~= nil then
 						player.setEquippedItem(slotTable[6], adaptArmorPlayerItem)
-						armorAdapt.showPlayerCompletionLog(adaptArmorPlayerItem, self.playerSpecies, bodyType)
+						armorAdapt.showCompletionLog(adaptArmorPlayerItem, self.playerSpecies, bodyType, entityType)
 						storageArmorTable[6] = adaptArmorPlayerItem
 						played[4] = 0
 						equippedArmorTimer = 10
@@ -207,10 +206,10 @@ function update(dt)
 				end
 				if adaptPlayerArmor[7] ~= nil then
 					baseArmorItem = adaptPlayerArmor[7]
-					adaptArmorPlayerItem = armorAdapt.runPlayerAdapt(baseArmorItem, 7, self.playerSpecies, bodyType, hideBody)
+					adaptArmorPlayerItem = armorAdapt.runArmorAdapt(baseArmorItem, 7, self.playerSpecies, bodyType, hideBody, entityType)
 					if adaptArmorPlayerItem ~= nil then
 						player.setEquippedItem(slotTable[7], adaptArmorPlayerItem)
-						armorAdapt.showPlayerCompletionLog(adaptArmorPlayerItem, self.playerSpecies, bodyType)
+						armorAdapt.showCompletionLog(adaptArmorPlayerItem, self.playerSpecies, bodyType, entityType)
 						storageArmorTable[7] = adaptArmorPlayerItem
 						played[4] = 0
 						equippedArmorTimer = 10
@@ -222,10 +221,10 @@ function update(dt)
 				end
 				if adaptPlayerArmor[8] ~= nil then
 					baseArmorItem = adaptPlayerArmor[8]
-					adaptArmorPlayerItem = armorAdapt.runPlayerAdapt(baseArmorItem, 8, self.playerSpecies, bodyType, hideBody)
+					adaptArmorPlayerItem = armorAdapt.runArmorAdapt(baseArmorItem, 8, self.playerSpecies, bodyType, hideBody, entityType)
 					if adaptArmorPlayerItem ~= nil then
 						player.setEquippedItem(slotTable[8], adaptArmorPlayerItem)
-						armorAdapt.showPlayerCompletionLog(adaptArmorPlayerItem, self.playerSpecies, bodyType)
+						armorAdapt.showCompletionLog(adaptArmorPlayerItem, self.playerSpecies, bodyType, entityType)
 						storageArmorTable[8] = adaptArmorPlayerItem
 						played[4] = 0
 						equippedArmorTimer = 10
@@ -235,17 +234,14 @@ function update(dt)
 				else
 					storageArmorTable[8] = nil
 				end
-				--sb.logInfo("Show completion is %s", adaptDebug.showBuildCompletion)
-				
 				equippedArmorTimer = 10
-				--sb.logInfo("Stored Table is %s", storageArmorTable)
 			end
 		end
-		--sb.logInfo("Is the script still false? %s", changed)
 	end
 end
 
 function uninit()
+	baseUnInit()
 	if adaptDebug.showShutDown == true then
 		sb.logInfo("[Armor Adapt][Player Handler] Shutting Down: Thank you for using Armor Adapt.")
 	end

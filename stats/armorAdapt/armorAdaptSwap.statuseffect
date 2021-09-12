@@ -1,0 +1,10 @@
+{
+  "name" : "armorAdapt_Swap",
+
+  "effectConfig" : {},
+  "defaultDuration" : 100,
+  
+  "scripts" : [ "armorAdaptSwap.lua" ],
+
+  "animationConfig" : "armorAdaptSwap.animation"
+}

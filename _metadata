@@ -3,8 +3,8 @@
   "description" : "A Mod used to automatically adapt an armor to your species body type.",
   "friendlyName" : "Armor Adapt",
   "link" : "",
-  "name" : "armorAdapt",
-  "requires" : ["lucario"],
+  "name" : "rentek_armorAdapt",
   "steamContentId" : "",
   "tags" : "Character Improvements",
-  "version" : "1.4.3.1.2"}
+  "version" : "1.4.3.1.3"
+}
