@@ -2,9 +2,9 @@
   "author" : "Zancuno",
   "description" : "A Mod used to automatically adapt an armor to your species body type.",
   "friendlyName" : "Armor Adapt",
-  "link" : "",
+  "link" : "steam://url/CommunityFilePage/2601606862",
   "name" : "rentek_armorAdapt",
-  "steamContentId" : "",
-  "tags" : "Character Improvements",
+  "steamContentId" : "2601606862",
+  "tags" : "Character Improvements|Mechanics",
   "version" : "1.4.3.1.3"
 }
