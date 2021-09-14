@@ -1,3 +1,4 @@
+![RenTek Armor Adapt Logo](https://cdn.discordapp.com/attachments/786857409138131006/886062383737495573/IMG_1426photo.PNG)
 # Armor-Adapt
 A utility library mod for Starbound that changes the spritework of armor to spritework that matches the species and body type of entities, so as long as support for that item is made.
 Additional utility also allows status effects to alter what images are used.
