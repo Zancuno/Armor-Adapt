@@ -29,11 +29,12 @@ function armorAdapt.runArmorAdapt(baseItem, key, species, bodyType, hideBody, en
 		armorAdapt.showItemLog(baseArmorItem, entity)
 		local adaptItem = copy(baseItem)
 		if key == 1 or key == 2 then
+			local baseName = root.itemConfig(baseItem).config.itemName
 			adaptItem.parameters.maleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/headm.png", species, root.itemConfig(adaptItem).config.itemName, bodyType)
 			adaptItem.parameters.femaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/headf.png", species, root.itemConfig(adaptItem).config.itemName, bodyType)
-			adaptItem.parameters.mask = string.format("/items/armors/armorAdapt/%s/%s/%s/mask.png", species, root.itemConfig(adaptItem).config.itemName, bodyType)
+			adaptItem.parameters.mask = string.format("mask.png")
 	
-			adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "head" }
+			adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "head", baseName }
 			
 			armorAdapt.showBuildLog(baseItem, adaptItem, entity)
 			return adaptItem

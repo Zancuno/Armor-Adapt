@@ -1,10 +1,38 @@
 {
   "author" : "Zancuno",
-  "description" : "A Mod used to automatically adapt an armor to your species body type.",
+  "description" : "[h1]Brought to you by the RenTek Corporation[/h1]
+(Tailer needs work, I know, may make a better one later)
+
+[h2]Armor Adapt is a utility mod that makes the basis for vanilla and modded items to change their images to fit your species and body type automatically.[/h2]
+
+[h3]How does it work?[/h3]
+
+[quote]So as long as the item has been made compatible and your race mod is set up to use Armor Adapt, armor adapt will try to change the images of the item to images that fit your species and body type. If the alternate artwork doesn't exist yet, then it'll either use a default outfit for the species or it will use the item's original images. Whether the species uses a default outfit or makes items with no alternate artwork yet use the original images is up to the race mod author for that species.[/quote]
+
+[h3]What else does it do?[/h3]
+
+[quote]Armor adapt also allows status effects to alter what images are being used in the conversion of your outfit images. This can be used to have outfits transform, force a specific outfit on status effect, or use a status effect for a temporary disguise. While Armor Adapt itself has no effects by itself (unless you manage to get a hold of the dog effect). it does allow other mods to use armor adapt to create these effects.[/quote]
+
+Armor Adapt has to be installed for other mods to change the images of their armor automatically, without Armor Adapt Installed, the items will revert to normal and will not convert, even with compatible mods installed.
+
+[h3]Compatible mods:[/h3]
+
+[quote]
+Lucario Race
+Saturnians (in the works)
+Arachne (in the works)
+Elithian Alliance (in the works)
+[/quote]
+
+[h2]All Vanilla outfits have compatibility, just waiting for other race mods to make compatibility.[/h2]
+
+[h2]If a mod is not compatible with Armor Adapt, the mod author of the mods you want could be reached out to, to make compatibility. It is best that the compatibility files are stored inside the mods you want instead of making a 3rd mod to bridge them as the compatibility is completely harmless and without Armor Adapt installed, it sleeps until it is needed.[/h2]
+
+[h1]Github with Wiki!!![/h1] https://github.com/Zancuno/Armor-Adapt",
   "friendlyName" : "Armor Adapt",
   "link" : "steam://url/CommunityFilePage/2601606862",
   "name" : "rentek_armorAdapt",
   "steamContentId" : "2601606862",
-  "tags" : "Character Improvements|Mechanics",
-  "version" : "1.4.3.1.6"
+  "tags" : "Character Improvements|Mechanics|Armor and Clothes",
+  "version" : "1.4.3.1.8"
 }
