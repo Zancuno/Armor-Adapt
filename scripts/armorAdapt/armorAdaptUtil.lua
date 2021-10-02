@@ -29,49 +29,102 @@ function armorAdapt.runArmorAdapt(baseItem, key, species, bodyType, hideBody, en
 		armorAdapt.showItemLog(baseArmorItem, entity)
 		local adaptItem = copy(baseItem)
 		if key == 1 or key == 2 then
-			local baseName = root.itemConfig(baseItem).config.itemName
-			adaptItem.parameters.maleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/headm.png", species, root.itemConfig(adaptItem).config.itemName, bodyType)
-			adaptItem.parameters.femaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/headf.png", species, root.itemConfig(adaptItem).config.itemName, bodyType)
-			adaptItem.parameters.mask = string.format("mask.png")
-	
-			adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "head", baseName }
-			
-			armorAdapt.showBuildLog(baseItem, adaptItem, entity)
-			return adaptItem
-		elseif key == 3 or key == 4 then
-			maleChestBody = string.format("/items/armors/armorAdapt/%s/%s/%s/chestm.png", species, root.itemConfig(adaptItem).config.itemName, bodyType)
-			femaleChestBody = string.format("/items/armors/armorAdapt/%s/%s/%s/chestf.png", species, root.itemConfig(adaptItem).config.itemName, bodyType)
-			frontArmMaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/fsleeve.png", species, root.itemConfig(adaptItem).config.itemName, bodyType)
-			backArmMaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/bsleeve.png", species, root.itemConfig(adaptItem).config.itemName, bodyType)
-			frontArmFemaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/fsleevef.png", species, root.itemConfig(adaptItem).config.itemName, bodyType)
-			backArmFemaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/bsleevef.png", species, root.itemConfig(adaptItem).config.itemName, bodyType)
-	
-			adaptItem.parameters.maleFrames = { body = maleChestBody , frontSleeve = frontArmMaleFrames, backSleeve = backArmMaleFrames }
-
-			adaptItem.parameters.femaleFrames = { body = femaleChestBody, frontSleeve = frontArmFemaleFrames, backSleeve = backArmFemaleFrames }
-	
-			adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "chest" }
-			
-			armorAdapt.showBuildLog(baseItem, adaptItem, entity)
-			return adaptItem
-		elseif key == 5 or key == 6 then
-			adaptItem.parameters.maleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/pantsm.png", species, root.itemConfig(adaptItem).config.itemName, bodyType)
-			adaptItem.parameters.femaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/pantsf.png", species, root.itemConfig(adaptItem).config.itemName, bodyType)
-
-			if hideBody == false then
-				adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "pants" }
+			if species == "null" then
+				local baseName = root.itemConfig(baseItem).config.itemName
+				adaptItem.parameters.maleFrames = "/items/armors/armorAdapt/default/null/Default/headm.png"
+				adaptItem.parameters.femaleFrames = "/items/armors/armorAdapt/default/null/Default/headf.png"
+				adaptItem.parameters.mask = string.format("mask.png")
+		
+				adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "head", baseName }
+				
+				armorAdapt.showBuildLog(baseItem, adaptItem, entity)
+				return adaptItem
 			else
-				adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "pants", "hideBody" }
+				local baseName = root.itemConfig(baseItem).config.itemName
+				adaptItem.parameters.maleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/headm.png", species, root.itemConfig(adaptItem).config.itemName, bodyType)
+				adaptItem.parameters.femaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/headf.png", species, root.itemConfig(adaptItem).config.itemName, bodyType)
+				adaptItem.parameters.mask = string.format("mask.png")
+		
+				adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "head", baseName }
+				
+				armorAdapt.showBuildLog(baseItem, adaptItem, entity)
+				return adaptItem
 			end
-			armorAdapt.showBuildLog(baseItem, adaptItem, entity)
-			return adaptItem
+		elseif key == 3 or key == 4 then
+			if species == "null" then
+				maleChestBody = "/items/armors/armorAdapt/default/null/Default/chestm.png"
+				femaleChestBody = "/items/armors/armorAdapt/default/null/Default/chestf.png"
+				frontArmMaleFrames = "/items/armors/armorAdapt/default/null/Default/fsleeve.png"
+				backArmMaleFrames = "/items/armors/armorAdapt/default/null/Default/bsleeve.png"
+				frontArmFemaleFrames = "/items/armors/armorAdapt/default/null/Default/fsleevef.png"
+				backArmFemaleFrames = "/items/armors/armorAdapt/default/null/Default/bsleevef.png"
+		
+				adaptItem.parameters.maleFrames = { body = maleChestBody , frontSleeve = frontArmMaleFrames, backSleeve = backArmMaleFrames }
+
+				adaptItem.parameters.femaleFrames = { body = femaleChestBody, frontSleeve = frontArmFemaleFrames, backSleeve = backArmFemaleFrames }
+		
+				adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "chest" }
+				
+				armorAdapt.showBuildLog(baseItem, adaptItem, entity)
+				return adaptItem
+			else
+				maleChestBody = string.format("/items/armors/armorAdapt/%s/%s/%s/chestm.png", species, root.itemConfig(adaptItem).config.itemName, bodyType)
+				femaleChestBody = string.format("/items/armors/armorAdapt/%s/%s/%s/chestf.png", species, root.itemConfig(adaptItem).config.itemName, bodyType)
+				frontArmMaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/fsleeve.png", species, root.itemConfig(adaptItem).config.itemName, bodyType)
+				backArmMaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/bsleeve.png", species, root.itemConfig(adaptItem).config.itemName, bodyType)
+				frontArmFemaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/fsleevef.png", species, root.itemConfig(adaptItem).config.itemName, bodyType)
+				backArmFemaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/bsleevef.png", species, root.itemConfig(adaptItem).config.itemName, bodyType)
+		
+				adaptItem.parameters.maleFrames = { body = maleChestBody , frontSleeve = frontArmMaleFrames, backSleeve = backArmMaleFrames }
+
+				adaptItem.parameters.femaleFrames = { body = femaleChestBody, frontSleeve = frontArmFemaleFrames, backSleeve = backArmFemaleFrames }
+		
+				adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "chest" }
+				
+				armorAdapt.showBuildLog(baseItem, adaptItem, entity)
+				return adaptItem
+			end
+			
+		elseif key == 5 or key == 6 then
+			if species == "null" then
+				adaptItem.parameters.maleFrames = "/items/armors/armorAdapt/default/null/Default/pantsm.png"
+				adaptItem.parameters.femaleFrames = "/items/armors/armorAdapt/default/null/Default/pantsf.png"
+
+				if hideBody == false then
+					adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "pants" }
+				else
+					adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "pants", "hideBody" }
+				end
+				armorAdapt.showBuildLog(baseItem, adaptItem, entity)
+				return adaptItem
+			else
+				adaptItem.parameters.maleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/pantsm.png", species, root.itemConfig(adaptItem).config.itemName, bodyType)
+				adaptItem.parameters.femaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/pantsf.png", species, root.itemConfig(adaptItem).config.itemName, bodyType)
+
+				if hideBody == false then
+					adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "pants" }
+				else
+					adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "pants", "hideBody" }
+				end
+				armorAdapt.showBuildLog(baseItem, adaptItem, entity)
+				return adaptItem
+			end
 		else
-			adaptItem.parameters.maleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/back.png", species, root.itemConfig(adaptItem).config.itemName, bodyType)
-			adaptItem.parameters.femaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/back.png", species, root.itemConfig(adaptItem).config.itemName, bodyType)
-	
-			adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "back" }
-			armorAdapt.showBuildLog(baseItem, adaptItem, entity)
-			return adaptItem
+			if species == "null" then
+				adaptItem.parameters.maleFrames = "/items/armors/armorAdapt/default/null/Default/back.png"
+				adaptItem.parameters.femaleFrames = "/items/armors/armorAdapt/default/null/Default/back.png"
+		
+				adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "back" }
+				armorAdapt.showBuildLog(baseItem, adaptItem, entity)
+				return adaptItem
+			else
+				adaptItem.parameters.maleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/back.png", species, root.itemConfig(adaptItem).config.itemName, bodyType)
+				adaptItem.parameters.femaleFrames = string.format("/items/armors/armorAdapt/%s/%s/%s/back.png", species, root.itemConfig(adaptItem).config.itemName, bodyType)
+		
+				adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "back" }
+				armorAdapt.showBuildLog(baseItem, adaptItem, entity)
+				return adaptItem
+			end
 		end
 	end
 end
@@ -106,7 +159,7 @@ end
 
 function armorAdapt.getSpeciesBodyTable(species)
 	if species == "standard" then
-		bodyTable = { "Default", "standard", "None", "None", "None" }
+		bodyTable = { "Default", "Default", "Default", "Default", "Default" }
 		return bodyTable
 	elseif species == "lucario" then
 		bodyTable = armorAdapt.getLucarioBodyType()
@@ -134,36 +187,18 @@ function armorAdapt.getLucarioBodyType(bodyTable)
 			(tail == 1 and "L" or tail == 2 and "R" or "F") ..
 			(appendage and "A" or "")
 	bodyTable[1] = lucarioBody
-	if gender and true then
-		bodyShape = "Gendered"
-	else
-		bodyShape = "Neutral"
-	end
-	bodyTable[2] = bodyShape
-	if bodySpike and true and pawSpike and true then
-		bodyAccessory = "Fully Spiked"
-	elseif bodySpike and true and pawSpike and false then
-		bodyAccessory = "Chest Spike"
-	elseif bodySpike and false and pawSpike and true then
-		bodyAccessory = "Paw Spikes"
-	else
-		bodyAccessory = "Bare"
-	end
-	bodyTable[3] = bodyAccessory
-	if tail == 1 then
-		bodyAlt = "Lucario Tail"
-	elseif tail == 2 then
-		bodyAlt = "Riolu Tail"
-	else
-		bodyAlt = "fluffy Tail"
-	end
-	bodyTable[4] = bodyAlt
-	if appendage and true then
-		bodyOther = "Head Locks"
-	else
-		bodyOther = "None"
-	end
-	bodyTable[5] = bodyOther
+	bodyTable[2] = "Default"
+	bodyChest =
+			(gender and "G" or "N") ..
+			(bodySpike and "CS" or "") ..
+			(pawSpike and "" or "NPS")
+	bodyTable[3] = bodyChest
+	bodyLegs = 
+			(gender and "G" or "N") ..
+			(tail == 1 and "L" or tail == 2 and "R" or "F") ..
+			(appendage and "A" or "")
+	bodyTable[4] = bodyLegs
+	bodyTable[5] = "Default"
 	
 	return bodyTable
 
