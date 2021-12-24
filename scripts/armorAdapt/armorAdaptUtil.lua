@@ -39,6 +39,7 @@ function armorAdapt.runArmorAdapt(baseItem, key, species, bodyType, hideBody, en
 				adaptItem.parameters.mask = "mask.png"
 		
 				adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "head", baseName }
+				sb.logInfo("Head item name is %s", baseName)
 				
 				bldLg(baseItem, adaptItem, entity)
 				return adaptItem
@@ -65,7 +66,7 @@ function armorAdapt.runArmorAdapt(baseItem, key, species, bodyType, hideBody, en
 
 				adaptItem.parameters.femaleFrames = { body = femaleChestBody, frontSleeve = frontArmFemaleFrames, backSleeve = backArmFemaleFrames }
 		
-				adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "chest" }
+				adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "chest", baseName }
 				
 				bldLg(baseItem, adaptItem, entity)
 				return adaptItem
@@ -81,7 +82,7 @@ function armorAdapt.runArmorAdapt(baseItem, key, species, bodyType, hideBody, en
 
 				adaptItem.parameters.femaleFrames = { body = femaleChestBody, frontSleeve = frontArmFemaleFrames, backSleeve = backArmFemaleFrames }
 		
-				adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "chest" }
+				adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "chest", baseName }
 				
 				bldLg(baseItem, adaptItem, entity)
 				return adaptItem

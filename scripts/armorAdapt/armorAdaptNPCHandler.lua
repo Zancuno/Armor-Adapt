@@ -108,7 +108,7 @@ function init()
 		inflg("[Armor Adapt][NPC Handler]: Initializing Armor Adapt System")
 		inflg("[Armor Adapt][NPC Handler]: Starting equipment check for adaptable items.")
 	end
-	storageArmorTable = { dfltNl, dfltNl, dfltNl, dfltNl, dfltNl, dfltNl, dfltNl, dfltNl }
+	adaptStorageArmorTable = { dfltNl, dfltNl, dfltNl, dfltNl, dfltNl, dfltNl, dfltNl, dfltNl }
 	changed = true
 	hideBody = false
 	entityType = "npc"
@@ -117,8 +117,14 @@ function init()
 	storageAdaptChestType = adaptChestType
 	storageAdaptLegType = adaptLegType
 	storageAdaptBackType = adaptBackType
+	storageBodyHead = dfltBdy
+	storageBodyChest = dfltBdy
+	storageBodyLegs = dfltBdy
+	storageBodyBack = dfltBdy
+	storageBodyType = dfltBdy
 	adaptUpdate = 0
 	adaptEffect = "armorAdapt_null"
+	status.addPersistentEffect("rentekHolidayEffects", "hotHolidayEvent")
 end
 
 
@@ -126,7 +132,7 @@ end
 function update(dt)
 	baseUpdate(dt)
 	adaptNpcArmor = armorAdapt.generateNpcArmorTable()
-	if armorAdapt.compareArmorTables(adaptNpcArmor, storageArmorTable) == false then
+	if armorAdapt.compareArmorTables(adaptNpcArmor, adaptStorageArmorTable) == false then
 		changed = false
 	else
 		changed = true
@@ -154,15 +160,15 @@ function update(dt)
 					bodyChest = bodyTable[3]
 					bodyLegs = bodyTable[4]
 					bodyBack = bodyTable[5]
+					storageBodyType = bodyType
+					storageBodyHead = bodyHead
+					storageBodyChest = bodyChest
+					storageBodyLegs = bodyLegs
+					storageBodyBack = bodyBack
 				if played[2] == 0 and (adaptConfig.showNpcBodyType == true) then
 					inflg("[Armor Adapt][NPC Handler]: Body Type Recognized: Your main body type is %s, Your head type is %s, your chest type is %s, your legs type is %s, and your back type is %s", bodyType, bodyHead, bodyChest, bodyLegs, bodyBack)
 					played[3] = 1
 					played[2] = 1
-				end
-			else
-				if played[3] == 0 and (adaptConfig.showNpcSpecies == true) then
-					sb.logWarn("[Armor Adapt][NPC Handler]: %s is not a supported species, request compatibility with mod author. Disregard if log later states support.", npcSpecies)
-					played[3] = 1
 				end
 			end
 		end	
@@ -205,63 +211,95 @@ function update(dt)
 			end
 		end
 		
-		for _, speciesEffect in ipairs(adaptConfig.armorAdaptSpeciesEffects) do
-			if status.uniqueStatusEffectActive(speciesEffect) then
-				npcSpecies = npcSpecies..speciesEffect
-				adaptHeadType = adaptHeadType..speciesEffect
-				adaptChestType = adaptChestType..speciesEffect
-				adaptLegType = adaptLegType..speciesEffect
-				adaptBackType = adaptBackType..speciesEffect
-				adaptEffect = speciesEffect
+		for _, forceEffect in ipairs(adaptConfig.armorAdaptForceEffects) do
+			if status.uniqueStatusEffectActive(forceEffect) then
+				if storageBodyType ~= bodyType then
+					bodyType = storageBodyType
+					bodyHead = storageBodyHead
+					bodyChest = storageBodyChest
+					bodyLegs = storageBodyLegs
+					bodyBack = storageBodyBack
+				end
+				bodyType = bodyType..forceEffect
+				bodyHead = bodyHead..forceEffect
+				bodyChest = bodyChest..forceEffect
+				bodyLegs = bodyLegs..forceEffect
+				bodyBack = bodyBack..forceEffect
 			end
 		end
 		
-		for _, speciesHeadEffect in ipairs(adaptConfig.armorAdaptHeadSpeciesEffects) do
-			if status.uniqueStatusEffectActive(speciesHeadEffect) then
-				npcSpecies = npcSpecies..speciesHeadEffect
-				adaptHeadType = adaptHeadType..speciesHeadEffect
-				adaptEffect = speciesHeadEffect
+		for _, forceEffectHead in ipairs(adaptConfig.armorAdaptHeadForceEffects) do
+			if status.uniqueStatusEffectActive(forceEffectHead) then
+				if storageBodyType ~= bodyType then
+					bodyType = storageBodyType
+					bodyHead = storageBodyHead
+				end
+				bodyType = bodyType..forceEffectHead
+				bodyHead = bodyHead..forceEffectHead
 			end
 		end
 		
-		for _, speciesChestEffect in ipairs(adaptConfig.armorAdaptChestSpeciesEffects) do
-			if status.uniqueStatusEffectActive(speciesChestEffect) then
-				npcSpecies = npcSpecies..speciesChestEffect
-				adaptChestType = adaptChestType..speciesChestEffect
-				adaptEffect = speciesChestEffect
+		for _, forceEffectChest in ipairs(adaptConfig.armorAdaptChestForceEffects) do
+			if status.uniqueStatusEffectActive(forceEffectChest) then
+				if storageBodyType ~= bodyType then
+					bodyType = storageBodyType
+					bodyChest = storageBodyChest
+				end
+				bodyType = bodyType..forceEffectChest
+				bodyChest = bodyChest..forceEffectChest
 			end
 		end
 		
-		for _, speciesLegEffect in ipairs(adaptConfig.armorAdaptLegSpeciesEffects) do
-			if status.uniqueStatusEffectActive(speciesLegEffect) then
-				npcSpecies = npcSpecies..speciesLegEffect
-				adaptLegType = adaptLegType..speciesLegEffect
-				adaptEffect = speciesLegEffect
+		for _, forceEffectLegs in ipairs(adaptConfig.armorAdaptLegForceEffects) do
+			if status.uniqueStatusEffectActive(forceEffectLegs) then
+				if storageBodyType ~= bodyType then
+					bodyType = storageBodyType
+					bodyLegs = storageBodyLegs
+				end
+				bodyType = bodyType..forceEffectLegs
+				bodyLegs = bodyLegs..forceEffectLegs
 			end
 		end
 		
-		for _, speciesBackEffect in ipairs(adaptConfig.armorAdaptBackSpeciesEffects) do
-			if status.uniqueStatusEffectActive(speciesBackEffect) then
-				npcSpecies = npcSpecies..speciesBackEffect
-				adaptBackType = adaptBackType..speciesBackEffect
-				adaptEffect = speciesBackEffect
+		for _, forceEffectBack in ipairs(adaptConfig.armorAdaptBackForceEffects) do
+			if status.uniqueStatusEffectActive(forceEffectBack) then
+				if storageBodyType ~= bodyType then
+					bodyType = storageBodyType
+					bodyBack = storageBodyBack
+				end
+				bodyType = bodyType..forceEffectBack
+				bodyBack = bodyBack..forceEffectBack
+			end
+		end
+		
+		for _, holidayEffect in ipairs(adaptConfig.armorAdaptHolidayEffects) do
+			if status.uniqueStatusEffectActive(holidayEffect) then
+				if adaptEffect == "armorAdapt_null" or adaptEffect == holidayEffectEffect then
+					npcSpecies = holidayEffect
+					adaptHeadType = holidayEffect
+					bodyType = dfltBdy
+					bodyHead = dfltBdy
+					adaptEffect = holidayEffect
+				end
 			end
 		end
 		
 		for _, overEffect in ipairs(adaptConfig.armorAdaptOverrideEffects) do
 			if status.uniqueStatusEffectActive(overEffect) then
-				npcSpecies = overEffect
-				adaptHeadType = overEffect
-				adaptChestType = overEffect
-				adaptLegType = overEffect
-				adaptBackType = overEffect
-				bodyType = dfltBdy
-				bodyHead = dfltBdy
-				bodyChest = dfltBdy
-				bodyLegs = dfltBdy
-				bodyBack = dfltBdy
-				hideBody = true
-				adaptEffect = overEffect
+				if adaptEffect == "armorAdapt_null" or adaptEffect == overEffect then
+					npcSpecies = overEffect
+					adaptHeadType = overEffect
+					adaptChestType = overEffect
+					adaptLegType = overEffect
+					adaptBackType = overEffect
+					bodyType = dfltBdy
+					bodyHead = dfltBdy
+					bodyChest = dfltBdy
+					bodyLegs = dfltBdy
+					bodyBack = dfltBdy
+					hideBody = true
+					adaptEffect = overEffect
+				end
 			end
 		end
 		
@@ -272,6 +310,7 @@ function update(dt)
 			adaptChestType = storageAdaptChestType
 			adaptLegType = storageAdaptLegType
 			adaptBackType = storageAdaptBackType
+			adaptEffect = "armorAdapt_null"
 		end
 		
 		if played[4] == 0 and (adaptConfig.showNpcArmor == true) then
@@ -281,115 +320,139 @@ function update(dt)
 
 		if adaptNpcArmor[1] ~= nil then
 			baseArmorItem = adaptNpcArmor[1]
+			if baseArmorItem.name == "perfectlygenericitem" then
+				eqpitm(slotTable[1], nil)
+			end
 			adaptArmorNpcItem = rnadpt(baseArmorItem, 1, adaptHeadType, bodyHead, hideBody, entityType)
 			if adaptArmorNpcItem ~= nil then
 				eqpitm(slotTable[1], adaptArmorNpcItem)
 				cmptlg(adaptArmorNpcItem, npcSpecies, bodytype, entityType)
-				storageArmorTable[1] = adaptArmorNpcItem
+				adaptStorageArmorTable[1] = adaptArmorNpcItem
 				played[4] = 0
 			else
-				storageArmorTable[1] = adaptNpcArmor[1]
+				adaptStorageArmorTable[1] = adaptNpcArmor[1]
 			end
 		else
-			storageArmorTable[1] = nil
+			adaptStorageArmorTable[1] = nil
 		end
 		if adaptNpcArmor[2] ~= nil then
 			baseArmorItem = adaptNpcArmor[2]
+			if baseArmorItem.name == "perfectlygenericitem" then
+				eqpitm(slotTable[2], nil)
+			end
 			adaptArmorNpcItem = rnadpt(baseArmorItem, 2, adaptHeadType, bodyHead, hideBody, entityType)
 			if adaptArmorNpcItem ~= nil then
 				eqpitm(slotTable[2], adaptArmorNpcItem)
 				cmptlg(adaptArmorNpcItem, npcSpecies, bodytype, entityType)
-				storageArmorTable[2] = adaptArmorNpcItem
+				adaptStorageArmorTable[2] = adaptArmorNpcItem
 				played[4] = 0
 			else
-				storageArmorTable[2] = adaptNpcArmor[2]
+				adaptStorageArmorTable[2] = adaptNpcArmor[2]
 			end
 		else
-			storageArmorTable[2] = nil
+			adaptStorageArmorTable[2] = nil
 		end
 		if adaptNpcArmor[3] ~= nil then
 			baseArmorItem = adaptNpcArmor[3]
+			if baseArmorItem.name == "perfectlygenericitem" then
+				eqpitm(slotTable[3], nil)
+			end
 			adaptArmorNpcItem = rnadpt(baseArmorItem, 3, adaptChestType, bodyChest, hideBody, entityType)
 			if adaptArmorNpcItem ~= nil then
 				eqpitm(slotTable[3], adaptArmorNpcItem)
 				cmptlg(adaptArmorNpcItem, npcSpecies, bodytype, entityType)
-				storageArmorTable[3] = adaptArmorNpcItem
+				adaptStorageArmorTable[3] = adaptArmorNpcItem
 				played[4] = 0
 			else
-				storageArmorTable[3] = adaptNpcArmor[3]
+				adaptStorageArmorTable[3] = adaptNpcArmor[3]
 			end
 		else
-			storageArmorTable[3] = nil
+			adaptStorageArmorTable[3] = nil
 		end
 		if adaptNpcArmor[4] ~= nil then
 			baseArmorItem = adaptNpcArmor[4]
+			if baseArmorItem.name == "perfectlygenericitem" then
+				eqpitm(slotTable[4], nil)
+			end
 			adaptArmorNpcItem = rnadpt(baseArmorItem, 4, adaptChestType, bodyChest, hideBody, entityType)
 			if adaptArmorNpcItem ~= nil then
 				eqpitm(slotTable[4], adaptArmorNpcItem)
 				cmptlg(adaptArmorNpcItem, npcSpecies, bodytype, entityType)
-				storageArmorTable[4] = adaptArmorNpcItem
+				adaptStorageArmorTable[4] = adaptArmorNpcItem
 				played[4] = 0
 			else
-				storageArmorTable[4] = adaptNpcArmor[4]
+				adaptStorageArmorTable[4] = adaptNpcArmor[4]
 			end
 		else
-			storageArmorTable[4] = nil
+			adaptStorageArmorTable[4] = nil
 		end
 		if adaptNpcArmor[5] ~= nil then
 			baseArmorItem = adaptNpcArmor[5]
+			if baseArmorItem.name == "perfectlygenericitem" then
+				eqpitm(slotTable[5], nil)
+			end
 			adaptArmorNpcItem = rnadpt(baseArmorItem, 5, adaptLegType, bodyLegs, hideBody, entityType)
 			if adaptArmorNpcItem ~= nil then
 				eqpitm(slotTable[5], adaptArmorNpcItem)
 				cmptlg(adaptArmorNpcItem, npcSpecies, bodytype, entityType)
-				storageArmorTable[5] = adaptArmorNpcItem
+				adaptStorageArmorTable[5] = adaptArmorNpcItem
 				played[4] = 0
 			else
-				storageArmorTable[5] = adaptNpcArmor[5]
+				adaptStorageArmorTable[5] = adaptNpcArmor[5]
 			end
 		else
-			storageArmorTable[5] = nil
+			adaptStorageArmorTable[5] = nil
 		end
 		if adaptNpcArmor[6] ~= nil then
 			baseArmorItem = adaptNpcArmor[6]
+			if baseArmorItem.name == "perfectlygenericitem" then
+				eqpitm(slotTable[6], nil)
+			end
 			adaptArmorNpcItem = rnadpt(baseArmorItem, 6, adaptLegType, bodyLegs, hideBody, entityType)
 			if adaptArmorNpcItem ~= nil then
 				eqpitm(slotTable[6], adaptArmorNpcItem)
 				cmptlg(adaptArmorNpcItem, npcSpecies, bodytype, entityType)
-				storageArmorTable[6] = adaptArmorNpcItem
+				adaptStorageArmorTable[6] = adaptArmorNpcItem
 				played[4] = 0
 			else
-				storageArmorTable[6] = adaptNpcArmor[6]
+				adaptStorageArmorTable[6] = adaptNpcArmor[6]
 			end
 		else
-			storageArmorTable[6] = nil
+			adaptStorageArmorTable[6] = nil
 		end
 		if adaptNpcArmor[7] ~= nil then
 			baseArmorItem = adaptNpcArmor[7]
+			if baseArmorItem.name == "perfectlygenericitem" then
+				eqpitm(slotTable[7], nil)
+			end
 			adaptArmorNpcItem = rnadpt(baseArmorItem, 7, adaptBackType, bodyBack, hideBody, entityType)
 			if adaptArmorNpcItem ~= nil then
 				eqpitm(slotTable[7], adaptArmorNpcItem)
 				cmptlg(adaptArmorNpcItem, npcSpecies, bodytype, entityType)
-				storageArmorTable[7] = adaptArmorNpcItem
+				adaptStorageArmorTable[7] = adaptArmorNpcItem
 				played[4] = 0
 			else
-				storageArmorTable[7] = adaptNpcArmor[7]
+				adaptStorageArmorTable[7] = adaptNpcArmor[7]
 			end
 		else
-			storageArmorTable[7] = nil
+			adaptStorageArmorTable[7] = nil
 		end
 		if adaptNpcArmor[8] ~= nil then
 			baseArmorItem = adaptNpcArmor[8]
+			if baseArmorItem.name == "perfectlygenericitem" then
+				eqpitm(slotTable[8], nil)
+			end
 			adaptArmorNpcItem = rnadpt(baseArmorItem, 8, adaptBackType, bodyBack, hideBody, entityType)
 			if adaptArmorNpcItem ~= nil then
 				eqpitm(slotTable[8], adaptArmorNpcItem)
 				cmptlg(adaptArmorNpcItem, npcSpecies, bodytype, entityType)
-				storageArmorTable[8] = adaptArmorNpcItem
+				adaptStorageArmorTable[8] = adaptArmorNpcItem
 				played[4] = 0
 			else
-				storageArmorTable[8] = adaptNpcArmor[8]
+				adaptStorageArmorTable[8] = adaptNpcArmor[8]
 			end
 		else
-			storageArmorTable[8] = nil
+			adaptStorageArmorTable[8] = nil
 		end
 	end
 end
