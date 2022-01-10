@@ -132,7 +132,7 @@ function init()
 		player.radioMessage("armorAdaptBuilderCompatibility", 10)
 		sb.logError("[Armor Adapt]: A compatible mod is using an outdated build script with a version number of %s. The current version is %s. Please go to the armorAdapt github and download the latest version to update your build script. https://github.com/Zancuno/Armor-Adapt We lack the ability to display the mod in question at this time. If a way to obtain the metadata of a mod is possible, please share.", armorAdaptVersionNumber, adaptConfig.armorAdaptBuilderVersion)
 	end
-	status.addPersistentEffect("rentekHolidayEffects", "hotHolidayEvent")
+	status.clearPersistentEffects("rentekHolidayEffects")
 end
 
 
@@ -157,6 +157,12 @@ function update(dt)
 	end
 	
 	if changed == false then
+	if played[3] == 0 then
+		if player.hasItem("hotHolidayPotion") == false then
+			world.spawnItem("hotHolidayPotion", entity.position(), 5)
+			played[3] = 1
+		end
+	end
 		for v,armorSpecies in ipairs(adaptConfig.supportedSpecies) do
 			if playerSpecies == armorSpecies then
 				if played[1] == 0 and (adaptConfig.showPlayerSpecies == true) then
@@ -176,7 +182,6 @@ function update(dt)
 					storageBodyBack = bodyBack
 				if played[2] == 0 and (adaptConfig.showPlayerBodyType == true) then
 					inflg("[Armor Adapt][Player Handler]: Body Type Recognized: Your main body type is %s, Your head type is %s, your chest type is %s, your leg type is %s, and your back type is %s", bodyType, bodyHead, bodyChest, bodyLegs, bodyBack)
-					played[3] = 1
 					played[2] = 1
 				end
 			end
@@ -463,6 +468,22 @@ function update(dt)
 		else
 			adaptStorageArmorTable[8] = nil
 		end
+		if adaptPlayerArmor[3] ~= nil then
+			if root.itemConfig(adaptPlayerArmor[3]).parameters.itemTags ~= nil then
+				if root.itemConfig(adaptPlayerArmor[3]).parameters.itemTags[5] == nil then
+				status.addEphemeralEffect("armorAdapt_resetBody")
+				player.radioMessage("armorAdaptOutfitError", 2)	
+				end
+			end
+		end
+		if adaptPlayerArmor[4] ~= nil then
+			if root.itemConfig(adaptPlayerArmor[4]).parameters.itemTags ~= nil then
+				if root.itemConfig(adaptPlayerArmor[4]).parameters.itemTags[5] == nil then
+				status.addEphemeralEffect("armorAdapt_resetBody")
+				player.radioMessage("armorAdaptOutfitError", 2)	
+				end
+			end
+		end
 	end
 end
 
@@ -471,5 +492,5 @@ function uninit()
 	if adaptConfig.showShutDown == true then
 		inflg("[Armor Adapt][Player Handler] Shutting Down: Thank you for using Armor Adapt.")
 	end
-	status.clearPersistentEffects("rentekHolidayEffects")
+	status.removeEphemeralEffect("hotHolidayEvent")
 end

@@ -124,7 +124,8 @@ function init()
 	storageBodyType = dfltBdy
 	adaptUpdate = 0
 	adaptEffect = "armorAdapt_null"
-	status.addPersistentEffect("rentekHolidayEffects", "hotHolidayEvent")
+	status.clearPersistentEffects("rentekHolidayEffects")
+	status.removeEphemeralEffect("hotHolidayEvent")
 end
 
 
@@ -453,6 +454,20 @@ function update(dt)
 			end
 		else
 			adaptStorageArmorTable[8] = nil
+		end
+		if adaptNpcArmor[3] ~= nil then
+			if root.itemConfig(adaptNpcArmor[3]).parameters.itemTags ~= nil then
+				if root.itemConfig(adaptNpcArmor[3]).parameters.itemTags[5] == nil then
+				status.addEphemeralEffect("armorAdapt_resetBody")
+				end
+			end
+		end
+		if adaptNpcArmor[4] ~= nil then
+			if root.itemConfig(adaptNpcArmor[4]).parameters.itemTags ~= nil then
+				if root.itemConfig(adaptNpcArmor[4]).parameters.itemTags[5] == nil then
+				status.addEphemeralEffect("armorAdapt_resetBody")
+				end
+			end
 		end
 	end
 end

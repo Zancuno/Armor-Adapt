@@ -4,5 +4,12 @@
     "text" : "The Armor Adapt build script you are using is out of date. Please inform the mod owner to download the latest build script. Information is noted in your error log.",
     "textSpeed" : 70,
 	"persistTime" : 20.0
+  },
+  
+  "armorAdaptOutfitError" : {
+	"unique" : false,
+	"text" : "An outfit your are wearing is bugged, do not be alarmed, we are fixing the problem.",
+	"textSpeed" : 70,
+	"persistTime" : 20
   }
 }
