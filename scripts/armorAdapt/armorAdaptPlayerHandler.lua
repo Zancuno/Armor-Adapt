@@ -157,12 +157,6 @@ function update(dt)
 	end
 	
 	if changed == false then
-	if played[3] == 0 then
-		if player.hasItem("hotHolidayPotion") == false then
-			world.spawnItem("hotHolidayPotion", entity.position(), 5)
-			played[3] = 1
-		end
-	end
 		for v,armorSpecies in ipairs(adaptConfig.supportedSpecies) do
 			if playerSpecies == armorSpecies then
 				if played[1] == 0 and (adaptConfig.showPlayerSpecies == true) then
