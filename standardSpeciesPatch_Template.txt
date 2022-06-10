@@ -1,5 +1,0 @@
-[
-"op" : "add", "path" : "/vanillaBodySpecies/-", "value" : "<species>"
-
-//Do not use the <>, just replace with your species name
-]
