@@ -1,0 +1,13 @@
+{
+  "name" : "hotHolidayEvent",
+
+  "effectConfig" : {},
+  "defaultDuration" : 100,
+  
+  "scripts" : [ "hotHolidayEvent.lua" ],
+
+  "animationConfig" : "hotHolidayEvent.animation",
+  
+  "label" : "Santafication: all your hats are belong to us! Festivities for all, love RenTek.",
+  "icon" : "/interface/statuses/hotHolidayIcon.png"
+}

@@ -21,7 +21,7 @@ function armorAdapt.runArmorAdapt(baseItem, key, species, bodyType, hideBody, en
 	local bldLg,rtCfg = armorAdapt.showBuildLog, root.itemConfig
 	local adtPth = "/items/armors/armorAdapt/"
 	adaptDirectivesMin = root.assetJson("/scripts/armorAdapt/armorAdapt.config:adaptDirectivesMin")
-	if rtCfg(baseItem).parameters.directives ~= nil and string.len(rtCfg(baseItem).parameters.directives) >= adaptDirectivesMin then
+	if rtCfg(baseItem).parameters.directives ~= nil and string.len(rtCfg(baseItem).parameters.directives) >= adaptDirectivesMin or rtCfg(baseItem).config.builder == "/sys/stardust/cosplay/build.lua" then
 		adaptItem = baseItem
 		armorAdapt.showCustomSkipLog(entity)
 		return adaptItem
@@ -29,7 +29,7 @@ function armorAdapt.runArmorAdapt(baseItem, key, species, bodyType, hideBody, en
 		adaptItem = baseItem
 		return adaptItem
 	elseif rtCfg(baseItem).parameters.itemTags == nil or rtCfg(baseItem).parameters.itemTags[2] ~= species or rtCfg(baseItem).parameters.itemTags[3] ~= bodyType then 
-		armorAdapt.showItemLog(baseArmorItem, entity)
+		armorAdapt.showItemLog(baseItem, entity)
 		local adaptItem = copy(baseItem)
 		local baseName = rtCfg(baseItem).config.itemName
 		if key == 1 or key == 2 then
@@ -39,6 +39,7 @@ function armorAdapt.runArmorAdapt(baseItem, key, species, bodyType, hideBody, en
 				adaptItem.parameters.mask = "mask.png"
 		
 				adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "head", baseName }
+				sb.logInfo("Head item name is %s", baseName)
 				
 				bldLg(baseItem, adaptItem, entity)
 				return adaptItem
@@ -65,7 +66,7 @@ function armorAdapt.runArmorAdapt(baseItem, key, species, bodyType, hideBody, en
 
 				adaptItem.parameters.femaleFrames = { body = femaleChestBody, frontSleeve = frontArmFemaleFrames, backSleeve = backArmFemaleFrames }
 		
-				adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "chest" }
+				adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "chest", baseName }
 				
 				bldLg(baseItem, adaptItem, entity)
 				return adaptItem
@@ -81,7 +82,7 @@ function armorAdapt.runArmorAdapt(baseItem, key, species, bodyType, hideBody, en
 
 				adaptItem.parameters.femaleFrames = { body = femaleChestBody, frontSleeve = frontArmFemaleFrames, backSleeve = backArmFemaleFrames }
 		
-				adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "chest" }
+				adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "chest", baseName }
 				
 				bldLg(baseItem, adaptItem, entity)
 				return adaptItem

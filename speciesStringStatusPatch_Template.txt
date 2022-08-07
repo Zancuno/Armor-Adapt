@@ -1,6 +1,0 @@
-[
-"op" : "add", "path" : "/armorAdaptSpeciesEffects/-", "value" : "<effect>",
-
-
-//Do not use the <>, just replace <effect> with the exact name of your effect in the .statuseffect file.
-]

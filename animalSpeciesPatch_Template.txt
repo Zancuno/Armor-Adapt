@@ -1,6 +1,0 @@
-[
-"op" : "add", "path" : "/supportedSpecies/-", "value" : "<species>",
-"op" : "add", "path" : "/animalSpecies/-", "value" : "<species>"
-
-//Do not use the <>, just replace with your species name
-]
