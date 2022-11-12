@@ -4,10 +4,13 @@ local baseUpdate = update or function() end
 local dfltSpc,dfltBdy,dfltNl = "standard", "Default", "null"
 local rnadpt = armorAdapt.runArmorAdapt
 local cmptlg = armorAdapt.showCompletionLog
+local armtbl = armorAdapt.generateNpcArmorTable
+local cmparmtbt = armorAdapt.compareArmorTables
 function init()
 	baseInit()
 	eqpitm = npc.setItemSlot
 	inflg = sb.logInfo
+	stseffact = status.uniqueStatusEffectActive
 	adaptConfig = root.assetJson("/scripts/armorAdapt/armorAdapt.config")
 	played = { 0, 0, 0, 0 }
 	bodyTable = { dfltBdy, dfltBdy, dfltBdy, dfltBdy, dfltBdy }
@@ -132,8 +135,8 @@ end
 
 function update(dt)
 	baseUpdate(dt)
-	armorAdapt_NpcArmor = armorAdapt.generateNpcArmorTable()
-	if armorAdapt.compareArmorTables(armorAdapt_NpcArmor, armorAdapt_storageArmorTable) == false then
+	armorAdapt_NpcArmor = armtbl()
+	if cmparmtbt(armorAdapt_NpcArmor, armorAdapt_storageArmorTable) == false then
 		changed = false
 	else
 		changed = true
@@ -143,7 +146,7 @@ function update(dt)
 		end
 	end
 	
-	if status.uniqueStatusEffectActive("armorAdapt_resetTrigger") and adaptUpdate == 0 then
+	if stseffact("armorAdapt_resetTrigger") and adaptUpdate == 0 then
 		changed = false
 		adaptUpdate = 1
 	end
@@ -175,7 +178,7 @@ function update(dt)
 		end	
 		
 		for _, effect in ipairs(adaptConfig.armorAdaptEffects) do
-			if status.uniqueStatusEffectActive(effect) then
+			if stseffact(effect) then
 				bodyType = bodyType..effect
 				bodyHead = bodyHead..effect
 				bodyChest = bodyChest..effect
@@ -185,35 +188,35 @@ function update(dt)
 		end
 		
 		for _, effectHead in ipairs(adaptConfig.armorAdaptHeadEffects) do
-			if status.uniqueStatusEffectActive(effectHead) then
+			if stseffact(effectHead) then
 				bodyType = bodyType..effectHead
 				bodyHead = bodyHead..effectHead
 			end
 		end
 		
 		for _, effectChest in ipairs(adaptConfig.armorAdaptChestEffects) do
-			if status.uniqueStatusEffectActive(effectChest) then
+			if stseffact(effectChest) then
 				bodyType = bodyType..effectChest
 				bodyChest = bodyChest..effectChest
 			end
 		end
 		
 		for _, effectLegs in ipairs(adaptConfig.armorAdaptLegEffects) do
-			if status.uniqueStatusEffectActive(effectLegs) then
+			if stseffact(effectLegs) then
 				bodyType = bodyType..effectLegs
 				bodyLegs = bodyLegs..effectLegs
 			end
 		end
 		
 		for _, effectBack in ipairs(adaptConfig.armorAdaptBackEffects) do
-			if status.uniqueStatusEffectActive(effectBack) then
+			if stseffact(effectBack) then
 				bodyType = bodyType..effectBack
 				bodyBack = bodyBack..effectBack
 			end
 		end
 		
 		for _, forceEffect in ipairs(adaptConfig.armorAdaptForceEffects) do
-			if status.uniqueStatusEffectActive(forceEffect) then
+			if stseffact(forceEffect) then
 				if storageBodyType ~= bodyType then
 					bodyType = storageBodyType
 					bodyHead = storageBodyHead
@@ -230,7 +233,7 @@ function update(dt)
 		end
 		
 		for _, forceEffectHead in ipairs(adaptConfig.armorAdaptHeadForceEffects) do
-			if status.uniqueStatusEffectActive(forceEffectHead) then
+			if stseffact(forceEffectHead) then
 				if storageBodyType ~= bodyType then
 					bodyType = storageBodyType
 					bodyHead = storageBodyHead
@@ -241,7 +244,7 @@ function update(dt)
 		end
 		
 		for _, forceEffectChest in ipairs(adaptConfig.armorAdaptChestForceEffects) do
-			if status.uniqueStatusEffectActive(forceEffectChest) then
+			if stseffact(forceEffectChest) then
 				if storageBodyType ~= bodyType then
 					bodyType = storageBodyType
 					bodyChest = storageBodyChest
@@ -252,7 +255,7 @@ function update(dt)
 		end
 		
 		for _, forceEffectLegs in ipairs(adaptConfig.armorAdaptLegForceEffects) do
-			if status.uniqueStatusEffectActive(forceEffectLegs) then
+			if stseffact(forceEffectLegs) then
 				if storageBodyType ~= bodyType then
 					bodyType = storageBodyType
 					bodyLegs = storageBodyLegs
@@ -263,7 +266,7 @@ function update(dt)
 		end
 		
 		for _, forceEffectBack in ipairs(adaptConfig.armorAdaptBackForceEffects) do
-			if status.uniqueStatusEffectActive(forceEffectBack) then
+			if stseffact(forceEffectBack) then
 				if storageBodyType ~= bodyType then
 					bodyType = storageBodyType
 					bodyBack = storageBodyBack
@@ -274,7 +277,7 @@ function update(dt)
 		end
 		
 		for _, holidayEffect in ipairs(adaptConfig.armorAdaptHolidayEffects) do
-			if status.uniqueStatusEffectActive(holidayEffect) then
+			if stseffact(holidayEffect) then
 				if adaptEffect == "armorAdapt_null" or adaptEffect == holidayEffect then
 					npcSpecies = holidayEffect
 					adaptHeadType = holidayEffect
@@ -286,7 +289,7 @@ function update(dt)
 		end
 		
 		for _, overEffect in ipairs(adaptConfig.armorAdaptOverrideEffects) do
-			if status.uniqueStatusEffectActive(overEffect) then
+			if stseffact(overEffect) then
 				if adaptEffect == "armorAdapt_null" or adaptEffect == overEffect then
 					npcSpecies = overEffect
 					adaptHeadType = overEffect
@@ -304,7 +307,7 @@ function update(dt)
 			end
 		end
 		
-		if status.uniqueStatusEffectActive(adaptEffect) == false then
+		if stseffact(adaptEffect) == false then
 			hideBody = false
 			playerSpecies = storagePlayerSpecies
 			adaptHeadType = storageAdaptHeadType

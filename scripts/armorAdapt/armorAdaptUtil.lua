@@ -161,12 +161,18 @@ function armorAdapt.generateNpcArmorTable(adaptNpcArmor)
 end
 
 function armorAdapt.getSpeciesBodyTable(species)
-	if species == "standard" then
-		bodyTable = { "Default", "Default", "Default", "Default", "Default" }
-		return bodyTable
-	elseif species == "lucario" then
-		bodyTable = armorAdapt.getLucarioBodyType()
-		return bodyTable
+	for listSpecies, speciesScript in ipairs(root.assetJson("/scripts/armorAdapt/armorAdapt.config:adaptSpeciesSubTypeScripts")) do
+		if species == "standard" then
+			bodyTable = { "Default", "Default", "Default", "Default", "Default" }
+			return bodyTable
+		elseif species == "lucario" then
+			bodyTable = armorAdapt.getLucarioBodyType()
+			return bodyTable
+		elseif species == listSpecies then
+			require(speciesScript)
+			bodyTable = armorAdapt.speciesBodyTable()
+			return bodyTable
+		end
 	end
 end
 
@@ -177,7 +183,7 @@ function armorAdapt.getLucarioBodyType(bodyTable)
 	
 	gender = not not (backArm:find("b1ffa7=00000000"))
 	bodySpike = not not (backArm:find("eddfd4=ffffff") or backArm:find("eddfd4=000000"))
-	pawSpike = not not (backArm:find("ffb34a=fefefe")) -- checks for paw spike, if false then none
+	pawSpike = not not (backArm:find("ffb34a=ffffff")) -- checks for paw spike, if false then none
 	tail = backArm:find("42217b=00000000") and 1 -- Lucario
               or backArm:find("748db8=00000000") and 2 -- Riolu
               or backArm:find("6b5b88=00000000") and 3 -- Fluffy
@@ -257,11 +263,11 @@ function armorAdapt.showCompletionLog(item, species, bodytype, entity)
 	local infLg = sb.logInfo
 	if entity == "player" then
 		if root.assetJson("/scripts/armorAdapt/armorAdapt.config:showPlayerBuildCompletion") == true then
-			infLg("[Armor Adapt][Player Handler]: Item %s has sucessfully been adapted to the species %s and the body type %s", root.itemConfig(item).config.itemName, species, bodyType)
+			infLg("[Armor Adapt][Player Handler]: Item %s has sucessfully been adapted to the species %s and the sub type %s", root.itemConfig(item).config.itemName, species, bodyType)
 		end
 	elseif entity == "npc" then
 		if root.assetJson("/scripts/armorAdapt/armorAdapt.config:showNpcBuildCompletion") == true then
-			infLg("[Armor Adapt][NPC Handler]: Item %s has sucessfully been adapted to the species %s and the body type %s", root.itemConfig(item).config.itemName, species, bodyType)
+			infLg("[Armor Adapt][NPC Handler]: Item %s has sucessfully been adapted to the species %s and the sub type %s", root.itemConfig(item).config.itemName, species, bodyType)
 		end
 	end
 end
@@ -271,6 +277,69 @@ function armorAdapt.showCustomSkipLog(entity)
 	if entity == "player" then
 		if root.assetJson("/scripts/armorAdapt/armorAdapt.config:showCustomItemSkip") == true then
 		sb.logInfo("[Armor Adapt][Player Handler]: Custom Directives based item detected, skipping conversion.")
+		end
+	end
+end
+
+function armorAdapt.v1EffectUpdate(effCfg, bodyType, bodyHead, bodyChest, bodyLegs, bodyBack, strg1, strg2, strg3, strg4, strg5, forceBool)
+	for _, effVal in ipairs(effCfg) do
+		if forceBool == false then
+			if status.uniqueStatusEffectActive(effect) then
+				bodyType = bodyType..effect
+				if bodyHead ~= nil then
+					bodyHead = bodyHead..effect
+				end
+				if bodyChest ~= nil then
+					bodyChest = bodyChest..effect
+				end
+				if bodyLegs ~= nil then
+					bodyLegs = bodyLegs..effect
+				end
+				if bodyBack ~= nil then
+					bodyBack = bodyBack..effect
+				end
+			end
+		else
+			if strg1 ~= bodyType then
+				bodyType = strg1
+			end
+			bodyType = bodyType..forceEffect
+			if bodyHead ~= nil then
+				if strg1 ~= bodyType then
+					bodyHead = strg2
+				end
+				bodyHead = bodyHead..forceEffect
+			end
+			if bodyChest ~= nil then
+				if strg1 ~= bodyType then
+					bodyChest = strg3
+				end
+				bodyChest = bodyChest..forceEffect
+			end
+			if bodyLegs ~= nil then
+				if strg1 ~= bodyType then
+					bodyLegs = strg4
+				end
+				bodyLegs = bodyLegs..forceEffect
+			end
+			if bodyBack ~= nil then
+				if storageBodyType ~= bodyType then
+					bodyBack = strg5
+				end
+				bodyBack = bodyBack..forceEffect
+			end
+		end			
+	end
+end
+
+function armorAdapt.v1SpeciesFill(specTable, spec1, spec2, spec3, spec4, spec5)
+	for _,specValue in ipairs(specTable) do
+		if player.species() == specValue then
+			playerSpecies = spec1
+			adaptHeadType = spec2
+			adaptChestType = spec3
+			adaptLegType = spec4
+			adaptBackType = spec5
 		end
 	end
 end
