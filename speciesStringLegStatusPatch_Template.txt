@@ -1,6 +1,5 @@
 [
-"op" : "add", "path" : "/armorAdaptLegSpeciesEffects/-", "value" : "<effect>",
-
+{ "op" : "add", "path" : "/armorAdaptLegSpeciesEffects/-", "value" : "<effect>" }
 
 //Do not use the <>, just replace <effect> with the exact name of your effect in the .statuseffect file.
 ]
