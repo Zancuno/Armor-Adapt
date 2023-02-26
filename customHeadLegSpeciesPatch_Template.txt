@@ -1,6 +1,6 @@
 [
-"op" : "add", "path" : "/supportedSpecies/-", "value" : "<species>",
-"op" : "add", "path" : "/customHeadLegSpecies/-", "value" : "<species>"
+{ "op" : "add", "path" : "/supportedSpecies/-", "value" : "<species>" },
+{ "op" : "add", "path" : "/customHeadLegSpecies/-", "value" : "<species>" }
 
 //Do not use the <>, just replace with your species name
 ]
