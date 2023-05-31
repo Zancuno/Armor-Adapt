@@ -67,7 +67,8 @@ function update(dt)
 	baseUpdate(dt)
 	
 	adaptPlayerArmor = armtbl()
-	if cmparmtbt(adaptPlayerArmor, adaptStorageArmorTable) == false then
+	mismatchCheck = cmparmtbt(adaptPlayerArmor, adaptStorageArmorTable)
+	if type(mismatchCheck) == "table" then
 		changed = false
 	else
 		changed = true
@@ -102,7 +103,7 @@ function update(dt)
 		end	
 		
 		if adaptConfig.allowLegacyTransformativeEffects == true then
-			stsTransV1Update(effect, adaptConfig.armorAdaptEffects, bodyType, bodyHead, bodyChest, bodyLegs, bodyBack, nil, nil, nil, nil, nil, false)
+			stsTransV1Update(adaptConfig.armorAdaptEffects, bodyType, bodyHead, bodyChest, bodyLegs, bodyBack, nil, nil, nil, nil, nil, false)
 			stsTransV1Update(adaptConfig.armorAdaptHeadEffects, bodyType, bodyHead, nil, nil, nil, nil, nil, nil, nil, nil, false)
 			stsTransV1Update(adaptConfig.armorAdaptChestEffects, bodyType, nil, bodyChest, nil, nil, nil, nil, nil, nil, nil, false)
 			stsTransV1Update(adaptConfig.armorAdaptLegEffects, bodyType, nil, nil, bodyLegs, nil, nil, nil, nil, nil, nil, false)
@@ -112,86 +113,66 @@ function update(dt)
 			stsTransV1Update(adaptConfig.armorAdaptChestForceEffects, bodyType, nil, bodyChest, nil, nil, storageBodyType, nil, storageBodyChest, nil, nil, true)
 			stsTransV1Update(adaptConfig.armorAdaptLegForceEffects, bodyType, nil, nil, bodyLegs, nil, storageBodyType, nil, nil, storageBodyLegs, nil, true)
 			stsTransV1Update(adaptConfig.armorAdaptBackForceEffects, bodyType, nil, nil, nil, bodyBack, storageBodyType, nil, nil, nil, storageBodyBack, true)
+			for _, holidayEffect in ipairs(adaptConfig.armorAdaptHolidayEffects) do
+				if stseffact(holidayEffect) then
+					if adaptEffect == "armorAdapt_null" or adaptEffect == holidayEffectEffect then
+						playerSpecies,adaptHeadType = holidayEffect, holidayEffect
+						bodyType,bodyHead = dfltBdy, dfltBdy
+					
+						adaptEffect = holidayEffect
+					end
+				end
+			end
+		
+			for _, overEffect in ipairs(adaptConfig.armorAdaptOverrideEffects) do
+				if stseffact(overEffect) then
+					if adaptEffect == "armorAdapt_null" or adaptEffect == overEffect then
+						playerSpecies,adaptHeadType,adaptChestType,adaptLegType,adaptBackType = overEffect, overEffect, overEffect, overEffect, overEffect
+						bodyType,bodyHead,bodyChest,bodyLegs,bodyBack = dfltBdy, dfltBdy, dfltBdy, dfltBdy, dfltBdy
+
+						hideBody = true
+						adaptEffect = overEffect
+					end
+				end
+			end
 		end
 		
 		for transEffect, transSettings in ipairs(adaptConfig.armorAdaptTransformativeEffects) do
 			if stseffact(transEffect) then
-				bodyType = bodyType..transEffect
-				if transSettings[head] == 1 then
-					bodyHead = bodyHead..transEffect
-				end
-				if transSettings[chest] == 1 then
-					bodyChest = bodyChest..transEffect
-				end
-				if transSettings[legs] == 1 then
-					bodyLegs = bodyLegs..transEffect
-				end
-				if transSettings[back] == 1 then
-					bodyBack = bodyBack..transEffect
-				end
-			end
-		end
-		
-		for transForEffect, transForSettings in ipairs(adaptConfig.armorAdaptTransForceEffects) do
-			if stseffact(transForEffect) then
-				if storageBodyType ~= bodyType then
+				local stackTable = { bodyHead, bodyChest, bodyLegs, bodyBack }
+				if transSettings[setting] == "stack" then
+					bodyType = bodyType..transEffect
+					for stknum = 4, 1, -1 do
+						if transSettings[stknum] == 1 then
+							stackTable[stknum] = stackTable[stknum]..transEffect
+						end
+					end
+				elseif transSettings[setting] == "override" then
+					if storageBodyType ~= bodyType then
 					bodyType = storageBodyType
-				end
-				bodyType = bodyType..transForEffect
-				if storageBodyType ~= bodyType and transSettings[head] == 1 then
-					bodyHead = storageBodyHead
-					bodyHead = bodyHead..transForEffect
-				elseif transSettings[head] == 1 then
-					bodyHead = bodyHead..transForEffect
-				end
-				if storageBodyType ~= bodyType and transSettings[chest] == 1 then
-					bodyChest = storageBodyChest
-					bodyChest = bodyChest..transForEffect
-				elseif transSettings[chest] == 1 then
-					bodyChest = bodyChest..transForEffect
-				end
-				if storageBodyType ~= bodyType and transSettings[legs] == 1 then
-					bodyLegs = storageBodyLegs
-					bodyLegs = bodyLegs..transForEffect
-				elseif transSettings[legs] == 1 then
-					bodyLegs = bodyLegs..transForEffect
-				end
-				if storageBodyType ~= bodyType and transSettings[back] == 1 then
-					bodyBack = storageBodyBack
-					bodyBack = bodyBack..transForEffect
-				elseif transSettings[back] == 1 then
-					bodyBack = bodyBack..transForEffect
-				end
-			end
-		end
-			
-		for _, holidayEffect in ipairs(adaptConfig.armorAdaptHolidayEffects) do
-			if stseffact(holidayEffect) then
-				if adaptEffect == "armorAdapt_null" or adaptEffect == holidayEffectEffect then
-					playerSpecies,adaptHeadType = holidayEffect, holidayEffect
-					bodyType,bodyHead = dfltBdy, dfltBdy
+					end
+					bodyType = bodyType..transEffect
+					storageStackTable = { storageBodyHead, storageBodyChest, storageBodyLegs, storageBodyBack }
+					for stknum = 4, 1, -1 do
+						if storageBodyType ~= bodyType and transSettings[stknum] == 1 then
+							stackTable[stknum] = storageStackTable[stknum]
+							stackTable[stknum] = stackTable[stknum]..transEffect
+						elseif transSettings[stknum] == 1 then
+							stackTable[stknum] = stackTable[stknum]..transEffect
+						end
+					end
+				elseif transSettings[setting] == "classEdit" then
+					playerSpecies,adaptHeadType,adaptChestType,adaptLegType,adaptBackType = transEffect, transEffect, transEffect, transEffect, transEffect
 					
-					adaptEffect = holidayEffect
-				end
-			end
-		end
-		
-		for speciesEffect, specEffSpecies in ipairs(adaptConfig.armorAdaptSpeciesEffects) do
-			if stseffact(speciesEffect) then
-				playerSpecies,adaptHeadType,adaptChestType,adaptLegType,adaptBackType = specEffSpecies, specEffSpecies, specEffSpecies, specEffSpecies, specEffSpecies
-				
-				adaptEffect = overEffect
-			end
-		end
-		
-		for _, overEffect in ipairs(adaptConfig.armorAdaptOverrideEffects) do
-			if stseffact(overEffect) then
-				if adaptEffect == "armorAdapt_null" or adaptEffect == overEffect then
-					playerSpecies,adaptHeadType,adaptChestType,adaptLegType,adaptBackType = overEffect, overEffect, overEffect, overEffect, overEffect
+					adaptEffect = transEffect
+				elseif transSettings[setting] == "disguise" then
+					if adaptEffect == "armorAdapt_null" or adaptEffect == transEffect then
+					playerSpecies,adaptHeadType,adaptChestType,adaptLegType,adaptBackType = transEffect, transEffect, transEffect, transEffect, transEffect
 					bodyType,bodyHead,bodyChest,bodyLegs,bodyBack = dfltBdy, dfltBdy, dfltBdy, dfltBdy, dfltBdy
 
 					hideBody = true
-					adaptEffect = overEffect
+					adaptEffect = transEffect
+					end
 				end
 			end
 		end
@@ -207,15 +188,9 @@ function update(dt)
 			inflg("[Armor Adapt][Player Handler]: The player currently has these items equipped: Head %s, Cosmetic head %s, chest %s, cosmetic chest %s, legs %s, cosmetic legs %s, back %s, and cosmetic back %s", adaptPlayerArmor[1], adaptPlayerArmor[2], adaptPlayerArmor[3], adaptPlayerArmor[4], adaptPlayerArmor[5], adaptPlayerArmor[6], adaptPlayerArmor[7], adaptPlayerArmor[8])
 			played[4] = 1
 		end
-
-		armorAdapt_slotUpdate(1)
-		armorAdapt_slotUpdate(2)
-		armorAdapt_slotUpdate(3)
-		armorAdapt_slotUpdate(4)
-		armorAdapt_slotUpdate(5)
-		armorAdapt_slotUpdate(6)
-		armorAdapt_slotUpdate(7)
-		armorAdapt_slotUpdate(8)
+		for _, adt_mismat in ipairs(mismatchCheck) do
+			armorAdapt_slotUpdate(adt_mismat)
+		end
 		
 		armorAdapt_outfitErrorCheck(3)
 		armorAdapt_outfitErrorCheck(4)

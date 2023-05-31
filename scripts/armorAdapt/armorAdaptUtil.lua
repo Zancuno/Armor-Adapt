@@ -2,24 +2,39 @@ armorAdapt = {}
 
 function armorAdapt.compareArmorTables(a, b)
 	local adtItmMtch = root.itemDescriptorsMatch
-	if
-		adtItmMtch(a[1], b[1], true) and
-		adtItmMtch(a[2], b[2], true) and 
-		adtItmMtch(a[3], b[3], true) and
-		adtItmMtch(a[4], b[4], true) and
-		adtItmMtch(a[5], b[5], true) and
-		adtItmMtch(a[6], b[6], true) and
-		adtItmMtch(a[7], b[7], true) and
-		adtItmMtch(a[8], b[8], true) then
+	local rouletteTable = { "1", "1", "1", "1", "1", "1", "1", "1" }
+	local mismatchTable = {}
+	for k,v in pairs(rouletteTable) do
+		if not adtItmMtch(a[k], b[k], true) then
+			mismatchTable[k] = k
+		end
+	end
+
+	if mismatchTable == {} then
 		return true
 	else
-		return false
+		return mismatchTable	
 	end
 end
 
 function armorAdapt.runArmorAdapt(baseItem, key, species, bodyType, hideBody, entity)
 	local bldLg,rtCfg = armorAdapt.showBuildLog, root.itemConfig
 	local adtPth = "/items/armors/armorAdapt/"
+	local keyTable = {
+		{"head", "headf", "headm", false, true},
+		{"head", "headf", "headm", false, true},
+		{"chest", "chestf", "chestm", true, false},
+		{"chest", "chestf", "chestm", true, false},
+		{"pants", "pantsf", "pantsm", false, false},
+		{"pants", "pantsf", "pantsm", false, false},
+		{"back", "back", "back", false, false},
+		{"back", "back", "back", false, false}
+	}
+	if species == "null" then
+		midPath = "/default/null/Default/"
+	else
+		midPath = species.."/"..baseName.."/"..bodyType.."/"
+	end
 	adaptDirectivesMin = root.assetJson("/scripts/armorAdapt/armorAdapt.config:adaptDirectivesMin")
 	if rtCfg(baseItem).parameters.directives ~= nil and string.len(rtCfg(baseItem).parameters.directives) >= adaptDirectivesMin or rtCfg(baseItem).config.builder == "/sys/stardust/cosplay/build.lua" then
 		adaptItem = baseItem
@@ -32,103 +47,26 @@ function armorAdapt.runArmorAdapt(baseItem, key, species, bodyType, hideBody, en
 		armorAdapt.showItemLog(baseItem, entity)
 		local adaptItem = copy(baseItem)
 		local baseName = rtCfg(baseItem).config.itemName
-		if key == 1 or key == 2 then
-			if species == "null" then
-				adaptItem.parameters.maleFrames = "/items/armors/armorAdapt/default/null/Default/headf.png"
-				adaptItem.parameters.femaleFrames = "/items/armors/armorAdapt/default/null/Default/headf.png"
-				adaptItem.parameters.mask = "mask.png"
-		
-				adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "head", baseName }
-				sb.logInfo("Head item name is %s", baseName)
-				
-				bldLg(baseItem, adaptItem, entity)
-				return adaptItem
-			else
-				adaptItem.parameters.maleFrames = adtPth..species.."/"..baseName.."/"..bodyType.."/headm.png"
-				adaptItem.parameters.femaleFrames = adtPth..species.."/"..baseName.."/"..bodyType.."/headf.png"
-				adaptItem.parameters.mask = "mask.png"
-		
-				adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "head", baseName }
-				
-				bldLg(baseItem, adaptItem, entity)
-				return adaptItem
-			end
-		elseif key == 3 or key == 4 then
-			if species == "null" then
-				maleChestBody = "/items/armors/armorAdapt/default/null/Default/chestm.png"
-				femaleChestBody = "/items/armors/armorAdapt/default/null/Default/chestf.png"
-				frontArmMaleFrames = "/items/armors/armorAdapt/default/null/Default/fsleeve.png"
-				backArmMaleFrames = "/items/armors/armorAdapt/default/null/Default/bsleeve.png"
-				frontArmFemaleFrames = "/items/armors/armorAdapt/default/null/Default/fsleevef.png"
-				backArmFemaleFrames = "/items/armors/armorAdapt/default/null/Default/bsleevef.png"
-		
-				adaptItem.parameters.maleFrames = { body = maleChestBody , frontSleeve = frontArmMaleFrames, backSleeve = backArmMaleFrames }
-
-				adaptItem.parameters.femaleFrames = { body = femaleChestBody, frontSleeve = frontArmFemaleFrames, backSleeve = backArmFemaleFrames }
-		
-				adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "chest", baseName }
-				
-				bldLg(baseItem, adaptItem, entity)
-				return adaptItem
-			else
-				maleChestBody = adtPth..species.."/"..baseName.."/"..bodyType.."/chestm.png"
-				femaleChestBody = adtPth..species.."/"..baseName.."/"..bodyType.."/chestf.png"
-				frontArmMaleFrames = adtPth..species.."/"..baseName.."/"..bodyType.."/fsleeve.png"
-				backArmMaleFrames = adtPth..species.."/"..baseName.."/"..bodyType.."/bsleeve.png"
-				frontArmFemaleFrames = adtPth..species.."/"..baseName.."/"..bodyType.."/fsleevef.png"
-				backArmFemaleFrames = adtPth..species.."/"..baseName.."/"..bodyType.."/bsleevef.png"
-		
-				adaptItem.parameters.maleFrames = { body = maleChestBody , frontSleeve = frontArmMaleFrames, backSleeve = backArmMaleFrames }
-
-				adaptItem.parameters.femaleFrames = { body = femaleChestBody, frontSleeve = frontArmFemaleFrames, backSleeve = backArmFemaleFrames }
-		
-				adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "chest", baseName }
-				
-				bldLg(baseItem, adaptItem, entity)
-				return adaptItem
-			end
-			
-		elseif key == 5 or key == 6 then
-			if species == "null" then
-				adaptItem.parameters.maleFrames = "/items/armors/armorAdapt/default/null/Default/pantsm.png"
-				adaptItem.parameters.femaleFrames = "/items/armors/armorAdapt/default/null/Default/pantsf.png"
-
-				if hideBody == false then
-					adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "pants" }
-				else
-					adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "pants", "hideBody" }
-				end
-				bldLg(baseItem, adaptItem, entity)
-				return adaptItem
-			else
-				adaptItem.parameters.maleFrames = adtPth..species.."/"..baseName.."/"..bodyType.."/pantsm.png"
-				adaptItem.parameters.femaleFrames = adtPth..species.."/"..baseName.."/"..bodyType.."/pantsf.png"
-
-				if hideBody == false then
-					adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "pants" }
-				else
-					adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "pants", "hideBody" }
-				end
-				bldLg(baseItem, adaptItem, entity)
-				return adaptItem
-			end
+		if keyTable[key][4] == true then
+			adaptItem.parameters.maleFrames = { body = adtPth..midPath..keyTable[key][3]..".png", frontSleeve = adtPth..midPath.."/fsleeve.png", backSleeve = adtPth..midPath.."/bsleeve.png" }
+					
+			adaptItem.parameters.femaleFrames = { body = adtPth..midPath..keyTable[key][2]..".png", frontSleeve = adtPth..midPath.."/fsleevef.png", backSleeve = adtPth..midPath.."/bsleevef.png" }
 		else
-			if species == "null" then
-				adaptItem.parameters.maleFrames = "/items/armors/armorAdapt/default/null/Default/back.png"
-				adaptItem.parameters.femaleFrames = "/items/armors/armorAdapt/default/null/Default/back.png"
-		
-				adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "back" }
-				bldLg(baseItem, adaptItem, entity)
-				return adaptItem
-			else
-				adaptItem.parameters.maleFrames = adtPth..species.."/"..baseName.."/"..bodyType.."/back.png"
-				adaptItem.parameters.femaleFrames = adtPth..species.."/"..baseName.."/"..bodyType.."/back.png"
-		
-				adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, "back" }
-				bldLg(baseItem, adaptItem, entity)
-				return adaptItem
-			end
+			adaptItem.parameters.maleFrames = adtPth..midPath..keyTable[key][3]..".png"
+			adaptItem.parameters.femaleFrames = adtPth..midPath..keyTable[key][2]..".png"
 		end
+
+		if keyTable[key][5] == true then
+				adaptItem.parameters.mask = "mask.png"
+		end
+
+		if hideBody == false then
+			adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, keyTable[key][1], baseName }
+		else
+			adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, keyTable[key][1], baseName, "hideBody" }
+		end
+		bldLg(baseItem, adaptItem, entity)
+		return adaptItem
 	end
 end
 
@@ -282,53 +220,23 @@ function armorAdapt.showCustomSkipLog(entity)
 end
 
 function armorAdapt.v1EffectUpdate(effCfg, bodyType, bodyHead, bodyChest, bodyLegs, bodyBack, strg1, strg2, strg3, strg4, strg5, forceBool)
+	local bodyList = {bodyHead, bodyChest, bodyLegs, bodyBack}
+	local bodyListStorage{strg2, strg3, strg4, strg5}
 	for _, effVal in ipairs(effCfg) do
-		if forceBool == false then
-			if status.uniqueStatusEffectActive(effect) then
-				bodyType = bodyType..effect
-				if bodyHead ~= nil then
-					bodyHead = bodyHead..effect
+		if status.uniqueStatusEffectActive(effVal) then
+			for listRun = 4, 1, -1 do
+				if forceBool == true and strg1 ~= bodyType then
+					bodyType = strg1
 				end
-				if bodyChest ~= nil then
-					bodyChest = bodyChest..effect
-				end
-				if bodyLegs ~= nil then
-					bodyLegs = bodyLegs..effect
-				end
-				if bodyBack ~= nil then
-					bodyBack = bodyBack..effect
+				bodyType = bodyType..effVal
+				if bodyList[listRun] ~= nil then
+					if forceBool == true and strg1 ~= bodyType then
+						bodyList[listRun] = bodyListStorage[listRun]
+					end
+					bodyList[listRun] = bodyList[listRun]..effVal
 				end
 			end
-		else
-			if strg1 ~= bodyType then
-				bodyType = strg1
-			end
-			bodyType = bodyType..forceEffect
-			if bodyHead ~= nil then
-				if strg1 ~= bodyType then
-					bodyHead = strg2
-				end
-				bodyHead = bodyHead..forceEffect
-			end
-			if bodyChest ~= nil then
-				if strg1 ~= bodyType then
-					bodyChest = strg3
-				end
-				bodyChest = bodyChest..forceEffect
-			end
-			if bodyLegs ~= nil then
-				if strg1 ~= bodyType then
-					bodyLegs = strg4
-				end
-				bodyLegs = bodyLegs..forceEffect
-			end
-			if bodyBack ~= nil then
-				if storageBodyType ~= bodyType then
-					bodyBack = strg5
-				end
-				bodyBack = bodyBack..forceEffect
-			end
-		end			
+		end
 	end
 end
 
