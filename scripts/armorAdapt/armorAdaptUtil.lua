@@ -128,85 +128,65 @@ function armorAdapt.getLucarioBodyType(bodyTable)
               or 0 -- Unknown
 	appendage = not backArm:find("c4ea3a=00000000")
 	lucarioBody =
-			(gender and "G" or "N") ..--GC for Gender, NC for Neutral, true/flase
-			(bodySpike and "CS" or "") ..--blank string for has spike, NS for No Spike
-			(pawSpike and "" or "NPS") ..--blank string for having paw spikes, NPS for No Paw Spike
-			(tail == 1 and "L" or tail == 2 and "R" or "F") ..
-			(appendage and "A" or "")
+			(gender and "G" or "N")..(bodySpike and "CS" or "")..(pawSpike and "" or "NPS")..(tail == 1 and "L" or tail == 2 and "R" or "F")..(appendage and "A" or "")
 	bodyTable[1] = lucarioBody
 	bodyTable[2] = "Default"
-	bodyChest =
-			(gender and "G" or "N") ..
-			(bodySpike and "CS" or "") ..
-			(pawSpike and "" or "NPS")
+	bodyChest = (gender and "G" or "N")..(bodySpike and "CS" or "")..(pawSpike and "" or "NPS")
 	bodyTable[3] = bodyChest
-	bodyLegs = 
-			(gender and "G" or "N") ..
-			(tail == 1 and "L" or tail == 2 and "R" or "F") ..
-			(appendage and "A" or "")
+	bodyLegs = (gender and "G" or "N")..(tail == 1 and "L" or tail == 2 and "R" or "F")..(appendage and "A" or "")
 	bodyTable[4] = bodyLegs
 	bodyTable[5] = "Default"
 	
 	return bodyTable
-
 end
 
 function armorAdapt.showItemLog(item, entity)
 	local infLg = sb.logInfo
 	local itmName = root.itemConfig(item).config.itemName
 	local itmPara = root.itemConfig(item).parameters
+	local entityTable = {}
 	if entity == "player" then
-		if root.assetJson("/scripts/armorAdapt/armorAdapt.config:showPlayerSupportedItem") == true then
-			infLg("[Armor Adapt][Player Handler]: The name for the suported item is %s", itmName)
-			infLg("[Armor Adapt][Player Handler]: The parameters for the suported item are %s", itmPara)
-		end
+		entityTable = {"Player", "Player"}
 	elseif entity == "npc" then
-		if root.assetJson("/scripts/armorAdapt/armorAdapt.config:showNpcSupportedItem") == true then
-			infLg("[Armor Adapt][NPC Handler]: The name for the suported item is %s", itmName)
-			infLg("[Armor Adapt][NPC Handler]: The parameters for the suported item are %s", itmPara)
-		end
+		entityTable = {"NPC", "Npc"}
+	end
+	if root.assetJson("/scripts/armorAdapt/armorAdapt.config:show"..entityTable[2].."SupportedItem") == true then
+		infLg("[Armor Adapt]["..entityTable[1].." Handler]: The name for the suported item is %s", itmName)
+		infLg("[Armor Adapt]["..entityTable[1].." Handler]: The parameters for the suported item are %s", itmPara)
 	end
 end
 
 function armorAdapt.showBuildLog(baseItem, adaptItem, entity)
 	local infLg = sb.logInfo
+	local entityTable = {}
 	if entity == "player" then
-		if root.assetJson("/scripts/armorAdapt/armorAdapt.config:showPlayerBuildInfo") == true then
-			infLg("[Armor Adapt][Player Handler]: The tags of the base item are %s", root.itemConfig(baseItem).config.itemTags)
-			infLg("[Armor Adapt][Player Handler]: The male frames of the base item are %s", root.itemConfig(baseItem).config.maleFrames)
-			infLg("[Armor Adapt][Player Handler]: The female frames of the base item are %s", root.itemConfig(baseItem).config.femaleFrames)
-			infLg("[Armor Adapt][Player Handler]: The mask of the base item is %s", root.itemConfig(baseItem).config.mask)
-
-			infLg("[Armor Adapt][Player Handler]: Adapted item tags are %s", adaptItem.parameters.itemTags)
-			infLg("[Armor Adapt][Player Handler]: Adapted item male frames are %s", 	adaptItem.parameters.maleFrames)
-			infLg("[Armor Adapt][Player Handler]: Adapted item female frames are %s", adaptItem.parameters.femaleFrames)
-			infLg("[Armor Adapt][Player Handler]: Adapted item mask is %s", adaptItem.parameters.mask)
-		end
+		entityTable = {"Player", "Player"}
 	elseif entity == "npc" then
-		if root.assetJson("/scripts/armorAdapt/armorAdapt.config:showNpcBuildInfo") == true then
-			infLg("[Armor Adapt][NPC Handler]: The tags of the base item are %s", root.itemConfig(baseItem).config.itemTags)
-			infLg("[Armor Adapt][NPC Handler]: The male frames of the base item are %s", root.itemConfig(baseItem).config.maleFrames)
-			infLg("[Armor Adapt][NPC Handler]: The female frames of the base item are %s", root.itemConfig(baseItem).config.femaleFrames)
-			infLg("[Armor Adapt][NPC Handler]: The mask of the base item is %s", root.itemConfig(baseItem).config.mask)
+		entityTable = {"NPC", "Npc"}
+	end
+	if root.assetJson("/scripts/armorAdapt/armorAdapt.config:show"..entityTable[2].."BuildInfo") == true then
+		infLg("[Armor Adapt]["..entityTable[1].." Handler]: The tags of the base item are %s", root.itemConfig(baseItem).config.itemTags)
+		infLg("[Armor Adapt]["..entityTable[1].." Handler]: The male frames of the base item are %s", root.itemConfig(baseItem).config.maleFrames)
+		infLg("[Armor Adapt]["..entityTable[1].." Handler]: The female frames of the base item are %s", root.itemConfig(baseItem).config.femaleFrames)
+		infLg("[Armor Adapt]["..entityTable[1].." Handler]: The mask of the base item is %s", root.itemConfig(baseItem).config.mask)
 
-			infLg("[Armor Adapt][NPC Handler]: Adapted item tags are %s", adaptItem.parameters.itemTags)
-			infLg("[Armor Adapt][NPC Handler]: Adapted item male frames are %s", 	adaptItem.parameters.maleFrames)
-			infLg("[Armor Adapt][NPC Handler]: Adapted item female frames are %s", adaptItem.parameters.femaleFrames)
-			infLg("[Armor Adapt][NPC Handler]: Adapted item mask is %s", adaptItem.parameters.mask)
-		end
+		infLg("[Armor Adapt]["..entityTable[1].." Handler]: Adapted item tags are %s", adaptItem.parameters.itemTags)
+		infLg("[Armor Adapt]["..entityTable[1].." Handler]: Adapted item male frames are %s", 	adaptItem.parameters.maleFrames)
+		infLg("[Armor Adapt]["..entityTable[1].." Handler]: Adapted item female frames are %s", adaptItem.parameters.femaleFrames)
+		infLg("[Armor Adapt]["..entityTable[1].." Handler]: Adapted item mask is %s", adaptItem.parameters.mask)
 	end
 end
 
 function armorAdapt.showCompletionLog(item, species, bodytype, entity)
 	local infLg = sb.logInfo
+	local entityTable = {}
 	if entity == "player" then
-		if root.assetJson("/scripts/armorAdapt/armorAdapt.config:showPlayerBuildCompletion") == true then
-			infLg("[Armor Adapt][Player Handler]: Item %s has sucessfully been adapted to the species %s and the sub type %s", root.itemConfig(item).config.itemName, species, bodyType)
-		end
+		entityTable = {"Player", "Player"}
 	elseif entity == "npc" then
-		if root.assetJson("/scripts/armorAdapt/armorAdapt.config:showNpcBuildCompletion") == true then
-			infLg("[Armor Adapt][NPC Handler]: Item %s has sucessfully been adapted to the species %s and the sub type %s", root.itemConfig(item).config.itemName, species, bodyType)
-		end
+		entityTable = {"NPC", "Npc"}
+	end
+	if root.assetJson("/scripts/armorAdapt/armorAdapt.config:show"..entityTable[2].."BuildCompletion") == true then
+		infLg("[Armor Adapt]["..entityTable[1].." Handler]: Item %s has sucessfully been adapted to the species %s and the sub type %s", root.itemConfig(item).config.itemName, species, bodyType)
 	end
 end
 

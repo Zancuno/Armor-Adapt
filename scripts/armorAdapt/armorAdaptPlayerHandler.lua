@@ -42,6 +42,11 @@ function init()
 			adaptChestType = speciesValue[chest]
 			adaptLegType = speciesValue[pants]
 			adaptBackType = speciesValue[back]
+			if speciesValue[spriteLibrary] ~= "armorAdapt" then
+				armAdtSpriteLibrary = speciesValue[spriteLibrary]
+			else
+				armAdtSpriteLibrary = "armorAdapt"
+			end
 		end
 	end
 
@@ -189,6 +194,8 @@ function update(dt)
 			played[4] = 1
 		end
 		for _, adt_mismat in ipairs(mismatchCheck) do
+			slotUAdapt = {adaptHeadType, adaptHeadType, adaptChestType, adaptChestType, adaptLegType, adaptLegType, adaptBackType, adaptBackType}
+			slotUBody = {bodyHead, bodyHead, bodyChest, bodyChest, bodyLegs, bodyLegs, bodyBack, bodyBack}
 			armorAdapt_slotUpdate(adt_mismat)
 		end
 		
@@ -211,7 +218,7 @@ function armorAdapt_slotUpdate(slotU)
 		if baseArmorItem.name == "perfectlygenericitem" then
 			eqpitm(slotTable[slotU], nil)
 		end
-			adaptArmorPlayerItem = rnadpt(baseArmorItem, slotU, adaptBackType, bodyBack, hideBody, entityType)
+			adaptArmorPlayerItem = rnadpt(baseArmorItem, slotU, slotUAdapt[slotU], slotUBody[slotU], hideBody, entityType)
 		if adaptArmorPlayerItem ~= nil then
 			eqpitm(slotTable[slotU], adaptArmorPlayerItem)
 			cmptlg(adaptArmorPlayerItem, playerSpecies, bodyType, entityType)
