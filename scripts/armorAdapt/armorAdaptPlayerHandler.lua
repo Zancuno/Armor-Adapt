@@ -36,18 +36,16 @@ function init()
 	spsFill(headSpecies, adaptConfig.customHeadSpecies, initSpecies, initSpecies, dfltSpc, dfltSpc, dfltSpc)
 	spsFill(standardSpecies, adaptConfig.vanillaBodySpecies, dfltSpc, dfltSpc, dfltSpc, dfltSpc, dfltSpc)
 	
-	for speciesIndex, speciesValue in ipairs(adaptConfig.adaptSpeciesSettings) do
-		if player.species() == speciesIndex then
-			playerSpecies = speciesIndex
-			adaptHeadType = speciesValue[head]
-			adaptChestType = speciesValue[chest]
-			adaptLegType = speciesValue[pants]
-			adaptBackType = speciesValue[back]
-			if speciesValue[spriteLibrary] ~= "default" then
-				armAdtSpriteLibrary = speciesValue[spriteLibrary]
-			else
-				armAdtSpriteLibrary = "default"
-			end
+	if type(adaptConfig.adaptSpeciesSettings[initSpecies]) == "table" then
+		playerSpecies = initSpecies
+		adaptHeadType = adaptConfig.adaptSpeciesSettings[initSpecies]["head"]
+		adaptChestType = adaptConfig.adaptSpeciesSettings[initSpecies]["chest"]
+		adaptLegType = adaptConfig.adaptSpeciesSettings[initSpecies]["pants"]
+		adaptBackType = adaptConfig.adaptSpeciesSettings[initSpecies]["back"]
+		if adaptConfig.adaptSpeciesSettings[initSpecies]["spriteLibrary"] ~= "default" then
+			armAdtSpriteLibrary = adaptConfig.adaptSpeciesSettings[initSpecies]["spriteLibrary"]
+		else
+			armAdtSpriteLibrary = "default"
 		end
 	end
 
@@ -66,7 +64,7 @@ function init()
 	adaptUpdate = 0
 	adaptEffect = "armorAdapt_null"
 	status.clearPersistentEffects("rentekHolidayEffects")
-	if _ENV.root[assetOrigin] ~= nil then
+	if _ENV.root["assetOrigin"] ~= nil then
 		if armorAdaptVersionNumber == nil or armorAdaptVersionNumber ~= adaptConfig.armorAdaptBuilderVersion then
 			player.radioMessage("armorAdaptBuilderCompatibility", 10)
 			sb.logError("[Armor Adapt]: A mod named %s has an outdated build script for Armor Adapt, please advise the developer to visit https://github.com/Zancuno/Armor-Adapt to get the updated file. [Star Extensions installed]", root.assetSourceMetadata(root.assetOrigin("/armorAdapt/armorAdaptBuilder.lua")).friendlyName)

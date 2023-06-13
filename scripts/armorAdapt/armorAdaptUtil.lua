@@ -44,7 +44,7 @@ function armorAdapt.runArmorAdapt(baseItem, key, species, bodyType, hideBody, en
 	else
 		midPath = species.."/"..baseName.."/"..bodyType.."/"
 	end
-	if rtCfg(baseItem).config[armorAdapt_tags] ~= nil then
+	if rtCfg(baseItem).config["armorAdapt_tags"] ~= nil then
 		tagCheck = true
 	end
 	adaptDirectivesMin = root.assetJson("/scripts/armorAdapt/armorAdapt.config:adaptDirectivesMin")
@@ -89,19 +89,19 @@ function armorAdapt.runArmorAdapt(baseItem, key, species, bodyType, hideBody, en
 
 		if hideBody == false then
 			if tagCheck == true then
-				adaptItem.parameters.armorAdapt_tags[library] = adtlibrary
-				adaptItem.parameters.armorAdapt_tags[hideBool] = "showBody"
-				adaptItem.parameters.armorAdapt_tags[bodyClass] = species
-				adaptItem.parameters.armorAdapt_tags[subType] = bodyType
+				adaptItem.parameters.armorAdapt_tags["library"] = adtlibrary
+				adaptItem.parameters.armorAdapt_tags["hideBool"] = "showBody"
+				adaptItem.parameters.armorAdapt_tags["bodyClass"] = species
+				adaptItem.parameters.armorAdapt_tags["subType"] = bodyType
 			else
 				adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, keyTable[key][1], baseName, "showBody", adtlibrary }
 			end
 		else
 			if tagCheck == true then
-				adaptItem.parameters.armorAdapt_tags[library] = adtlibrary
-				adaptItem.parameters.armorAdapt_tags[hideBool] = "hideBody"
-				adaptItem.parameters.armorAdapt_tags[bodyClass] = species
-				adaptItem.parameters.armorAdapt_tags[subType] = bodyType
+				adaptItem.parameters.armorAdapt_tags["library"] = adtlibrary
+				adaptItem.parameters.armorAdapt_tags["hideBool"] = "hideBody"
+				adaptItem.parameters.armorAdapt_tags["bodyClass"] = species
+				adaptItem.parameters.armorAdapt_tags["subType"] = bodyType
 			else
 				adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, keyTable[key][1], baseName, "hideBody", adtlibrary }
 			end
@@ -140,45 +140,16 @@ function armorAdapt.generateNpcArmorTable(adaptNpcArmor)
 end
 
 function armorAdapt.getSpeciesBodyTable(species)
-	for listSpecies, speciesScript in ipairs(root.assetJson("/scripts/armorAdapt/armorAdapt.config:adaptSpeciesSubTypeScripts")) do
-		if species == "standard" then
-			bodyTable = { "Default", "Default", "Default", "Default", "Default" }
-			return bodyTable
-		elseif species == "lucario" then
-			bodyTable = armorAdapt.getLucarioBodyType()
-			return bodyTable
-		elseif species == listSpecies then
-			require(speciesScript)
-			bodyTable = armorAdapt.speciesBodyTable()
-			return bodyTable
-		end
+	local scriptList = root.assetJson("/scripts/armorAdapt/armorAdapt.config:adaptSpeciesSubTypeScripts")
+	if scriptList[species] ~= nil then
+		speciesScript = scriptList[species]
+		require(speciesScript)
+		bodyTable = armorAdapt.speciesBodyTable()
+		return bodyTable
+	else 
+		bodyTable = { "Default", "Default", "Default", "Default", "Default" }
+		return bodyTable
 	end
-end
-
-function armorAdapt.getLucarioBodyType(bodyTable)
-	portrait = world.entityPortrait(entity.id(), "full")
-	backArm = portrait[1].image:lower()
-	bodyTable = {}
-	
-	gender = not not (backArm:find("b1ffa7=00000000"))
-	bodySpike = not not (backArm:find("eddfd4=ffffff") or backArm:find("eddfd4=000000"))
-	pawSpike = not not (backArm:find("ffb34a=ffffff")) -- checks for paw spike, if false then none
-	tail = backArm:find("42217b=00000000") and 1 -- Lucario
-              or backArm:find("748db8=00000000") and 2 -- Riolu
-              or backArm:find("6b5b88=00000000") and 3 -- Fluffy
-              or 0 -- Unknown
-	appendage = not backArm:find("c4ea3a=00000000")
-	lucarioBody =
-			(gender and "G" or "N")..(bodySpike and "CS" or "")..(pawSpike and "" or "NPS")..(tail == 1 and "L" or tail == 2 and "R" or "F")..(appendage and "A" or "")
-	bodyTable[1] = lucarioBody
-	bodyTable[2] = "Default"
-	bodyChest = (gender and "G" or "N")..(bodySpike and "CS" or "")..(pawSpike and "" or "NPS")
-	bodyTable[3] = bodyChest
-	bodyLegs = (gender and "G" or "N")..(tail == 1 and "L" or tail == 2 and "R" or "F")..(appendage and "A" or "")
-	bodyTable[4] = bodyLegs
-	bodyTable[5] = "Default"
-	
-	return bodyTable
 end
 
 function armorAdapt.showItemLog(item, entity)

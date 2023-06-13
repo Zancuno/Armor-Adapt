@@ -62,7 +62,7 @@ end
 function armorAdapt.defaultCheck(parameterPath, adtpath, subType, bodyClass, imageName, defaultImage)
 	local imgchk = root.imageSize
 	local pathTable = {parameterPath, adtpath..bodyClass.."/"..subType..imageName, adtpath..bodyClass..imageName, defaultImage}
-	if _ENV.root[assetOrigin] ~= nil then
+	if _ENV.root["assetOrigin"] ~= nil then
 		pathTable[4] = root.itemConfig(config.itemName).directory.."/"..defaultImage
 		for i = 1, #pathTable do
 			if root.assetOrigin(pathTable[i]) ~= nil then
