@@ -25,6 +25,12 @@ function armorAdapt.spriteBuild(directory, config, parameters, level, seed)
 	end
 	if config[armorAdapt_intendedBody] ~= nil and config.armorAdapt_intendedBody.library == library and config.armorAdapt_intendedBody.bodyClass == bodyClass and config.armorAdapt_intendedBody.subType == subType then
 		config = config
+	elseif config[armorAdapt_custom] ~= nil and config.armorAdapt_custom[library][bodyClass][subType] ~= nil then
+		config.maleFrames = config.armorAdapt_custom[library][bodyClass][subType][maleFrames]
+		config.femaleFrames = config.armorAdapt_custom[library][bodyClass][subType][femaleFrames]
+		if config.armorAdapt_custom[library][bodyClass][subType][mask] ~= nil then
+			parameters.mask = config.armorAdapt_custom[library][bodyClass][subType][mask]
+		end
 	elseif parameters.itemTags ~= nil and parameters.itemTags[1] == "armorAdapted" then
 		adtpath = "/items/armors/armorAdapt/default/"
 		if type(maleFrames) = "table" then
