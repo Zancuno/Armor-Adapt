@@ -43,7 +43,7 @@ function init()
 			adaptChestType = speciesValue[chest]
 			adaptLegType = speciesValue[pants]
 			adaptBackType = speciesValue[back]
-			if speciesValue[spriteLibrary] ~= "armorAdapt" then
+			if speciesValue[spriteLibrary] ~= "default" then
 				armAdtSpriteLibrary = speciesValue[spriteLibrary]
 			else
 				armAdtSpriteLibrary = "default"
@@ -152,40 +152,40 @@ function update(dt)
 		end
 		
 		for transEffect, transSettings in ipairs(adaptConfig.armorAdaptTransformativeEffects) do
-			if stseffact(transEffect) then
+			if stseffact(transSettings[effectName]) then
 				local stackTable = { bodyHead, bodyChest, bodyLegs, bodyBack }
 				if transSettings[setting] == "stack" then
-					bodyType = bodyType..transEffect
+					bodyType = bodyType..transSettings[modifier]
 					for stknum = 4, 1, -1 do
 						if transSettings[stknum] == 1 then
-							stackTable[stknum] = stackTable[stknum]..transEffect
+							stackTable[stknum] = stackTable[stknum]..transSettings[modifier]
 						end
 					end
 				elseif transSettings[setting] == "override" then
 					if storageBodyType ~= bodyType then
 					bodyType = storageBodyType
 					end
-					bodyType = bodyType..transEffect
+					bodyType = bodyType..transSettings[modifier]
 					storageStackTable = { storageBodyHead, storageBodyChest, storageBodyLegs, storageBodyBack }
 					for stknum = 4, 1, -1 do
 						if storageBodyType ~= bodyType and transSettings[stknum] == 1 then
 							stackTable[stknum] = storageStackTable[stknum]
-							stackTable[stknum] = stackTable[stknum]..transEffect
+							stackTable[stknum] = stackTable[stknum]..transSettings[modifier]
 						elseif transSettings[stknum] == 1 then
-							stackTable[stknum] = stackTable[stknum]..transEffect
+							stackTable[stknum] = stackTable[stknum]..transSettings[modifier]
 						end
 					end
 				elseif transSettings[setting] == "classEdit" then
-					playerSpecies,adaptHeadType,adaptChestType,adaptLegType,adaptBackType = transEffect, transEffect, transEffect, transEffect, transEffect
+					playerSpecies,adaptHeadType,adaptChestType,adaptLegType,adaptBackType = transSettings[modifier], transSettings[modifier], transSettings[modifier], transSettings[modifier], transSettings[modifier]
 					
-					adaptEffect = transEffect
+					adaptEffect = transSettings[modifier]
 				elseif transSettings[setting] == "disguise" then
-					if adaptEffect == "armorAdapt_null" or adaptEffect == transEffect then
-					playerSpecies,adaptHeadType,adaptChestType,adaptLegType,adaptBackType = transEffect, transEffect, transEffect, transEffect, transEffect
+					if adaptEffect == "armorAdapt_null" or adaptEffect == transSettings[modifier] then
+					playerSpecies,adaptHeadType,adaptChestType,adaptLegType,adaptBackType = transSettings[modifier], transSettings[modifier], transSettings[modifier], transSettings[modifier], transSettings[modifier]
 					bodyType,bodyHead,bodyChest,bodyLegs,bodyBack = dfltBdy, dfltBdy, dfltBdy, dfltBdy, dfltBdy
 
 					hideBody = true
-					adaptEffect = transEffect
+					adaptEffect = transSettings[effectName]
 					end
 				end
 				if transSettings[singleFolder] ~= nil then
