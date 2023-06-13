@@ -17,9 +17,14 @@ function armorAdapt.compareArmorTables(a, b)
 	end
 end
 
-function armorAdapt.runArmorAdapt(baseItem, key, species, bodyType, hideBody, entity)
+function armorAdapt.runArmorAdapt(baseItem, key, species, bodyType, hideBody, entity, adtlibrary, statusFolder)
 	local bldLg,rtCfg = armorAdapt.showBuildLog, root.itemConfig
-	local adtPth = "/items/armors/armorAdapt/"
+	local adtPth = "/path"
+	if adtlibrary == "default" then
+		adtPth = "/items/armors/armorAdapt/"
+	else
+		adtPth = "/items/armors/"..adtlibrary.."/"
+	end
 	local keyTable = {
 		{"head", "headf", "headm", false, true},
 		{"head", "headf", "headm", false, true},
@@ -30,40 +35,76 @@ function armorAdapt.runArmorAdapt(baseItem, key, species, bodyType, hideBody, en
 		{"back", "back", "back", false, false},
 		{"back", "back", "back", false, false}
 	}
+	local baseName = rtCfg(baseItem).config.itemName
+	if statusFolder ~= "none"
+		baseName = statusFolder
+	end
 	if species == "null" then
 		midPath = "/default/null/Default/"
 	else
 		midPath = species.."/"..baseName.."/"..bodyType.."/"
+	end
+	if rtCfg(baseItem).config[armorAdapt_tags] ~= nil then
+		tagCheck = true
 	end
 	adaptDirectivesMin = root.assetJson("/scripts/armorAdapt/armorAdapt.config:adaptDirectivesMin")
 	if rtCfg(baseItem).parameters.directives ~= nil and string.len(rtCfg(baseItem).parameters.directives) >= adaptDirectivesMin or rtCfg(baseItem).config.builder == "/sys/stardust/cosplay/build.lua" then
 		adaptItem = baseItem
 		armorAdapt.showCustomSkipLog(entity)
 		return adaptItem
-	elseif rtCfg(baseItem).parameters.itemTags ~= nil and rtCfg(baseItem).parameters.itemTags[2] == species and rtCfg(baseItem).parameters.itemTags[3] == bodyType then
+	elseif (rtCfg(baseItem).parameters.itemTags ~= nil and rtCfg(baseItem).parameters.itemTags[2] == species and rtCfg(baseItem).parameters.itemTags[3] == bodyType) or (tagCheck == true and  rtCfg(baseItem).parameters.armorAdapt_tags.bodyClass == species and rtCfg(baseItem).parameters.armorAdapt_tags.subType == bodyType) then
 		adaptItem = baseItem
 		return adaptItem
-	elseif rtCfg(baseItem).parameters.itemTags == nil or rtCfg(baseItem).parameters.itemTags[2] ~= species or rtCfg(baseItem).parameters.itemTags[3] ~= bodyType then 
+	elseif (rtCfg(baseItem).parameters.itemTags == nil or rtCfg(baseItem).parameters.itemTags[2] ~= species or rtCfg(baseItem).parameters.itemTags[3] ~= bodyType) or (tagCheck == true and  rtCfg(baseItem).parameters.armorAdapt_tags.bodyClass ~= species or rtCfg(baseItem).parameters.armorAdapt_tags.subType ~= bodyType) then 
 		armorAdapt.showItemLog(baseItem, entity)
 		local adaptItem = copy(baseItem)
-		local baseName = rtCfg(baseItem).config.itemName
+		
 		if keyTable[key][4] == true then
-			adaptItem.parameters.maleFrames = { body = adtPth..midPath..keyTable[key][3]..".png", frontSleeve = adtPth..midPath.."/fsleeve.png", backSleeve = adtPth..midPath.."/bsleeve.png" }
-					
-			adaptItem.parameters.femaleFrames = { body = adtPth..midPath..keyTable[key][2]..".png", frontSleeve = adtPth..midPath.."/fsleevef.png", backSleeve = adtPth..midPath.."/bsleevef.png" }
+			if tagCheck == true then
+				adaptItem.parameters.armorAdapt_tags.maleFrames = { body = adtPth..midPath..keyTable[key][3]..".png", frontSleeve = adtPth..midPath.."/fsleeve.png", backSleeve = adtPth..midPath.."/bsleeve.png" }
+				
+				adaptItem.parameters.armorAdapt_tags.femaleFrames = { body = adtPth..midPath..keyTable[key][2]..".png", frontSleeve = adtPth..midPath.."/fsleevef.png", backSleeve = adtPth..midPath.."/bsleevef.png" }
+			elseif
+				adaptItem.parameters.maleFrames = { body = adtPth..midPath..keyTable[key][3]..".png", frontSleeve = adtPth..midPath.."/fsleeve.png", backSleeve = adtPth..midPath.."/bsleeve.png" }
+						
+				adaptItem.parameters.femaleFrames = { body = adtPth..midPath..keyTable[key][2]..".png", frontSleeve = adtPth..midPath.."/fsleevef.png", backSleeve = adtPth..midPath.."/bsleevef.png" }
+			end
 		else
-			adaptItem.parameters.maleFrames = adtPth..midPath..keyTable[key][3]..".png"
-			adaptItem.parameters.femaleFrames = adtPth..midPath..keyTable[key][2]..".png"
+			if tagCheck == true then
+				adaptItem.parameters.armorAdapt_tags.maleFrames = adtPth..midPath..keyTable[key][3]..".png"
+				adaptItem.parameters.armorAdapt_tags.femaleFrames = adtPth..midPath..keyTable[key][2]..".png"
+			else
+				adaptItem.parameters.maleFrames = adtPth..midPath..keyTable[key][3]..".png"
+				adaptItem.parameters.femaleFrames = adtPth..midPath..keyTable[key][2]..".png"
+			end
 		end
 
 		if keyTable[key][5] == true then
+			if tagCheck == true then
+				adaptItem.parameters.armorAdapt_tags.mask = adtPth..midPath.."mask.png"
+			else
 				adaptItem.parameters.mask = "mask.png"
+			end
 		end
 
 		if hideBody == false then
-			adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, keyTable[key][1], baseName }
+			if tagCheck == true then
+				adaptItem.parameters.armorAdapt_tags[library] = adtlibrary
+				adaptItem.parameters.armorAdapt_tags[hideBool] = "showBody"
+				adaptItem.parameters.armorAdapt_tags[bodyClass] = species
+				adaptItem.parameters.armorAdapt_tags[subType] = bodyType
+			else
+				adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, keyTable[key][1], baseName, "showBody", adtlibrary }
+			end
 		else
-			adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, keyTable[key][1], baseName, "hideBody" }
+			if tagCheck == true then
+				adaptItem.parameters.armorAdapt_tags[library] = adtlibrary
+				adaptItem.parameters.armorAdapt_tags[hideBool] = "hideBody"
+				adaptItem.parameters.armorAdapt_tags[bodyClass] = species
+				adaptItem.parameters.armorAdapt_tags[subType] = bodyType
+			else
+				adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, keyTable[key][1], baseName, "hideBody", adtlibrary }
+			end
 		end
 		bldLg(baseItem, adaptItem, entity)
 		return adaptItem

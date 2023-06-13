@@ -1,5 +1,7 @@
 require "/scripts/util.lua"
 
+armorAdabtBuilderVersion = 10
+
 function build(directory, config, parameters, level, seed)
 	armorAdaptCheck = root.assetJson("/cinematics/apex/intro.cinematic.disabled:muteMusic")
 	if armorAdaptCheck == false then

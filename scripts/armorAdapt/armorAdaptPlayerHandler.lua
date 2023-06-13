@@ -1,9 +1,10 @@
 require "/scripts/armorAdapt/armorAdaptUtil.lua"
 require "/scripts/util.lua"
+require "/armorAdapt/armorAdaptBuilder.lua"
 local baseInit = init or function() end
 local baseUpdate = update or function() end
 local baseUnInit = uninit or function() end
-local dfltSpc,dfltBdy,dfltNl = "standard", "Default", "null"
+local dfltSpc,dfltBdy,dfltNl = "standard", "Default", "null",
 local rnadpt = armorAdapt.runArmorAdapt
 local cmptlg = armorAdapt.showCompletionLog
 local armtbl = armorAdapt.generatePlayerArmorTable
@@ -45,7 +46,7 @@ function init()
 			if speciesValue[spriteLibrary] ~= "armorAdapt" then
 				armAdtSpriteLibrary = speciesValue[spriteLibrary]
 			else
-				armAdtSpriteLibrary = "armorAdapt"
+				armAdtSpriteLibrary = "default"
 			end
 		end
 	end
@@ -58,12 +59,19 @@ function init()
 	changed = true
 	hideBody = false
 	entityType = "player"
+	statusFolder = "none"
 	storagePlayerSpecies,storageAdaptHeadType,storageAdaptChestType,storageAdaptLegType,storageAdaptBackType = playerSpecies, adaptHeadType, adaptChestType, adaptLegType, adaptBackType
 	storageBodyHead,storageBodyChest,storageBodyLegs,storageBodyBack,storageBodyType = dfltBdy, dfltBdy, dfltBdy, dfltBdy, dfltBdy
 
 	adaptUpdate = 0
 	adaptEffect = "armorAdapt_null"
 	status.clearPersistentEffects("rentekHolidayEffects")
+	if _ENV.root[assetOrigin] ~= nil then
+		if armorAdaptVersionNumber == nil or armorAdaptVersionNumber ~= adaptConfig.armorAdaptBuilderVersion then
+			player.radioMessage("armorAdaptBuilderCompatibility", 10)
+			sb.logError("[Armor Adapt]: A mod named %s has an outdated build script for Armor Adapt, please advise the developer to visit https://github.com/Zancuno/Armor-Adapt to get the updated file. [Star Extensions installed]", root.assetSourceMetadata(root.assetOrigin("/armorAdapt/armorAdaptBuilder.lua")).friendlyName)
+		end
+	end
 end
 
 
@@ -89,6 +97,7 @@ function update(dt)
 	end
 	
 	if changed == false then
+		statusFolder = "none"
 		for v,armorSpecies in ipairs(adaptConfig.supportedSpecies) do
 			if playerSpecies == armorSpecies then
 				if played[1] == 0 and (adaptConfig.showPlayerSpecies == true) then
@@ -179,6 +188,9 @@ function update(dt)
 					adaptEffect = transEffect
 					end
 				end
+				if transSettings[singleFolder] ~= nil then
+					statusFolder = transSettings[singleFolder]
+				end
 			end
 		end
 		
@@ -218,7 +230,7 @@ function armorAdapt_slotUpdate(slotU)
 		if baseArmorItem.name == "perfectlygenericitem" then
 			eqpitm(slotTable[slotU], nil)
 		end
-			adaptArmorPlayerItem = rnadpt(baseArmorItem, slotU, slotUAdapt[slotU], slotUBody[slotU], hideBody, entityType)
+			adaptArmorPlayerItem = rnadpt(baseArmorItem, slotU, slotUAdapt[slotU], slotUBody[slotU], hideBody, entityType, armAdtSpriteLibrary, statusFolder)
 		if adaptArmorPlayerItem ~= nil then
 			eqpitm(slotTable[slotU], adaptArmorPlayerItem)
 			cmptlg(adaptArmorPlayerItem, playerSpecies, bodyType, entityType)
