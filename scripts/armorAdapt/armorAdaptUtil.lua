@@ -4,7 +4,7 @@ function armorAdapt.compareArmorTables(a, b)
 	local adtItmMtch = root.itemDescriptorsMatch
 	local rouletteTable = { "1", "1", "1", "1", "1", "1", "1", "1" }
 	local mismatchTable = {}
-	for k,v in pairs(rouletteTable) do
+	for k,v in ipairs(rouletteTable) do
 		if not adtItmMtch(a[k], b[k], true) then
 			mismatchTable[k] = k
 		end
@@ -212,17 +212,14 @@ function armorAdapt.showCustomSkipLog(entity)
 end
 
 function armorAdapt.v1EffectUpdate(effCfg, bodyType, bodyHead, bodyChest, bodyLegs, bodyBack, strg1, strg2, strg3, strg4, strg5, forceBool)
-	local bodyList = {bodyHead, bodyChest, bodyLegs, bodyBack}
-	local bodyListStorage{strg2, strg3, strg4, strg5}
+	local bodyList = {bodyType, bodyHead, bodyChest, bodyLegs, bodyBack}
+	local bodyListStorage{strg1, strg2, strg3, strg4, strg5}
 	for _, effVal in ipairs(effCfg) do
 		if status.uniqueStatusEffectActive(effVal) then
-			for listRun = 4, 1, -1 do
-				if forceBool == true and strg1 ~= bodyType then
-					bodyType = strg1
-				end
+			for listRun = 5, 1, -1 do
 				bodyType = bodyType..effVal
 				if bodyList[listRun] ~= nil then
-					if forceBool == true and strg1 ~= bodyType then
+					if forceBool == true then
 						bodyList[listRun] = bodyListStorage[listRun]
 					end
 					bodyList[listRun] = bodyList[listRun]..effVal
@@ -230,6 +227,7 @@ function armorAdapt.v1EffectUpdate(effCfg, bodyType, bodyHead, bodyChest, bodyLe
 			end
 		end
 	end
+	bodyType, bodyHead, bodyChest, bodyLegs, bodyBack = bodyList[1], bodyList[2], bodyList[3], bodyList[4], bodyList[5]
 end
 
 function armorAdapt.v1SpeciesFill(specTable, spec1, spec2, spec3, spec4, spec5)
