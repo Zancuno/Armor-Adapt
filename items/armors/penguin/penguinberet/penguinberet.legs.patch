@@ -1,3 +1,17 @@
 [
-{"op" : "add", "path" : "/builder", "value" : "/armorAdapt/armorAdaptBuilder.lua"}
+	[
+		{ "op" : "add", "path" : "/armorAdapt_buildscripts", "value" : []},
+		{"op" : "test", "path" : "/builder", "inverse" : false},
+		{"op" : "move", "from" : "/builder", "path" : "/armorAdapt_buildscripts/-"},
+		{"op" : "add", "path" : "/builder", "value" : "/armorAdapt/armorAdaptBuilder.lua"},
+		{"op" : "add", "path" : "/armorAdapt_intendedBody", "value" : { "library" : "default", "bodyClass" : "penguin", "subType" : "default" }},
+		{"op" : "add", "path" : "/armorAdapt_tags", "value" : { "maleFrames" : "", "femaleFrames" : "", "mask" : "", "library" : "", "hideBool" : "", "bodyClass" : "", "subType" : "" }}
+	],
+	[
+		{ "op" : "add", "path" : "/armorAdapt_buildscripts", "value" : []},
+		{"op" : "test", "path" : "/builder", "inverse" : true},
+		{"op" : "add", "path" : "/builder", "value" : "/armorAdapt/armorAdaptBuilder.lua"},
+		{"op" : "add", "path" : "/armorAdapt_intendedBody", "value" : { "library" : "default", "bodyClass" : "penguin", "subType" : "default" }},
+		{"op" : "add", "path" : "/armorAdapt_tags", "value" : { "maleFrames" : "", "femaleFrames" : "", "mask" : "", "library" : "", "hideBool" : "", "bodyClass" : "", "subType" : "" }}
+	]
 ]

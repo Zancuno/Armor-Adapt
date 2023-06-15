@@ -18,6 +18,7 @@ function build(directory, config, parameters, level, seed)
 		if imgchk(parameters.mask)[1] ~= 43 then
 			parameters.mask = config.mask
 		end
+		local buildscripts = config.armorAdapt_buildscripts
 		for i = 1, #buildscripts do
 			require(buildscripts[i])
 			config, parameters = build(directory, config, parameters, level, seed)

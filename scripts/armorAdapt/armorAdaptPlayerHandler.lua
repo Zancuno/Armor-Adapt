@@ -1,5 +1,4 @@
 require "/scripts/armorAdapt/armorAdaptUtil.lua"
-require "/scripts/util.lua"
 require "/armorAdapt/armorAdaptBuilder.lua"
 local baseInit = init or function() end
 local baseUpdate = update or function() end
