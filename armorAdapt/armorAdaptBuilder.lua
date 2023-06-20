@@ -8,9 +8,13 @@ function build(directory, config, parameters, level, seed)
 		require("/scripts/armorAdapt/armorAdaptBuildUtil.lua")
 		config, parameters = armorAdapt.spriteBuild(directory, config, parameters, level, seed)
 		local buildscripts = config.armorAdapt_buildscripts
-		for i = 1, #buildscripts do
-			require(buildscripts[i])
-			config, parameters = build(directory, config, parameters, level, seed)
+		if type(buildscripts) == "table" then
+			if next(buildscripts) then
+				for i = 1, #buildscripts do
+					require(buildscripts[i])
+					config, parameters = build(directory, config, parameters, level, seed)
+				end
+			end
 		end
 		return config, parameters
 	else
@@ -19,9 +23,13 @@ function build(directory, config, parameters, level, seed)
 			parameters.mask = config.mask
 		end
 		local buildscripts = config.armorAdapt_buildscripts
-		for i = 1, #buildscripts do
-			require(buildscripts[i])
-			config, parameters = build(directory, config, parameters, level, seed)
+		if type(buildscripts) == "table" then
+			if next(buildscripts) then
+				for i = 1, #buildscripts do
+					require(buildscripts[i])
+					config, parameters = build(directory, config, parameters, level, seed)
+				end
+			end
 		end
 	end
 	return config, parameters

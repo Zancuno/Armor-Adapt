@@ -3,13 +3,7 @@ require "/armorAdapt/armorAdaptBuilder.lua"
 local baseInit = init or function() end
 local baseUpdate = update or function() end
 local baseUnInit = uninit or function() end
-local dfltSpc,dfltBdy,dfltNl = "standard", "Default", "null",
-local rnadpt = armorAdapt.runArmorAdapt
-local cmptlg = armorAdapt.showCompletionLog
-local armtbl = armorAdapt.generatePlayerArmorTable
-local cmparmtbt = armorAdapt.compareArmorTables
-local stsTransV1Update = armorAdapt.v1EffectUpdate
-local spsFill = armorAdapt.v1SpeciesFill
+local dfltSpc,dfltBdy,dfltNl = "standard", "Default", "null"
 function init()
 	baseInit()
 	eqpitm = player.setEquippedItem
@@ -25,15 +19,15 @@ function init()
 	
 	playerSpecies,adaptHeadType,adaptChestType,adaptLegType,adaptBackType = dfltSpc, dfltSpc, dfltSpc, dfltSpc, dfltSpc
 	
-	spsFill(aniSpecies, adaptConfig.animalSpecies, initSpecies, dfltNl, dfltNl, initSpecies, dfltNl)
-	spsFill(customSpecies, adaptConfig.customBodySpecies, initSpecies, initSpecies, initSpecies, initSpecies, initSpecies)
-	spsFill(headChestLegSpecies, adaptConfig.customHeadChestLegSpecies, initSpecies, initSpecies, initSpecies, initSpecies, dfltSpc)
-	spsFill(chestLegSpecies, adaptConfig.customChestLegSpecies, initSpecies, dfltSpc, initSpecies, initSpecies, dfltSpc)
-	spsFill(headLegSpecies, adaptConfig.customHeadLegSpecies, initSpecies, initSpecies, dfltSpc, initSpecies, dfltSpc)
-	spsFill(legSpecies, adaptConfig.customLegSpecies, initSpecies, dfltSpc, dfltSpc, initSpecies, dfltSpc)
-	spsFill(chestSpecies, adaptConfig.customChestSpecies, initSpecies, dfltSpc, initSpecies, dfltSpc, dfltSpc)
-	spsFill(headSpecies, adaptConfig.customHeadSpecies, initSpecies, initSpecies, dfltSpc, dfltSpc, dfltSpc)
-	spsFill(standardSpecies, adaptConfig.vanillaBodySpecies, dfltSpc, dfltSpc, dfltSpc, dfltSpc, dfltSpc)
+	armorAdapt.v1SpeciesFill(aniSpecies, adaptConfig.animalSpecies, initSpecies, dfltNl, dfltNl, initSpecies, dfltNl)
+	armorAdapt.v1SpeciesFill(customSpecies, adaptConfig.customBodySpecies, initSpecies, initSpecies, initSpecies, initSpecies, initSpecies)
+	armorAdapt.v1SpeciesFill(headChestLegSpecies, adaptConfig.customHeadChestLegSpecies, initSpecies, initSpecies, initSpecies, initSpecies, dfltSpc)
+	armorAdapt.v1SpeciesFill(chestLegSpecies, adaptConfig.customChestLegSpecies, initSpecies, dfltSpc, initSpecies, initSpecies, dfltSpc)
+	armorAdapt.v1SpeciesFill(headLegSpecies, adaptConfig.customHeadLegSpecies, initSpecies, initSpecies, dfltSpc, initSpecies, dfltSpc)
+	armorAdapt.v1SpeciesFill(legSpecies, adaptConfig.customLegSpecies, initSpecies, dfltSpc, dfltSpc, initSpecies, dfltSpc)
+	armorAdapt.v1SpeciesFill(chestSpecies, adaptConfig.customChestSpecies, initSpecies, dfltSpc, initSpecies, dfltSpc, dfltSpc)
+	armorAdapt.v1SpeciesFill(headSpecies, adaptConfig.customHeadSpecies, initSpecies, initSpecies, dfltSpc, dfltSpc, dfltSpc)
+	armorAdapt.v1SpeciesFill(standardSpecies, adaptConfig.vanillaBodySpecies, dfltSpc, dfltSpc, dfltSpc, dfltSpc, dfltSpc)
 	
 	if type(adaptConfig.adaptSpeciesSettings[initSpecies]) == "table" then
 		playerSpecies = initSpecies
@@ -76,8 +70,9 @@ end
 function update(dt)
 	baseUpdate(dt)
 	
-	adaptPlayerArmor = armtbl()
-	mismatchCheck = cmparmtbt(adaptPlayerArmor, adaptStorageArmorTable)
+	adaptPlayerArmor = armorAdapt.generatePlayerArmorTable()
+	mismatchCheck = true
+	mismatchCheck = armorAdapt.compareArmorTables(adaptPlayerArmor, adaptStorageArmorTable)
 	if type(mismatchCheck) == "table" then
 		changed = false
 	else
@@ -114,16 +109,16 @@ function update(dt)
 		end	
 		
 		if adaptConfig.allowLegacyTransformativeEffects == true then
-			stsTransV1Update(adaptConfig.armorAdaptEffects, bodyType, bodyHead, bodyChest, bodyLegs, bodyBack, nil, nil, nil, nil, nil, false)
-			stsTransV1Update(adaptConfig.armorAdaptHeadEffects, bodyType, bodyHead, nil, nil, nil, nil, nil, nil, nil, nil, false)
-			stsTransV1Update(adaptConfig.armorAdaptChestEffects, bodyType, nil, bodyChest, nil, nil, nil, nil, nil, nil, nil, false)
-			stsTransV1Update(adaptConfig.armorAdaptLegEffects, bodyType, nil, nil, bodyLegs, nil, nil, nil, nil, nil, nil, false)
-			stsTransV1Update(adaptConfig.armorAdaptBackEffects, bodyType, nil, nil, nil, bodyBack, nil, nil, nil, nil, nil, false)
-			stsTransV1Update(adaptConfig.armorAdaptForceEffects, bodyType, bodyHead, bodyChest, bodyLegs, bodyBack, storageBodyType, storageBodyHead, storageBodyChest, storageBodyLegs, storageBodyBack, true)
-			stsTransV1Update(adaptConfig.armorAdaptHeadForceEffects, bodyType, bodyHead, nil, nil, nil, storageBodyType, storageBodyHead, nil, nil, nil, true)
-			stsTransV1Update(adaptConfig.armorAdaptChestForceEffects, bodyType, nil, bodyChest, nil, nil, storageBodyType, nil, storageBodyChest, nil, nil, true)
-			stsTransV1Update(adaptConfig.armorAdaptLegForceEffects, bodyType, nil, nil, bodyLegs, nil, storageBodyType, nil, nil, storageBodyLegs, nil, true)
-			stsTransV1Update(adaptConfig.armorAdaptBackForceEffects, bodyType, nil, nil, nil, bodyBack, storageBodyType, nil, nil, nil, storageBodyBack, true)
+			armorAdapt.v1EffectUpdate(adaptConfig.armorAdaptEffects, bodyType, bodyHead, bodyChest, bodyLegs, bodyBack, nil, nil, nil, nil, nil, false)
+			armorAdapt.v1EffectUpdate(adaptConfig.armorAdaptHeadEffects, bodyType, bodyHead, nil, nil, nil, nil, nil, nil, nil, nil, false)
+			armorAdapt.v1EffectUpdate(adaptConfig.armorAdaptChestEffects, bodyType, nil, bodyChest, nil, nil, nil, nil, nil, nil, nil, false)
+			armorAdapt.v1EffectUpdate(adaptConfig.armorAdaptLegEffects, bodyType, nil, nil, bodyLegs, nil, nil, nil, nil, nil, nil, false)
+			armorAdapt.v1EffectUpdate(adaptConfig.armorAdaptBackEffects, bodyType, nil, nil, nil, bodyBack, nil, nil, nil, nil, nil, false)
+			armorAdapt.v1EffectUpdate(adaptConfig.armorAdaptForceEffects, bodyType, bodyHead, bodyChest, bodyLegs, bodyBack, storageBodyType, storageBodyHead, storageBodyChest, storageBodyLegs, storageBodyBack, true)
+			armorAdapt.v1EffectUpdate(adaptConfig.armorAdaptHeadForceEffects, bodyType, bodyHead, nil, nil, nil, storageBodyType, storageBodyHead, nil, nil, nil, true)
+			armorAdapt.v1EffectUpdate(adaptConfig.armorAdaptChestForceEffects, bodyType, nil, bodyChest, nil, nil, storageBodyType, nil, storageBodyChest, nil, nil, true)
+			armorAdapt.v1EffectUpdate(adaptConfig.armorAdaptLegForceEffects, bodyType, nil, nil, bodyLegs, nil, storageBodyType, nil, nil, storageBodyLegs, nil, true)
+			armorAdapt.v1EffectUpdate(adaptConfig.armorAdaptBackForceEffects, bodyType, nil, nil, nil, bodyBack, storageBodyType, nil, nil, nil, storageBodyBack, true)
 			for _, holidayEffect in ipairs(adaptConfig.armorAdaptHolidayEffects) do
 				if stseffact(holidayEffect) then
 					if adaptEffect == "armorAdapt_null" or adaptEffect == holidayEffectEffect then
@@ -148,7 +143,7 @@ function update(dt)
 			end
 		end
 		
-		for transEffect, transSettings in ipairs(adaptConfig.armorAdaptTransformativeEffects) do
+		for transEffect, transSettings in pairs(adaptConfig.armorAdaptTransformativeEffects) do
 			if stseffact(transSettings["effectName"]) then
 				local stackTable = { bodyType, bodyHead, bodyChest, bodyLegs, bodyBack }
 				local storageStackTable = {storageBodyType, storageBodyHead, storageBodyChest, storageBodyLegs, storageBodyBack }
@@ -194,10 +189,12 @@ function update(dt)
 			inflg("[Armor Adapt][Player Handler]: The player currently has these items equipped: Head %s, Cosmetic head %s, chest %s, cosmetic chest %s, legs %s, cosmetic legs %s, back %s, and cosmetic back %s", adaptPlayerArmor[1], adaptPlayerArmor[2], adaptPlayerArmor[3], adaptPlayerArmor[4], adaptPlayerArmor[5], adaptPlayerArmor[6], adaptPlayerArmor[7], adaptPlayerArmor[8])
 			played[4] = 1
 		end
-		for _, adt_mismat in ipairs(mismatchCheck) do
+		for adt_misnum = 8, 1, -1 do
 			slotUAdapt = {adaptHeadType, adaptHeadType, adaptChestType, adaptChestType, adaptLegType, adaptLegType, adaptBackType, adaptBackType}
 			slotUBody = {bodyHead, bodyHead, bodyChest, bodyChest, bodyLegs, bodyLegs, bodyBack, bodyBack}
-			armorAdapt_slotUpdate(adt_mismat)
+			if mismatchCheck[adt_misnum] == adt_misnum then
+				armorAdapt_slotUpdate(adt_misnum)
+			end
 		end
 		
 		armorAdapt_outfitErrorCheck(3)
@@ -219,14 +216,14 @@ function armorAdapt_slotUpdate(slotU)
 		if baseArmorItem.name == "perfectlygenericitem" then
 			eqpitm(slotTable[slotU], nil)
 		end
-			adaptArmorPlayerItem = rnadpt(baseArmorItem, slotU, slotUAdapt[slotU], slotUBody[slotU], hideBody, entityType, armAdtSpriteLibrary, statusFolder)
+			adaptArmorPlayerItem = armorAdapt.runArmorAdapt(baseArmorItem, slotU, slotUAdapt[slotU], slotUBody[slotU], hideBody, entityType, armAdtSpriteLibrary, statusFolder)
 		if adaptArmorPlayerItem ~= nil then
 			eqpitm(slotTable[slotU], adaptArmorPlayerItem)
-			cmptlg(adaptArmorPlayerItem, playerSpecies, bodyType, entityType)
+			armorAdapt.showCompletionLog(adaptArmorPlayerItem, playerSpecies, bodyType, entityType)
 			adaptStorageArmorTable[slotU] = adaptArmorPlayerItem
 			played[4] = 0
 		else
-			adaptStorageArmorTable[slotU] = adaptPlayerArmor[slot]
+			adaptStorageArmorTable[slotU] = adaptPlayerArmor[slotU]
 		end
 	else
 		adaptStorageArmorTable[slotU] = nil
