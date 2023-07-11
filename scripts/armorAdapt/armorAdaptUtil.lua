@@ -45,6 +45,12 @@ function armorAdapt.runArmorAdapt(baseItem, key, species, bodyType, hideBody, en
 	else
 		midPath = species.."/"..baseName.."/"..bodyType.."/"
 	end
+	if baseItem.parameters.mask ~= nil then
+		baseItem.parameters.mask = nil
+	end
+	if not next(baseItem.parameters) then
+		baseItem.parameters.itemTags = {}
+	end
 		tagCheck = false
 	if rtCfg(baseItem).config.armorAdapt_tags ~= nil then
 		tagCheck = true
@@ -92,31 +98,24 @@ function armorAdapt.runArmorAdapt(baseItem, key, species, bodyType, hideBody, en
 
 		if keyTable[key][5] == true then
 			if tagCheck == true then
-				adaptItem.parameters.armorAdapt_tags.mask = adtPth..midPath.."mask.png"
-				adaptItem.parameters.mask = "mask.png"
-			else
+				adaptItem.parameters.armorAdapt_tags.maskFrames = adtPth..midPath.."mask.png"
 				adaptItem.parameters.mask = "mask.png"
 			end
 		end
 
 		if hideBody == false then
-			if tagCheck == true then
-				adaptItem.parameters.armorAdapt_tags["library"] = adtlibrary
-				adaptItem.parameters.armorAdapt_tags["hideBool"] = "showBody"
-				adaptItem.parameters.armorAdapt_tags["bodyClass"] = species
-				adaptItem.parameters.armorAdapt_tags["subType"] = bodyType
-			else
-				adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, keyTable[key][1], baseName, "showBody", adtlibrary }
-			end
+			hideBool = "hideBody"
 		else
-			if tagCheck == true then
-				adaptItem.parameters.armorAdapt_tags["library"] = adtlibrary
-				adaptItem.parameters.armorAdapt_tags["hideBool"] = "hideBody"
-				adaptItem.parameters.armorAdapt_tags["bodyClass"] = species
-				adaptItem.parameters.armorAdapt_tags["subType"] = bodyType
-			else
-				adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, keyTable[key][1], baseName, "hideBody", adtlibrary }
-			end
+			hideBool = "showBody"
+		end
+		
+		if tagCheck == true then
+			adaptItem.parameters.armorAdapt_tags["library"] = adtlibrary
+			adaptItem.parameters.armorAdapt_tags["hideBool"] = hideBool
+			adaptItem.parameters.armorAdapt_tags["bodyClass"] = species
+			adaptItem.parameters.armorAdapt_tags["subType"] = bodyType
+		else
+			adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, keyTable[key][1], baseName, hideBool, adtlibrary }
 		end
 		bldLg(baseItem, adaptItem, entity)
 		return adaptItem
@@ -177,6 +176,7 @@ function armorAdapt.showItemLog(item, entity)
 	if root.assetJson("/scripts/armorAdapt/armorAdapt.config:show"..entityTable[2].."SupportedItem") == true then
 		infLg("[Armor Adapt]["..entityTable[1].." Handler]: The name for the suported item is %s", itmName)
 		infLg("[Armor Adapt]["..entityTable[1].." Handler]: The parameters for the suported item are %s", itmPara)
+		inflg("[Armor Adapt]["..entityTable[1].." Handler]: The config for the supported item is %s", root.itemConfig(item).config)
 	end
 end
 
