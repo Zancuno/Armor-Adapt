@@ -29,16 +29,20 @@ function init()
 	armorAdapt.v1SpeciesFill(headSpecies, adaptConfig.customHeadSpecies, initSpecies, initSpecies, dfltSpc, dfltSpc, dfltSpc)
 	armorAdapt.v1SpeciesFill(standardSpecies, adaptConfig.vanillaBodySpecies, dfltSpc, dfltSpc, dfltSpc, dfltSpc, dfltSpc)
 	
-	if type(adaptConfig.adaptSpeciesSettings[initSpecies]) == "table" then
+	armAdtSpriteLibrary = "default"
+	
+	if pcall(root.assetJson("/species/"..initSpecies..".species:armorAdapt_settings")) then
+		speciesSettings = root.assetJson("/species/"..initSpecies..".species:ArmorAdapt_settings")
 		playerSpecies = initSpecies
-		adaptHeadType = adaptConfig.adaptSpeciesSettings[initSpecies]["head"]
-		adaptChestType = adaptConfig.adaptSpeciesSettings[initSpecies]["chest"]
-		adaptLegType = adaptConfig.adaptSpeciesSettings[initSpecies]["pants"]
-		adaptBackType = adaptConfig.adaptSpeciesSettings[initSpecies]["back"]
-		if adaptConfig.adaptSpeciesSettings[initSpecies]["spriteLibrary"] ~= "default" then
-			armAdtSpriteLibrary = adaptConfig.adaptSpeciesSettings[initSpecies]["spriteLibrary"]
-		else
-			armAdtSpriteLibrary = "default"
+		adaptHeadType = speciesSettings.headFolder
+		adaptChestType = speciesSettings.chestFolder
+		adaptLegType = speciesSettings.legFolder
+		adaptBackType = speciesSettings.backFolder
+		if speciesSettings.spriteLibrary ~= "default" then
+			armAdtSpriteLibrary = speciesSettings.spriteLibrary
+		end
+		if speciesSettings.outfitFrames ~= nil then
+			frameOverrideFolder = speciesSettings.outfitFrames
 		end
 	end
 
@@ -90,23 +94,22 @@ function update(dt)
 	
 	if changed == false then
 		statusFolder = "none"
-		for v,armorSpecies in ipairs(adaptConfig.supportedSpecies) do
-			if playerSpecies == armorSpecies then
-				if played[1] == 0 and (adaptConfig.showPlayerSpecies == true) then
-					inflg("[Armor Adapt][Player Handler]: Supported Species Recognized: %s", playerSpecies)
-					played[1] = 1
-				end
-				bodyTable = armorAdapt.getSpeciesBodyTable(playerSpecies) or bodyTable
-					bodyType,bodyHead,bodyChest,bodyLegs,bodyBack = bodyTable[1], bodyTable[2], bodyTable[3], bodyTable[4], bodyTable[5]
-
-					storageBodyType,storageBodyHead,storageBodyChest,storageBodyLegs,storageBodyBack = bodyType, bodyHead, bodyChest, bodyLegs, bodyBack
-
-				if played[2] == 0 and (adaptConfig.showPlayerBodyType == true) then
-					inflg("[Armor Adapt][Player Handler]: Sub Type Recognized: Your sub body type is %s, Your head type is %s, your chest type is %s, your leg type is %s, and your back type is %s", bodyType, bodyHead, bodyChest, bodyLegs, bodyBack)
-					played[2] = 1
-				end
+		if playerSpecies == armorSpecies or playerSpecies == adaptConfig.supportedSpecies[playerSpecies] then
+			if played[1] == 0 and (adaptConfig.showPlayerSpecies == true) then
+				inflg("[Armor Adapt][Player Handler]: Supported Species Recognized: %s", playerSpecies)
+				played[1] = 1
 			end
-		end	
+			bodyTable = armorAdapt.getSpeciesBodyTable(playerSpecies) or bodyTable
+				bodyType,bodyHead,bodyChest,bodyLegs,bodyBack = bodyTable[1], bodyTable[2], bodyTable[3], bodyTable[4], bodyTable[5]
+
+				storageBodyType,storageBodyHead,storageBodyChest,storageBodyLegs,storageBodyBack = bodyType, bodyHead, bodyChest, bodyLegs, bodyBack
+
+			if played[2] == 0 and (adaptConfig.showPlayerBodyType == true) then
+				inflg("[Armor Adapt][Player Handler]: Sub Type Recognized: Your sub body type is %s, Your head type is %s, your chest type is %s, your leg type is %s, and your back type is %s", bodyType, bodyHead, bodyChest, bodyLegs, bodyBack)
+				played[2] = 1
+			end
+		end
+
 		
 		if adaptConfig.allowLegacyTransformativeEffects == true then
 			armorAdapt.v1EffectUpdate(adaptConfig.armorAdaptEffects, bodyType, bodyHead, bodyChest, bodyLegs, bodyBack, nil, nil, nil, nil, nil, false)
