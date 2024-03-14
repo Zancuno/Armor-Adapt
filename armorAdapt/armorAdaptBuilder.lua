@@ -5,7 +5,7 @@ armorAdabtBuilderVersion = 10
 function build(directory, config, parameters, level, seed)
 	armorAdaptCheck = root.assetJson("/cinematics/apex/intro.cinematic.disabled:muteMusic")
 	if armorAdaptCheck == false then
-		require("/scripts/armorAdapt/armorAdaptBuildUtil.lua")
+		require("/scripts/armorAdapt/builders/armorAdaptBuild_"..config.category..".lua")
 		config, parameters = armorAdapt.spriteBuild(directory, config, parameters, level, seed)
 		local buildscripts = config.armorAdapt_buildscripts
 		if type(buildscripts) == "table" then
