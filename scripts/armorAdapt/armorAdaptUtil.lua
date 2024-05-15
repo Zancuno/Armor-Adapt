@@ -44,161 +44,6 @@ function armorAdapt.slotUpdate()
 	end
 end
 
-function armorAdapt.runArmorAdapt(baseItem, key, species, bodyType, hideBody, entity, adtlibrary, statusFolder, framesOverride)
-	local bldLg,rtCfg = armorAdapt.showBuildLog, root.itemConfig
-	local adtPth = "/path"
-	if adtlibrary == "default" then
-		adtPth = "/items/armors/armorAdapt/"
-	else
-		adtPth = "/items/armors/"..adtlibrary.."/"
-	end
-	local keyTable = {
-		{"headf", "headm", "mask"},
-		{"headf", "headm", "mask"},
-		{"chestf", "chestm", "chest"},
-		{"chestf", "chestm", "chest"},
-		{"pantsf", "pantsm"},
-		{"pantsf", "pantsm"},
-		{"back", "back"},
-		{"back", "back"}
-	}
-	baseName = rtCfg(baseItem).config.itemName
-	if statusFolder ~= "none" then
-		baseName = statusFolder
-	end
-	nullCheck = "false"
-	if species == "null" then
-		midPath = "/default/null/Default/"
-		nullCheck = "true"
-	else
-		midPath = species.."/"..baseName.."/"..bodyType.."/"
-	end
-	if not next(baseItem.parameters) then
-		baseItem.parameters.itemTags = {}
-	end
-		tagCheck = false
-	if rtCfg(baseItem).config.armorAdapt_tags ~= nil then
-		tagCheck = true
-		itemTagTable = rtCfg(baseItem).parameters.armorAdapt_tags
-		bodyClassCheck = rtCfg(baseItem).parameters.armorAdapt_tags.bodyClass
-		bodySubTypeCheck = rtCfg(baseItem).parameters.armorAdapt_tags.subType
-	else
-		itemTagTable = rtCfg(baseItem).parameters.itemTags
-		bodyClassCheck = rtCfg(baseItem).parameters.itemTags[2]
-		bodySubTypeCheck = rtCfg(baseItem).parameters.itemTags[3]
-	end
-	adaptDirectivesMin = root.assetJson("/scripts/armorAdapt/armorAdapt.config:adaptDirectivesMin")
-	if rtCfg(baseItem).parameters.directives ~= nil and string.len(rtCfg(baseItem).parameters.directives) >= adaptDirectivesMin or rtCfg(baseItem).config.builder == "/sys/stardust/cosplay/build.lua" then
-		adaptItem = baseItem
-		armorAdapt.showCustomSkipLog(entity)
-		return adaptItem
-	elseif itemTagTable ~= nil and bodyClassCheck == species and bodySubTypeCheck == bodyType then
-		adaptItem = baseItem
-		return adaptItem
-	elseif itemTagTable == nil or bodyClassCheck ~= species or bodySubTypeCheck ~= bodyType then 
-		armorAdapt.showItemLog(baseItem, entity)
-		local adaptItem = copy(baseItem)
-		if tagCheck == true then
-			adaptItem.parameters.armorAdapt_tags = {}
-			if adaptItem.parameters.itemTags ~= nil and adaptItem.parameters.itemTags[1] == "armorAdapted" then
-				adaptItem.parameters.itemTags = {}
-			end
-		end
-		if keyTable[key][3] == "chest" then
-			if tagCheck == true then
-				--[[if adaptItem.parameters.storageBaseLayers ~= nil and spriteOverride ~= true then
-					adaptItem.parameters.armorAdapt_layers.chest.base.male = adaptItem.parameters.storageBaseLayers.chest.male
-					
-					adaptItem.parameters.armorAdapt_layers.farm.base.male = adaptItem.parameters.storageBaseLayers.farm.male
-					
-					adaptItem.parameters.armorAdapt_layers.barm.base.male = adaptItem.parameters.storageBaseLayers.barm.male
-				end
-				if adaptItem.parameters.storageOverlayLayers ~= nil and spriteOverride ~= true then
-					adaptItem.parameters.armorAdapt_layers.chest.overlay.female = adaptItem.parameters.storageOverlayLayers.chest.female
-					
-					adaptItem.parameters.armorAdapt_layers.farm.overlay.female = adaptItem.parameters.storageOverlayLayers.farm.female
-					
-					adaptItem.parameters.armorAdapt_layers.Overlay.overlay.female = adaptItem.parameters.storageBaseLayers.barm.female
-				end]]--
-				--[[if framesOverride ~= true then
-					if pcall(root.assetJson(framesOverride.."/"..keyTable[key][1]..".frames")) then
-						adaptItem.parameters.armorAdapt_layers.chest.female.frameOverride = framesOverride.."/"..keyTable[key][2]..".png"
-					end
-					if pcall(root.assetJson(framesOverride.."/"..keyTable[key][2]..".frames")) then
-						adaptItem.parameters.armorAdapt_layers.chest.male.frameOverride = framesOverride.."/"..keyTable[key][3]..".png"
-					end
-					if pcall(root.assetJson(framesOverride.."/fsleeve.frames")) then
-						adaptItem.parameters.armorAdapt_layers.farm.male.frameOverride = framesOverride.."/fsleeve.png"
-					end
-					if pcall(root.assetJson(framesOverride.."/bsleeve.frames")) then
-						adaptItem.parameters.armorAdapt_layers.farm.male.frameOverride = framesOverride.."/bsleeve.png"
-					end
-					if pcall(root.assetJson(framesOverride.."/fsleevef.frames")) then
-						adaptItem.parameters.armorAdapt_layers.farm.female.frameOverride = framesOverride.."/fsleevef.png"
-					end
-					if pcall(root.assetJson(framesOverride.."/bsleevef.frames")) then
-						adaptItem.parameters.armorAdapt_layers.farm.female.frameOverride = framesOverride.."/bsleevef.png"
-					end
-				end]]--
-			else		
-				adaptItem.parameters.femaleFrames = { body = adtPth..midPath..keyTable[key][1]..".png", frontSleeve = adtPth..midPath.."fsleevef.png", backSleeve = adtPth..midPath.."bsleevef.png" }
-				adaptItem.parameters.maleFrames = { body = adtPth..midPath..keyTable[key][2]..".png", frontSleeve = adtPth..midPath.."fsleeve.png", backSleeve = adtPth..midPath.."bsleeve.png" }
-			end
-		else
-			if tagCheck == true then
-				--[[if adaptItem.parameters.storageBaseLayers ~= nil and spriteOverride ~= true then
-					adaptItem.parameters.armorAdapt_layers.base = adaptItem.parameters.storageBaseLayers
-				end
-				if adaptItem.parameters.storageOverlayLayers ~= nil and spriteOverride ~= true then
-					adaptItem.parameters.armorAdapt_layers.overlay = adaptItem.parameters.storageOverlayLayers
-				end
-				if framesOverride == true then
-					if pcall(root.assetJson(framesOverride.."/"..keyTable[key][2]..".frames")) then
-						adaptItem.parameters.armorAdapt_layers.female.frameOverride = framesOverride.."/".. keyTable[key][2]..".png"
-					end
-					if pcall(root.assetJson(framesOverride.."/"..keyTable[key][3]..".frames")) then
-						adaptItem.parameters.armorAdapt_layers.male.frameOverride = framesOverride.."/".. keyTable[key][3]..".png"
-					end
-				end]]--
-			else
-				adaptItem.parameters.maleFrames = adtPth..midPath..keyTable[key][3]..".png"
-				adaptItem.parameters.femaleFrames = adtPth..midPath..keyTable[key][2]..".png"
-			end
-		end
-
-		if keyTable[key][3] == "mask" then
-			if tagCheck == true then
-				--[[if adaptItem.parameters.storageMaskBaseLayers ~= nil and spriteOverride ~= true then
-					adaptItem.parameters.armorAdapt_layers.mask.base = adaptItem.parameters.storageMaskBaseLayers
-				end
-				if adaptItem.parameters.storageMaskOverlayLayers ~= nil and spriteOverride ~= true then
-					adaptItem.parameters.armorAdapt_layers.mask.overlay = adaptItem.parameters.storageMaskOverlayLayers
-				end]]--
-			end
-		end
-
-		if hideBody == false then
-			hideBool = "hideBody"
-		else
-			hideBool = "showBody"
-		end
-		
-		if tagCheck == true then
-			adaptItem.parameters.armorAdapt_tags["library"] = adtlibrary
-			adaptItem.parameters.armorAdapt_tags["hideBool"] = hideBool
-			adaptItem.parameters.armorAdapt_tags["bodyClass"] = species
-			adaptItem.parameters.armorAdapt_tags["subType"] = bodyType
-			adaptItem.parameters.armorAdapt_tags["nullCheck"] = nullCheck
-			adaptItem.parameters.armorAdapt_tags["itemFolder"] = rtCfg(baseItem).config.itemName
-		else
-			adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, keyTable[key][1], baseName, hideBool, adtlibrary }
-		end
-
-		bldLg(baseItem, adaptItem, entity)
-		return adaptItem
-	end
-end
-
 function armorAdapt.generatePlayerArmorTable(adaptPlayerArmor)
 	adaptPlayerArmor = {}
 	local plrItm = player.equippedItem
@@ -227,136 +72,6 @@ function armorAdapt.generateNpcArmorTable(adaptNpcArmor)
 	return adaptNpcArmor
 end
 
-function armorAdapt.speciesConfig()
-	adaptSpecies,adaptHeadType,adaptChestType,adaptLegType,adaptBackType = dfltSpc, dfltSpc, dfltSpc, dfltSpc, dfltSpc
-	armAdtSpriteLibrary = "default"
-	
-	if pcall(root.assetJson("/species/"..initSpecies..".species")["armorAdapt_settings"] ~= nil) then
-		speciesSettings = root.assetJson("/species/"..initSpecies..".species:ArmorAdapt_settings")
-		adaptSpecies = initSpecies
-		armorSpecies = initSpecies
-		adaptHeadType = speciesSettings.headFolder
-		adaptChestType = speciesSettings.chestFolder
-		adaptLegType = speciesSettings.legFolder
-		adaptBackType = speciesSettings.backFolder
-		if speciesSettings.spriteLibrary ~= "default" then
-			armAdtSpriteLibrary = speciesSettings.spriteLibrary
-		end
-		if speciesSettings.outfitFrames ~= nil then
-			frameOverrideFolder = speciesSettings.outfitFrames
-		end
-	else
-		adaptSpecies = dfltSpc
-		armorSpecies = dfltSpc
-		adaptHeadType = dfltSpc
-		adaptChestType = dfltSpc
-		adaptLegType = dfltSpc
-		adaptBackType = dfltSpc
-	end
-	
-	v1Species = { 
-		animalSpecies = {initSpecies, dfltNl, dfltNl, initSpecies, dfltNl},
-		customBodySpecies = {initSpecies, initSpecies, initSpecies, initSpecies, initSpecies},
-		customHeadChestLegSpecies = {initSpecies, initSpecies, initSpecies, initSpecies, dfltSpc},
-		customChestLegSpecies= {initSpecies, dfltSpc, initSpecies, initSpecies, dfltSpc},
-		customHeadLegSpecies = {initSpecies, initSpecies, dfltSpc, initSpecies, dfltSpc},
-		customLegSpecies = {initSpecies, dfltSpc, dfltSpc, initSpecies, dfltSpc},
-		customChestSpecies= {initSpecies, dfltSpc, initSpecies, dfltSpc, dfltSpc},
-		customHeadSpecies = {initSpecies, initSpecies, dfltSpc, dfltSpc, dfltSpc},
-		vanillaBodySpecies = {dfltSpc, dfltSpc, dfltSpc, dfltSpc, dfltSpc}
-	}
-	for _, spcEntry in ipairs(v1Species) do
-		if adaptConfig[spcEntry][initSpecies] then
-			adaptSpecies = v1Species[spcEntry][1]
-			adaptHeadType = v1Species[spcEntry][2]
-			adaptChestType = v1Species[spcEntry][3]
-			adaptLegType = v1Species[spcEntry][4]
-			adaptBackType = v1Species[spcEntry][5]
-		end	
-	end
-	--[[armorAdapt.v1SpeciesFill(adaptConfig.animalSpecies, initSpecies, dfltNl, dfltNl, initSpecies, dfltNl)
-	armorAdapt.v1SpeciesFill(adaptConfig.customBodySpecies, initSpecies, initSpecies, initSpecies, initSpecies, initSpecies)
-	armorAdapt.v1SpeciesFill(adaptConfig.customHeadChestLegSpecies, initSpecies, initSpecies, initSpecies, initSpecies, dfltSpc)
-	armorAdapt.v1SpeciesFill(adaptConfig.customChestLegSpecies, initSpecies, dfltSpc, initSpecies, initSpecies, dfltSpc)
-	armorAdapt.v1SpeciesFill(adaptConfig.customHeadLegSpecies, initSpecies, initSpecies, dfltSpc, initSpecies, dfltSpc)
-	armorAdapt.v1SpeciesFill(adaptConfig.customLegSpecies, initSpecies, dfltSpc, dfltSpc, initSpecies, dfltSpc)
-	armorAdapt.v1SpeciesFill(adaptConfig.customChestSpecies, initSpecies, dfltSpc, initSpecies, dfltSpc, dfltSpc)
-	armorAdapt.v1SpeciesFill(adaptConfig.customHeadSpecies, initSpecies, initSpecies, dfltSpc, dfltSpc, dfltSpc)
-	armorAdapt.v1SpeciesFill(adaptConfig.vanillaBodySpecies, dfltSpc, dfltSpc, dfltSpc, dfltSpc, dfltSpc)]]--
-end
-
-function armorAdapt.getSpeciesBodyTable(speciesCheck)
-	if speciesCheck == armorSpecies or speciesCheck == adaptConfig.supportedSpecies[speciesCheck] then
-		if played[1] == 0 and (adaptConfig.showPlayerSpecies == true) then
-			inflg("[Armor Adapt][Player Handler]: Supported Species Recognized: %s", speciesCheck)
-			played[1] = 1
-		end
-		local scriptList = root.assetJson("/scripts/armorAdapt/armorAdapt.config:adaptSpeciesSubTypeScripts")
-		if scriptList[speciesCheck] ~= nil then
-			speciesScript = scriptList[speciesCheck]
-			require(speciesScript)
-			bodyTable = armorAdapt.speciesBodyTable()
-		else 
-			bodyTable = { "Default", "Default", "Default", "Default", "Default" }
-		end
-			bodyType,bodyHead,bodyChest,bodyLegs,bodyBack = bodyTable[1], bodyTable[2], bodyTable[3], bodyTable[4], bodyTable[5]
-
-			storageBodyType,storageBodyHead,storageBodyChest,storageBodyLegs,storageBodyBack = bodyType, bodyHead, bodyChest, bodyLegs, bodyBack
-		if entityType == "player" then
-			if played[2] == 0 and (adaptConfig.showPlayerBodyType == true) then
-				inflg("[Armor Adapt][Player Handler]: Sub Type Recognized: Your sub body type is %s, Your head type is %s, your chest type is %s, your leg type is %s, and your back type is %s", bodyType, bodyHead, bodyChest, bodyLegs, bodyBack)
-				played[2] = 1
-			end
-		else
-			if played[2] == 0 and (adaptConfig.showNpcBodyType == true) then
-				inflg("[Armor Adapt][NPC Handler]: Sub Type Recognized: Your main body type is %s, Your head type is %s, your chest type is %s, your legs type is %s, and your back type is %s", bodyType, bodyHead, bodyChest, bodyLegs, bodyBack)
-				played[2] = 1
-			end
-		end
-	end
-end
-
-function armorAdapt.showItemLog(item, entity)
-	local infLg = sb.logInfo
-	local itmName = root.itemConfig(item).config.itemName
-	local itmPara = root.itemConfig(item).parameters
-	if root.itemConfig(item).config.armorAdapt_tags ~= nil
-		then itmPara = root.itemConfig(item).parameters.armorAdapt_tags
-	end
-	local entityTable = {}
-	if entity == "player" then
-		entityTable = {"Player", "Player"}
-	elseif entity == "npc" then
-		entityTable = {"NPC", "Npc"}
-	end
-	if root.assetJson("/scripts/armorAdapt/armorAdapt.config:show"..entityTable[2].."SupportedItem") == true then
-		infLg("[Armor Adapt]["..entityTable[1].." Handler]: The name for the suported item is %s", itmName)
-		infLg("[Armor Adapt]["..entityTable[1].." Handler]: The parameters for the suported item are %s", itmPara)
-		inflg("[Armor Adapt]["..entityTable[1].." Handler]: The config for the supported item is %s", root.itemConfig(item).config)
-	end
-end
-
-function armorAdapt.showBuildLog(baseItem, adaptItem, entity)
-	local infLg = sb.logInfo
-	local entityTable = {}
-	if entity == "player" then
-		entityTable = {"Player", "Player"}
-	elseif entity == "npc" then
-		entityTable = {"NPC", "Npc"}
-	end
-	if root.assetJson("/scripts/armorAdapt/armorAdapt.config:show"..entityTable[2].."BuildInfo") == true then
-		infLg("[Armor Adapt]["..entityTable[1].." Handler]: The tags of the base item are %s", root.itemConfig(baseItem).config.itemTags)
-		infLg("[Armor Adapt]["..entityTable[1].." Handler]: The male frames of the base item are %s", root.itemConfig(baseItem).config.maleFrames)
-		infLg("[Armor Adapt]["..entityTable[1].." Handler]: The female frames of the base item are %s", root.itemConfig(baseItem).config.femaleFrames)
-		infLg("[Armor Adapt]["..entityTable[1].." Handler]: The mask of the base item is %s", root.itemConfig(baseItem).config.mask)
-
-		infLg("[Armor Adapt]["..entityTable[1].." Handler]: Adapted item tags are %s", adaptItem.parameters.itemTags)
-		infLg("[Armor Adapt]["..entityTable[1].." Handler]: Adapted item male frames are %s", 	adaptItem.parameters.maleFrames)
-		infLg("[Armor Adapt]["..entityTable[1].." Handler]: Adapted item female frames are %s", adaptItem.parameters.femaleFrames)
-		infLg("[Armor Adapt]["..entityTable[1].." Handler]: Adapted item mask is %s", adaptItem.parameters.mask)
-	end
-end
-
 function armorAdapt.showCompletionLog(item, species, bodytype, entity)
 	local infLg = sb.logInfo
 	local entityTable = {}
@@ -379,23 +94,52 @@ function armorAdapt.showCustomSkipLog(entity)
 	end
 end
 
-function armorAdapt.v1EffectUpdate(effCfg, bodyType, bodyHead, bodyChest, bodyLegs, bodyBack, strg1, strg2, strg3, strg4, strg5, forceBool)
-	local bodyList = {bodyType, bodyHead, bodyChest, bodyLegs, bodyBack}
-	local bodyListStorage = {strg1, strg2, strg3, strg4, strg5}
-	for _, effVal in ipairs(effCfg) do
-		if status.uniqueStatusEffectActive(effVal) then
-			for listRun = 5, 1, -1 do
-				bodyType = bodyType..effVal
-				if bodyList[listRun] ~= nil then
-					if forceBool == true then
-						bodyList[listRun] = bodyListStorage[listRun]
+function armorAdapt.transformativeEffects()
+	for transEffect, transSettings in pairs(adaptConfig.armorAdaptTransformativeEffects) do
+		if stseffact(transSettings["effectName"]) then
+			local stackTable = { bodyType, bodyHead, bodyChest, bodyLegs, bodyBack }
+			local storageStackTable = {storageBodyType, storageBodyHead, storageBodyChest, storageBodyLegs, storageBodyBack }
+			local stack2Table = {adaptSpecies, adaptHeadType, adaptChestType, adaptLegType, adaptBackType}
+			local disguiseStop = false
+			if transSettings["setting"] == "overlay" and transSettings["singleFolder"] ~= nil then
+				statusOverlayFolder = transSettings["singleFolder"]
+			elseif transSettings["setting"] == "baseEdit" and transSettings["singleFolder"] ~= nil then
+				statusBaseFolder = transSettings["singleFolder"]
+			elseif transSettings["singleFolder"] ~= nil then
+				statusFolder = transSettings["singleFolder"]
+			end
+			for stknum = 5, 1, -1 do
+				if transSettings[stknum] == 1 then
+					if transSettings["setting"] == "override" then
+						stackTable[stknum] = storageStackTable[stknum]
 					end
-					bodyList[listRun] = bodyList[listRun]..effVal
+					if transSettings["setting"] == "override" or transSettings["setting"] == "stack" then
+						stackTable[stknum] = stackTable[stknum]..transSettings["modifier"]
+					elseif (transSettings["setting"] == "classEdit" or transSettings["setting"] == "disguise") and (adaptEffect == transSettings["effectName"] or adaptEffect == "armorAdapt_null" )then
+						stack2Table[stknum] = transSettings["modifier"]
+						adaptEffect = transSettings["effectName"]
+						if transSettings["setting"] == "disguise" then
+							stackTable[stknum] = dfltBdy
+							hideBody = true
+							disguiseStop = true
+						end
+					end
 				end
 			end
+			bodyType, bodyHead, bodyChest, bodyLegs, bodyBack = stackTable[1], stackTable[2], stackTable[3], stackTable[4], stackTable[5]
+			adaptSpecies, adaptHeadType, adaptChestType, adaptLegType, adaptBackType = stack2Table[1], stack2Table[2], stack2Table[3], stack2Table[4], stack2Table[5]
+		end
+		if disguiseStop == true then
+			break
 		end
 	end
-	bodyType, bodyHead, bodyChest, bodyLegs, bodyBack = bodyList[1], bodyList[2], bodyList[3], bodyList[4], bodyList[5]
+	
+	if stseffact(adaptEffect) == false then
+		adaptSpecies,adaptHeadType,adaptChestType,adaptLegType,adaptBackType = storagePlayerSpecies, storageAdaptHeadType, storageAdaptChestType, storageAdaptLegType, storageAdaptBackType
+		
+		hideBody = false
+		adaptEffect = "armorAdapt_null"
+	end
 end
 
 function armorAdapt.v1SpeciesFill(specTable, spec1, spec2, spec3, spec4, spec5)
