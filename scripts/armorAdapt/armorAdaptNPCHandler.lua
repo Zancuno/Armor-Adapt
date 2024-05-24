@@ -1,41 +1,45 @@
+require "/scripts/util.lua"
 require "/scripts/armorAdapt/armorAdaptUtil.lua"
+require "/armorAdapt/armorAdaptBuilder.lua"
 local baseInit = init or function() end
 local baseUpdate = update or function() end
 local dfltSpc,dfltBdy,dfltNl = "standard", "Default", "null"
 function init()
 	baseInit()
-	if adaptConfig.showStartUp == true then
-		inflg("[Armor Adapt][NPC Handler]: Initializing Armor Adapt System")
-		inflg("[Armor Adapt][NPC Handler]: Starting equipment check for adaptable items.")
-	end
-	if armorAdaptVersionNumber == nil or armorAdaptVersionNumber ~= adaptConfig.armorAdaptBuilderVersion then
-		require("/scripts/armorAdapt/armorAdaptV1Util.lua")
-	else
-		require("/scripts/armorAdapt/armorAdaptV2Util.lua")
-	end
+	armAdt_Config = root.assetJson("/scripts/armorAdapt/armorAdapt.config")
+	armAdt_MinDrtv = armAdt_Config.adaptDirectivesMin"
 	eqpitm = npc.setItemSlot
 	inflg = sb.logInfo
 	stseffact = status.uniqueStatusEffectActive
 	
-	adaptConfig = root.assetJson("/scripts/armorAdapt/armorAdapt.config")
-	played = { 0, 0, 0, 0 }
-	bodyTable = { dfltBdy, dfltBdy, dfltBdy, dfltBdy, dfltBdy }
-	slotTable = { "head", "headCosmetic", "chest", "chestCosmetic", "legs", "legsCosmetic", "back", "backCosmetic" }
-	adaptStorageArmorTable = { dfltNl, dfltNl, dfltNl, dfltNl, dfltNl, dfltNl, dfltNl, dfltNl }
+	if armAdt_Config.showStartUp == true then
+		inflg("[Armor Adapt][Npc Handler]: Initializing Armor Adapt System")
+		inflg("[Armor Adapt][Npc Handler]: Starting equipment check for adaptable items.")
+	end
+	if armorAdaptVersionNumber == nil or armorAdaptVersionNumber ~= armAdt_Config.armorAdaptBuilderVersion then
+		require("/scripts/armorAdapt/armorAdaptV1Util.lua")
+	else
+		require("/scripts/armorAdapt/armorAdaptV2Util.lua")
+	end
 	
-	changed = true
-	hideBody = false
-	entityType = "npc"
-	statusFolder = "none"
-	adaptUpdate = 0
-	adaptEffect = "armorAdapt_null"
-	initSpecies = npc.species()
-	
+	armAdt = {
+		updateFlag = true
+		initSpecies = npc.species()
+		entity = "Npc"
+		statusFolder = "none"
+		hideBody = "showBody"
+		flags = { 0, 0, 0, 0 }
+		slotTable = { "head", "headCosmetic", "chest", "chestCosmetic", "legs", "legsCosmetic", "back", "backCosmetic" }
+		classType = dfltSpc
+		classFolders = { dfltSpc, dfltSpc, dfltSpc, dfltSpc, dfltSpc, dfltSpc, dfltSpc, dfltSpc }
+		classStorage = {}
+		subTypeFolders = { dfltBdy, dfltBdy, dfltBdy, dfltBdy, dfltBdy, dfltBdy, dfltBdy, dfltBdy }
+		subTypeStorage = {}
+		currentArmor = {}
+		itemStorage = { dfltNl, dfltNl, dfltNl, dfltNl, dfltNl, dfltNl, dfltNl, dfltNl }	
+	}
 	armorAdapt.speciesConfig()
-	
-	bodyType,bodyHead,bodyChest,bodyLegs,bodyBack = bodyTable[1], bodyTable[2], bodyTable[3], bodyTable[4], bodyTable[5]
-	storageAdaptSpecies, storageAdaptHeadType, storageAdaptChestType, storageAdaptLegType, storageAdaptBackType = adaptSpecies, adaptHeadType, adaptChestType, adaptLegType, adaptBackType
-	storageBodyHead,storageBodyChest, storageBodyLegs, storageBodyBack, storageBodyType = dfltBdy, dfltBdy, dfltBdy, dfltBdy, dfltBdy
+	armAdt.classStorage = util.mergeTable(armAdt.classStorage, armAdt.classFolders)
 	
 	status.clearPersistentEffects("rentekHolidayEffects")
 	status.removeEphemeralEffect("hotHolidayEvent")
@@ -46,33 +50,37 @@ end
 function update(dt)
 	baseUpdate(dt)
 	
-	armorArmor = armorAdapt.generateNpcArmorTable()
-	mismatchCheck = true
-	mismatchCheck = armorAdapt.compareArmorTables(armorAdapt_NpcArmor, armorAdapt_storageArmorTable)
-	if type(mismatchCheck) == "table" then
-		changed = false
+	armAdt.currentArmor = armorAdapt.generateNpcArmorTable()
+	armAdt_mismatch = true
+	armAdt_mismatch = armorAdapt.compareArmorTables(armAdt.currentArmor, armAdt.itemStorage)
+	if type(armAdt_mismatch) == "table" then
+		armAdt.updateFlag = false
 	else
-		changed = true
-		if adaptUpdate == 1 then
+		armAdt.updateFlag = true
+		if armAdt.flags[1] then
 			status.removeEphemeralEffect("armorAdapt_resetTrigger")
-			adaptUpdate = 0
+			armAdt.flags[1] = 0
 		end
 	end
 	
-	if stseffact("armorAdapt_resetTrigger") and adaptUpdate == 0 then
-		changed = false
-		adaptUpdate = 1
+	if stseffact("armorAdapt_resetTrigger") and armAdt.flags[1] == 0 then
+		armAdt.updateFlag = false
+		armAdt.flags[1] = 1
 	end
 	
-	if changed == false then
-		statusFolder = "none"
-		
+	if armAdt.updateFlag == false then
+		armAdt_mismatch = armorAdapt.exemptionCheck(armAdt_mismatch)
 		armorAdapt.getSpeciesBodyTable(adaptSpecies)
+		
+		armAdt.statusFolder = "none"
+		armAdt.classFolders = util.mergeTable({}, armAdt.classStorage)
+		armAdt.subTypeFolders = util.mergeTable({}, armAdt.subTypeStorage)
+		
 		armorAdapt.transformativeEffects()
 		
-		if played[4] == 0 and (adaptConfig.showNpcArmor == true) then
-			inflg("[Armor Adapt][NPC Handler]: The NPC currently has these items equipped: Head %s, Cosmetic head %s, chest %s, cosmetic chest %s, legs %s, cosmetic legs %s, back %s, and cosmetic back %s", armorAdapt_NpcArmor[1], armorAdapt_NpcArmor[2], armorAdapt_NpcArmor[3], armorAdapt_NpcArmor[4], armorAdapt_NpcArmor[5], armorAdapt_NpcArmor[6], armorAdapt_NpcArmor[7], armorAdapt_NpcArmor[8])
-			played[4] = 1
+		if armAdt.flags[4] == 0 and (armAdt_Config.showNpcArmor == true) then
+			inflg("[Armor Adapt][Npc Handler]: The NPC currently has these items equipped: Head %s, Cosmetic head %s, chest %s, cosmetic chest %s, legs %s, cosmetic legs %s, back %s, and cosmetic back %s", armAdt.currentArmor[1], armAdt.currentArmor[2], armAdt.currentArmor[3], armAdt.currentArmor[4], armAdt.currentArmor[5], armAdt.currentArmor[6], armAdt.currentArmor[7], armAdt.currentArmor[8])
+			armAdt.flags[4] = 1
 		end
 
 		armorAdapt.slotUpdate()
@@ -83,9 +91,9 @@ function update(dt)
 end
 
 function armorAdapt_outfitErrorCheck(slotC)
-	if armorAdapt_NpcArmor[slotC] ~= nil then
-		if root.itemConfig(armorAdapt_NpcArmor[slotC]).parameters.itemTags ~= nil then
-			if root.itemConfig(armorAdapt_NpcArmor[slotC]).parameters.itemTags[5] == nil then
+	if armAdt.currentArmor[slotC] ~= nil then
+		if root.itemConfig(armAdt.currentArmor[slotC]).parameters.itemTags ~= nil then
+			if root.itemConfig(armAdt.currentArmor[slotC]).parameters.itemTags[5] == nil then
 				status.addEphemeralEffect("armorAdapt_resetBody")
 			end
 		end
