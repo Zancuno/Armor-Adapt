@@ -4,46 +4,48 @@ require "/armorAdapt/armorAdaptBuilder.lua"
 local baseInit = init or function() end
 local baseUpdate = update or function() end
 local baseUnInit = uninit or function() end
-local dfltSpc,dfltBdy,dfltNl = "standard", "Default", "null"
 function init()
 	baseInit()
 	armAdt_Config = root.assetJson("/scripts/armorAdapt/armorAdapt.config")
-	armAdt_MinDrtv = armAdt_Config.adaptDirectivesMin"
+	armAdt_MinDrtv = armAdt_Config.adaptDirectivesMin
 	eqpitm = player.setEquippedItem
 	inflg = sb.logInfo
 	stseffact = status.uniqueStatusEffectActive
-	
+	dfltSpc,dfltBdy,dfltNl = "standard", "Default", "null"
 	if armAdt_Config.showStartUp == true then
 		inflg("[Armor Adapt][Player Handler]: Initializing Armor Adapt System")
 		inflg("[Armor Adapt][Player Handler]: Starting equipment check for adaptable items.")
 	end
-	if armorAdaptVersionNumber == nil or armorAdaptVersionNumber ~= armAdt_Config.armorAdaptBuilderVersion then
+	if armorAdabtBuilderVersion == nil or armorAdabtBuilderVersion ~= armAdt_Config.armorAdaptBuilderVersion then
 		require("/scripts/armorAdapt/armorAdaptV1Util.lua")
 	else
 		require("/scripts/armorAdapt/armorAdaptV2Util.lua")
 	end
 	armAdt = {
-		updateFlag = true
-		initSpecies = player.species()
-		entity = "Player"
-		statusFolder = "none"
-		hideBody = "showBody"
-		flags = { 0, 0, 0, 0 }
-		slotTable = { "head", "headCosmetic", "chest", "chestCosmetic", "legs", "legsCosmetic", "back", "backCosmetic" }
-		classType = dfltSpc
-		classFolders = { dfltSpc, dfltSpc, dfltSpc, dfltSpc, dfltSpc, dfltSpc, dfltSpc, dfltSpc }
-		classStorage = {}
-		subTypeFolders = { dfltBdy, dfltBdy, dfltBdy, dfltBdy, dfltBdy, dfltBdy, dfltBdy, dfltBdy }
-		subTypeStorage = {}
-		currentArmor = {}
+		firstUpdate = true,
+		updateFlag = true,
+		initSpecies = player.species(),
+		entity = "Player",
+		statusFolder = "none",
+		spriteLibrary = "default",
+		frameOverrideFolder = "none",
+		hideBody = "showBody",
+		flags = { 0, 0, 0, 0 },
+		slotTable = { "head", "headCosmetic", "chest", "chestCosmetic", "legs", "legsCosmetic", "back", "backCosmetic" },
+		classType = dfltSpc,
+		classFolders = { dfltSpc, dfltSpc, dfltSpc, dfltSpc, dfltSpc, dfltSpc, dfltSpc, dfltSpc },
+		classStorage = {},
+		subTypeFolders = { dfltBdy, dfltBdy, dfltBdy, dfltBdy, dfltBdy, dfltBdy, dfltBdy, dfltBdy },
+		subTypeStorage = {},
+		currentArmor = {},
 		itemStorage = { dfltNl, dfltNl, dfltNl, dfltNl, dfltNl, dfltNl, dfltNl, dfltNl }	
 	}
 	armorAdapt.speciesConfig()
-	armAdt.classStorage = util.mergeTable(armAdt.classStorage, armAdt.classFolders)
+	armAdt.classStorage = util.mergeTable({}, armAdt.classFolders)
 
 	status.clearPersistentEffects("rentekHolidayEffects")
 	if _ENV.root["assetOrigin"] ~= nil then
-		if armorAdaptVersionNumber == nil or armorAdaptVersionNumber ~= armAdt_Config.armorAdaptBuilderVersion then
+		if armorAdabtBuilderVersion == nil or armorAdabtBuilderVersion ~= armAdt_Config.armorAdaptBuilderVersion then
 			player.radioMessage("armorAdaptBuilderCompatibility", 10)
 			sb.logError("[Armor Adapt]: A mod named %s has an outdated build script for Armor Adapt, please advise the developer to visit https://github.com/Zancuno/Armor-Adapt to get the updated file. [Star Extensions installed]", root.assetSourceMetadata(root.assetOrigin("/armorAdapt/armorAdaptBuilder.lua")).friendlyName)
 		end
@@ -55,8 +57,8 @@ function update(dt)
 
 	armAdt.currentArmor = armorAdapt.generatePlayerArmorTable()
 	armAdt_mismatch = true
-	armAdt_mismatch = armorAdapt.compareArmorTables(armAdt.currentArmor, armAdt.itemStorage)
-	sb.logInfo("mismatchTable is %s", armAdt_mismatch)
+	armAdt_mismatch = armorAdapt.exemptionCheck(armorAdapt.compareArmorTables(armAdt.currentArmor, armAdt.itemStorage))
+	--sb.logInfo("mismatchTable edit is %s", armAdt_mismatch)
 	if type(armAdt_mismatch) == "table" then
 		armAdt.updateFlag = false
 	else
@@ -73,8 +75,7 @@ function update(dt)
 	end
 	
 	if armAdt.updateFlag == false then
-		armAdt_mismatch = armorAdapt.exemptionCheck(armAdt_mismatch)
-		armorAdapt.getSpeciesBodyTable(classType)
+		armorAdapt.getSpeciesBodyTable(armAdt.classType)
 		
 		armAdt.statusFolder = "none"
 		armAdt.classFolders = util.mergeTable({}, armAdt.classStorage)
@@ -88,7 +89,7 @@ function update(dt)
 		end
 		
 		armorAdapt.slotUpdate()
-		
+		armAdt.firstUpdate = false
 		armorAdapt_outfitErrorCheck(3)
 		armorAdapt_outfitErrorCheck(4)
 	end
@@ -104,8 +105,8 @@ end
 
 function armorAdapt_outfitErrorCheck(slotC)
 	if armAdt.currentArmor[slotC] ~= nil then
-		if root.itemConfig(armAdt.currentArmor[slotC]).parameters.itemTags ~= nil then
-			if root.itemConfig(armAdt.currentArmor[slotC]).parameters.itemTags[5] == nil then
+		if rarmAdt.currentArmor[slotC].parameters.itemTags ~= nil then
+			if armAdt.currentArmor[slotC].parameters.itemTags[5] == nil then
 				status.addEphemeralEffect("armorAdapt_resetBody")
 				player.radioMessage("armorAdaptOutfitError", 2)	
 			end

@@ -13,47 +13,53 @@ function armorAdapt.compareArmorTables(a, b)
 	if not next(mismatchTable) then
 		return true
 	else
-		sb.logInfo("mismatchTable is %s", mismatchTable)
 		return mismatchTable
 	end
 end
 
 function armorAdapt.exemptionCheck(mismatchTable)
 	if type(mismatchTable) == "table" then
-		for z = 1, #armAdt.slotTable do
-		exemp_item = adaptArmor[z]
-			if exemp_item.name == "startech:nanofield" or
-			exemp_item.name == "startech:nanofieldstatichead" or 
-			exemp_item.name == "startech:nanofieldstaticlegs" or 
-			(exemp_item.parameters.directives ~= nil and string.len(exemp_item.parameters.directives) >= armAdt_MinDrtv) or 
-			exemp_item.config.builder == "/sys/stardust/cosplay/build.lua" then
-				mismatchTable[z] = nil
-				armAdt_storage[z] = exemp_item
+		if next(armAdt.currentArmor) then --check if entity is loaded
+			for z = 1, #armAdt.slotTable do
+				exempt_item = armAdt.currentArmor[z]
+				if exempt_item ~= nil then
+					if root.itemConfig(exempt_item).config["builder"] == nil or
+					root.itemConfig(exempt_item).config.builder ~= "/armorAdapt/armorAdaptBuilder.lua" or
+					exempt_item.name == "startech:nanofield" or
+					exempt_item.name == "startech:nanofieldstatichead" or
+					exempt_item.name == "startech:nanofieldstaticlegs" or
+					(root.itemConfig(exempt_item).parameters.directives ~= nil and
+					string.len(root.itemConfig(exempt_item).parameters.directives) >= armAdt_MinDrtv) then
+						mismatchTable[z] = nil
+						armAdt.itemStorage[z] = exempt_item
+						if armAdt_Config.showCustomItemSkip == true then
+							sb.logInfo("[Armor Adapt]["..armAdt.entity.." Handler] %s exempted from conversion", exempt_item.name)
+						end
+					end
+				end
 			end
 		end
 	end
-	
 	if not next(mismatchTable) then
 		return true
-	else
-		sb.logInfo("mismatchTable edit is %s", mismatchTable)
+	else	
 		return mismatchTable
 	end
 end
 
 function armorAdapt.slotUpdate()
 	for adt_misnum = 8, 1, -1 do
-		if mismatchCheck[adt_misnum] == adt_misnum then
+		if armAdt_mismatch[adt_misnum] == adt_misnum then
 			if armAdt.currentArmor[adt_misnum] ~= nil then
-				armorAdapt_itemBase = armAdt.currentArmor[adt_misnum]
-				if armorAdapt_itemBase.name == "perfectlygenericitem" then
+				armAdt_itemBase = armAdt.currentArmor[adt_misnum]
+				if armAdt_itemBase.name == "perfectlygenericitem" then
 					eqpitm(armAdt.slotTable[adt_misnum], nil)
 				end
-					adaptArmorItem = armorAdapt.runArmorAdapt(armorAdapt_itemBase, adt_misnum, armAdt.classFolders[adt_misnum], armAdt.subTypeFolders[adt_misnum], armAdt.entity, armAdt.spriteLibrary, armAdt.statusFolder)
-				if adaptArmorItem ~= nil then
-					eqpitm(armAdt.slotTable[adt_misnum], adaptArmorItem)
-					armorAdapt.showCompletionLog(adaptArmorItem, armAdt.classFolders[adt_misnum], armAdt.subTypeFolders[adt_misnum], armAdt.entity)
-					armAdt.itemStorage[adt_misnum] = adaptArmorItem
+					armAdt_itemEdit = armorAdapt.runArmorAdapt(armAdt_itemBase, adt_misnum, armAdt.classFolders[adt_misnum], armAdt.subTypeFolders[adt_misnum], armAdt.spriteLibrary)
+				if armAdt_itemEdit ~= nil then
+					eqpitm(armAdt.slotTable[adt_misnum], armAdt_itemEdit)
+					armorAdapt.showCompletionLog(armAdt_itemEdit, armAdt.classFolders[adt_misnum], armAdt.subTypeFolders[adt_misnum], armAdt.entity)
+					armAdt.itemStorage[adt_misnum] = armAdt_itemEdit
 					armAdt.flags[4] = 0
 				else
 					armAdt.itemStorage[adt_misnum] = armAdt.currentArmor[adt_misnum]
@@ -65,37 +71,34 @@ function armorAdapt.slotUpdate()
 	end
 end
 
-function armorAdapt.generatePlayerArmorTable(adaptPlayerArmor)
-	adaptPlayerArmor = {}
-	local plrItm = player.equippedItem
+function armorAdapt.generatePlayerArmorTable()
+	armAdt_playerArmor = {}
 	for k = 1, #armAdt.slotTable do
-		adaptPlayerArmor[k] = plrItm(armAdt.slotTable[k])
+		armAdt_playerArmor[k] = player.equippedItem(armAdt.slotTable[k])
 	end
-	return adaptPlayerArmor
+	return armAdt_playerArmor
 end
 
-function armorAdapt.generateNpcArmorTable(adaptNpcArmor)
-	adaptNpcArmor = {}
-	local npcItm = npc.getItemSlot
+function armorAdapt.generateNpcArmorTable()
+	armAdt_npcArmor = {}
 	for k = 1, #armAdt_slotTable do
-		adaptNpcArmor[k] = npcItm(armAdt.slotTable[k])
+		armAdt_npcArmor[k] = npc.getItemSlot(armAdt.slotTable[k])
 	end
-	return adaptNpcArmor
+	return armAdt_npcArmor
 end
 
-function armorAdapt.showCompletionLog(item, species, bodytype)
+function armorAdapt.showCompletionLog(item, bodyClass, subType)
 	local infLg = sb.logInfo
-	if root.assetJson("/scripts/armorAdapt/armorAdapt.config:show"..armAdt_entity.."BuildCompletion") == true then
-		infLg("[Armor Adapt]["..armAdt_entity.." Handler]: Item %s has sucessfully been adapted to the species %s and the sub type %s", root.itemConfig(item).config.itemName, species, bodyType)
+	if root.assetJson("/scripts/armorAdapt/armorAdapt.config:show"..armAdt.entity.."BuildCompletion") == true then
+		infLg("[Armor Adapt]["..armAdt.entity.." Handler]: Item %s has sucessfully been adapted to the body class %s and the sub type %s", root.itemConfig(item).config.itemName, bodyClass, subType)
 	end
 end
 
 function armorAdapt.transformativeEffects()
+	local armAdt_statusOverride = false
+	local ArmAdt_OverrideBackUp = {}
 	for transEffect, transSettings in pairs(armAdt_Config.armorAdaptTransformativeEffects) do
 		if stseffact(transSettings["effectName"]) then
-			local stackTable = { bodyType, bodyHead, bodyChest, bodyLegs, bodyBack }
-			local storageStackTable = {storageBodyType, storageBodyHead, storageBodyChest, storageBodyLegs, storageBodyBack }
-			local stack2Table = {adaptSpecies, adaptHeadType, adaptChestType, adaptLegType, adaptBackType}
 			local disguiseStop = false
 			if transSettings["setting"] == "overlay" and transSettings["singleFolder"] ~= nil then
 				statusOverlayFolder = transSettings["singleFolder"]
@@ -104,42 +107,39 @@ function armorAdapt.transformativeEffects()
 			elseif transSettings["singleFolder"] ~= nil then
 				statusFolder = transSettings["singleFolder"]
 			end
-			for stknum = 5, 1, -1 do
-				if transSettings[stknum] == 1 then
+			for stknum = 8, 1, -2 do
+				if transSettings[stknum/2] == 1 then
 					if transSettings["setting"] == "override" then
-						stackTable[stknum] = storageStackTable[stknum]
+						armAdt.subTypeFolders[stknum] = armAdt.subTypeStorage[stknum]
+						armAdt.subTypeFolders[stknum-1] = armAdt.subTypeStorage[stknum-1]
 					end
 					if transSettings["setting"] == "override" or transSettings["setting"] == "stack" then
-						stackTable[stknum] = stackTable[stknum]..transSettings["modifier"]
+						armAdt.subTypeFolders[stknum] = armAdt.subTypeFolders[stknum]..transSettings["modifier"]
+						armAdt.subTypeFolders[stknum-1] = armAdt.subTypeFolders[stknum-1]..transSettings["modifier"]
+						if transSettings["setting"] == "override" then
+							armAdt_statusOverride = true
+						end
 					elseif (transSettings["setting"] == "classEdit" or transSettings["setting"] == "disguise") then
-						stack2Table[stknum] = transSettings["modifier"]
+						armAdt.classFolders[stknum] = transSettings["modifier"]
+						armAdt.classFolders[stknum-1] = transSettings["modifier"]
 						if transSettings["setting"] == "disguise" then
-							stackTable[stknum] = dfltBdy
+							armAdt.subTypeFolders[stknum] = dfltBdy
+							armAdt.subTypeFolders[stknum-1] = dfltBdy
 							armAdt_hideBody = "hideBody"
 							disguiseStop = true
 						end
 					end
 				end
 			end
-			bodyType, bodyHead, bodyChest, bodyLegs, bodyBack = stackTable[1], stackTable[2], stackTable[3], stackTable[4], stackTable[5]
-			adaptSpecies, adaptHeadType, adaptChestType, adaptLegType, adaptBackType = stack2Table[1], stack2Table[2], stack2Table[3], stack2Table[4], stack2Table[5]
+			if armAdt_statusOverride == true then
+				ArmAdt_OverrideBackUp = armAdt.subTypeFolders
+			end
 		end
 		if disguiseStop == true then
 			break
 		end
 	end
-end
-
-function armorAdapt.v1SpeciesFill(specTable, spec1, spec2, spec3, spec4, spec5)
-	if type(specTable) == "table" then
-		for _,specValue in ipairs(specTable) do
-			if player.species() == specValue then
-				playerSpecies = spec1
-				adaptHeadType = spec2
-				adaptChestType = spec3
-				adaptLegType = spec4
-				adaptBackType = spec5
-			end
-		end
+	if armAdt_statusOverride == true then
+		armAdt.subTypeFolders = util.mergeTable({}, ArmAdt_OverrideBackUp)
 	end
 end

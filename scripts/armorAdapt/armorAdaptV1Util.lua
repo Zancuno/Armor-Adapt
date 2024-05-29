@@ -1,45 +1,45 @@
-function armorAdapt.runArmorAdapt(baseItem, key, species, bodyType, armAdt_entity, adtlibrary, statusFolder, framesOverride)
+function armorAdapt.runArmorAdapt(baseItem, key, bodyClass, subType, adtlibrary)
 	local bldLg,rtCfg = armorAdapt.showBuildLog, root.itemConfig
 	adtPth = "/items/armors/armorAdapt/"
 	local keyTable = {
-		{"headf", "headm", "mask"},
-		{"headf", "headm", "mask"},
+		{"headf", "headm", "head"},
+		{"headf", "headm", "head"},
 		{"chestf", "chestm", "chest"},
 		{"chestf", "chestm", "chest"},
-		{"pantsf", "pantsm"},
-		{"pantsf", "pantsm"},
-		{"back", "back"},
-		{"back", "back"}
+		{"pantsf", "pantsm", "pants"},
+		{"pantsf", "pantsm", "pants"},
+		{"back", "back", "back"},
+		{"back", "back", "back"}
 	}
-	baseName = baseItem.config.itemName
+	baseName = baseItem.name
 	nullCheck = "false"
-	if species == "null" then
-		midPath = "/default/null/Default/"
+	if bodyClass == "null" then
+		midPath = "default/null/Default/"
 		nullCheck = "true"
 	else
-		midPath = species.."/"..baseName.."/"..bodyType.."/"
+		midPath = bodyClass.."/"..baseName.."/"..subType.."/"
 	end
-	if not next(baseItem.parameters) then
+	if not next(baseItem.parameters) or baseItem.parameters.itemTags == nil then
 		baseItem.parameters.itemTags = {}
 	end
 		itemTagTable = baseItem.parameters.itemTags
 		bodyClassCheck = baseItem.parameters.itemTags[2]
 		bodySubTypeCheck = baseItem.parameters.itemTags[3]
-	if itemTagTable ~= nil and bodyClassCheck == species and bodySubTypeCheck == bodyType then
+	if armAdt.firstUpdate == false and itemTagTable ~= nil and bodyClassCheck == bodyClass and bodySubTypeCheck == subType then
 		adaptItem = baseItem
 		return adaptItem
-	elseif itemTagTable == nil or bodyClassCheck ~= species or bodySubTypeCheck ~= bodyType then 
+	elseif armAdt.firstUpdate == true or itemTagTable == nil or bodyClassCheck ~= bodyClass or bodySubTypeCheck ~= subType then
 		armorAdapt.showItemLog(baseItem)
 		local adaptItem = copy(baseItem)
 		if keyTable[key][3] == "chest" then	
 				adaptItem.parameters.femaleFrames = { body = adtPth..midPath..keyTable[key][1]..".png", frontSleeve = adtPth..midPath.."fsleevef.png", backSleeve = adtPth..midPath.."bsleevef.png" }
 				adaptItem.parameters.maleFrames = { body = adtPth..midPath..keyTable[key][2]..".png", frontSleeve = adtPth..midPath.."fsleeve.png", backSleeve = adtPth..midPath.."bsleeve.png" }
 		else
-				adaptItem.parameters.maleFrames = adtPth..midPath..keyTable[key][3]..".png"
-				adaptItem.parameters.femaleFrames = adtPth..midPath..keyTable[key][2]..".png"
+				adaptItem.parameters.maleFrames = adtPth..midPath..keyTable[key][2]..".png"
+				adaptItem.parameters.femaleFrames = adtPth..midPath..keyTable[key][1]..".png"
 		end
-			adaptItem.parameters.itemTags = { "armorAdapted", species, bodyType, keyTable[key][1], baseName, armAdt_hideBody, adtlibrary }
-
+			adaptItem.parameters.itemTags = { "armorAdapted", bodyClass, subType, keyTable[key][3], baseName, armAdt.hideBody, adtlibrary }
+		
 		bldLg(baseItem, adaptItem)
 		return adaptItem
 	end
@@ -84,34 +84,34 @@ function armorAdapt.getSpeciesBodyTable(speciesCheck)
 		armAdt.subTypeFolders = { "Default", "Default", "Default", "Default", "Default", "Default", "Default", "Default" }
 	end
 		armAdt.subTypeStorage = util.mergeTable({}, armAdt.subTypeFolders)
-	if armAdt.flags[3] == 0 and (armAdt_Config["show"..armAdt_entity.."BodyType"] == true) then
-		inflg("[Armor Adapt]["..armAdt_entity.." Handler]: Sub Type Recognized: Your head type is %s, your chest type is %s, your leg type is %s, and your back type is %s", armAdt.subTypeFolders[1], armAdt.subTypeFolders[3], armAdt.subTypeFolders[5], armAdt.subTypeFolders[7])
+	if armAdt.flags[3] == 0 and (armAdt_Config["show"..armAdt.entity.."BodyType"] == true) then
+		inflg("[Armor Adapt]["..armAdt.entity.." Handler]: Sub Type Recognized: Your head type is %s, your chest type is %s, your leg type is %s, and your back type is %s", armAdt.subTypeFolders[1], armAdt.subTypeFolders[3], armAdt.subTypeFolders[5], armAdt.subTypeFolders[7])
 		armAdt.flags[3] = 1
 	end
 end
 
 function armorAdapt.showItemLog(item)
 	local infLg = sb.logInfo
-	local itmName = root.itemConfig(item).config.itemName
-	local itmPara = root.itemConfig(item).parameters
-	if root.assetJson("/scripts/armorAdapt/armorAdapt.config:show"..armAdt_entity.."SupportedItem") == true then
-		infLg("[Armor Adapt]["..armAdt_entity.." Handler]: The name for the suported item is %s", itmName)
-		infLg("[Armor Adapt]["..armAdt_entity.." Handler]: The parameters for the suported item are %s", itmPara)
-		inflg("[Armor Adapt]["..armAdt_entity.." Handler]: The config for the supported item is %s", root.itemConfig(item).config)
+	local itmName = item.name
+	local itmPara = item.parameters
+	if armAdt_Config["show"..armAdt.entity.."SupportedItem"] == true then
+		infLg("[Armor Adapt]["..armAdt.entity.." Handler]: The name for the suported item is %s", itmName)
+		infLg("[Armor Adapt]["..armAdt.entity.." Handler]: The parameters for the suported item are %s", itmPara)
+		infLg("[Armor Adapt]["..armAdt.entity.." Handler]: The config for the supported item is %s", root.itemConfig(item).config)
 	end
 end
 
 function armorAdapt.showBuildLog(baseItem, adaptItem)
 	local infLg = sb.logInfo
-	if root.assetJson("/scripts/armorAdapt/armorAdapt.config:show"..armAdt_entity.."BuildInfo") == true then
-		infLg("[Armor Adapt]["..armAdt_entity.." Handler]: The tags of the base item are %s", root.itemConfig(baseItem).config.itemTags)
-		infLg("[Armor Adapt]["..armAdt_entity.." Handler]: The male frames of the base item are %s", root.itemConfig(baseItem).config.maleFrames)
-		infLg("[Armor Adapt]["..armAdt_entity.." Handler]: The female frames of the base item are %s", root.itemConfig(baseItem).config.femaleFrames)
-		infLg("[Armor Adapt]["..armAdt_entity.." Handler]: The mask of the base item is %s", root.itemConfig(baseItem).config.mask)
+	if armAdt_Config["show"..armAdt.entity.."BuildInfo"] == true then
+		infLg("[Armor Adapt]["..armAdt.entity.." Handler]: The tags of the base item are %s", root.itemConfig(baseItem).config.itemTags)
+		infLg("[Armor Adapt]["..armAdt.entity.." Handler]: The male frames of the base item are %s", root.itemConfig(baseItem).config.maleFrames)
+		infLg("[Armor Adapt]["..armAdt.entity.." Handler]: The female frames of the base item are %s", root.itemConfig(baseItem).config.femaleFrames)
+		infLg("[Armor Adapt]["..armAdt.entity.." Handler]: The mask of the base item is %s", root.itemConfig(baseItem).config.mask)
 
-		infLg("[Armor Adapt]["..armAdt_entity.." Handler]: Adapted item tags are %s", adaptItem.parameters.itemTags)
-		infLg("[Armor Adapt]["..armAdt_entity.." Handler]: Adapted item male frames are %s", 	adaptItem.parameters.maleFrames)
-		infLg("[Armor Adapt]["..armAdt_entity.." Handler]: Adapted item female frames are %s", adaptItem.parameters.femaleFrames)
-		infLg("[Armor Adapt]["..armAdt_entity.." Handler]: Adapted item mask is %s", adaptItem.parameters.mask)
+		infLg("[Armor Adapt]["..armAdt.entity.." Handler]: Adapted item tags are %s", adaptItem.parameters.itemTags)
+		infLg("[Armor Adapt]["..armAdt.entity.." Handler]: Adapted item male frames are %s", 	adaptItem.parameters.maleFrames)
+		infLg("[Armor Adapt]["..armAdt.entity.." Handler]: Adapted item female frames are %s", adaptItem.parameters.femaleFrames)
+		infLg("[Armor Adapt]["..armAdt.entity.." Handler]: Adapted item mask is %s", adaptItem.parameters.mask)
 	end
 end

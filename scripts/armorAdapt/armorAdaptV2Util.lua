@@ -1,33 +1,57 @@
-function armorAdapt.runArmorAdapt(baseItem, key, species, bodyType, armAdt_entity, adtlibrary, statusFolder, framesOverride)
+function armorAdapt.runArmorAdapt(baseItem, key, bodyClass, subType, adtlibrary)
 	local bldLg,rtCfg = armorAdapt.showBuildLog, root.itemConfig
-	baseName = baseItem.config.itemName
-	if statusFolder ~= "none" then
+	baseName = baseItem.name
+	
+	if armAdt.statusFolder ~= "none" then
 		baseName = armAdt.statusFolder
 	end
 	nullCheck = "false"
-	if species == "null" then
+	if bodyClass == "null" then
 		nullCheck = "true"
+	end
+	if baseItem.parameters.armorAdapt_tags == nil then
+		baseItem.parameters.armorAdapt_tags = { }
+		baseItem.parameters.armorAdapt_tags["bodyClass"] = "none"
+		baseItem.parameters.armorAdapt_tags["subType"] = "none"
 	end
 	itemTagTable = baseItem.parameters.armorAdapt_tags
 	bodyClassCheck = baseItem.parameters.armorAdapt_tags.bodyClass
 	bodySubTypeCheck = baseItem.parameters.armorAdapt_tags.subType
-	if itemTagTable ~= nil and bodyClassCheck == species and bodySubTypeCheck == bodyType then
+	
+	if baseItem.parameters.itemTags ~= nil and baseItem.parameters.itemTags[1] == "armorAdapted" then
+		baseItem.parameters.itemTags = nil
+	end
+	
+	if key == 3 or key == 4 and baseItem.parameters.maleFrames ~= nil then
+		if string.find(baseItem.parameters.maleFrames.body, "armorAdapt") then
+			baseItem.parameters.maleFrames = nil
+			baseItem.parameters.femaleFrames = nil
+		end
+	elseif baseItem.parameters.maleFrames ~= nil then
+		if string.find(baseItem.parameters.maleFrames, "armorAdapt") then
+			baseItem.parameters.maleFrames = nil
+			baseItem.parameters.femaleFrames = nil
+		end
+	end
+	
+	if armAdt.firstUpdate == false and itemTagTable ~= nil and bodyClassCheck == bodyClass and bodySubTypeCheck == subType then
 		adaptItem = baseItem
 		return adaptItem
-	elseif itemTagTable == nil or bodyClassCheck ~= species or bodySubTypeCheck ~= bodyType then 
-		armorAdapt.showItemLog(baseItem, armAdt_entity)
+	elseif armAdt.firstUpdate == true or armAdt.firstUpdate == true or itemTagTable == nil or bodyClassCheck ~= bodyClass or bodySubTypeCheck ~= subType then 
+		armorAdapt.showItemLog(baseItem)
 		local adaptItem = copy(baseItem)
-		adaptItem.parameters.armorAdapt_tags = {}
+		adaptItem.parameters.armorAdapt_tags = { }
 		adaptItem.parameters.armorAdapt_tags["library"] = adtlibrary
-		adaptItem.parameters.armorAdapt_tags["hideBool"] = armAdt_hideBody
-		adaptItem.parameters.armorAdapt_tags["bodyClass"] = species
-		adaptItem.parameters.armorAdapt_tags["subType"] = bodyType
+		adaptItem.parameters.armorAdapt_tags["frameOverride"] = armAdt.frameOverrideFolder
+		adaptItem.parameters.armorAdapt_tags["hideBool"] = armAdt.hideBody
+		adaptItem.parameters.armorAdapt_tags["bodyClass"] = bodyClass
+		adaptItem.parameters.armorAdapt_tags["subType"] = subType
 		adaptItem.parameters.armorAdapt_tags["nullCheck"] = nullCheck
 		adaptItem.parameters.armorAdapt_tags["itemFolder"] = baseName
-
-		bldLg(baseItem, adaptItem, armAdt_entity)
+		bldLg(baseItem, adaptItem)
 		return adaptItem
 	end
+	
 end
 
 function armorAdapt.speciesConfig()
@@ -45,10 +69,10 @@ function armorAdapt.speciesConfig()
 		armAdt.classFolders[7] = speciesSettings.backFolder
 		armAdt.classFolders[8] = speciesSettings.backFolder
 		if speciesSettings.spriteLibrary ~= "default" then
-			armAdtSpriteLibrary = speciesSettings.spriteLibrary
+			armAdt.spriteLibrary = speciesSettings.spriteLibrary
 		end
 		if speciesSettings.outfitFrames ~= nil then
-			frameOverrideFolder = speciesSettings.outfitFrames
+			armAdpt.frameOverrideFolder = speciesSettings.outfitFrames
 		end
 	else
 		armAdt.classType = dfltSpc
@@ -100,31 +124,28 @@ function armorAdapt.getSpeciesBodyTable(speciesCheck)
 		armAdt.subTypeFolders = { "Default", "Default", "Default", "Default", "Default", "Default", "Default", "Default" }
 	end
 		armAdt.subTypeStorage = util.mergeTable({}, armAdt.subTypeFolders)
-	if armAdt.flags[3] == 0 and (armAdt_Config["show"..armAdt_entity.."BodyType"] == true) then
-		inflg("[Armor Adapt]["..armAdt_entity.." Handler]: Sub Type Recognized: Your head type is %s, your chest type is %s, your leg type is %s, and your back type is %s", armAdt.subTypeFolders[1], armAdt.subTypeFolders[3], armAdt.subTypeFolders[5], armAdt.subTypeFolders[7])
+	if armAdt.flags[3] == 0 and (armAdt_Config["show"..armAdt.entity.."BodyType"] == true) then
+		inflg("[Armor Adapt]["..armAdt.entity.." Handler]: Sub Type Recognized: Your head type is %s, your chest type is %s, your leg type is %s, and your back type is %s", armAdt.subTypeFolders[1], armAdt.subTypeFolders[3], armAdt.subTypeFolders[5], armAdt.subTypeFolders[7])
 		armAdt.flags[3] = 1
 	end
 end
 
 function armorAdapt.showItemLog(item)
 	local infLg = sb.logInfo
-	local itmName = root.itemConfig(item).config.itemName
-	local itmPara = root.itemConfig(item).parameters.armorAdapt_tags
-	if root.assetJson("/scripts/armorAdapt/armorAdapt.config:show"..armAdt_entity.."SupportedItem") == true then
-		infLg("[Armor Adapt]["..armAdt_entity.." Handler]: The name for the suported item is %s", itmName)
-		infLg("[Armor Adapt]["..armAdt_entity.." Handler]: The parameters for the suported item are %s", itmPara)
-		inflg("[Armor Adapt]["..armAdt_entity.." Handler]: The config for the supported item is %s", root.itemConfig(item).config)
+	if armAdt_Config["show"..armAdt.entity.."SupportedItem"] == true then
+		infLg("[Armor Adapt]["..armAdt.entity.." Handler]: The name for the suported item is %s", item.name)
+		infLg("[Armor Adapt]["..armAdt.entity.." Handler]: The parameters for the suported item are %s", item.parameters.armorAdapt_tags)
+		infLg("[Armor Adapt]["..armAdt.entity.." Handler]: The config for the supported item is %s", root.itemConfig(item).config)
 	end
 end
 
 function armorAdapt.showBuildLog(baseItem, adaptItem)
 	local infLg = sb.logInfo
-	if root.assetJson("/scripts/armorAdapt/armorAdapt.config:show"..armAdt_entity.."BuildInfo") == true then
-		infLg("[Armor Adapt]["..armAdt_entity.." Handler]: The tags of the base item are %s", root.itemConfig(baseItem).config.itemTags)
-		infLg("[Armor Adapt]["..armAdt_entity.." Handler]: The male frames of the base item are %s", root.itemConfig(baseItem).config.maleFrames)
-		infLg("[Armor Adapt]["..armAdt_entity.." Handler]: The female frames of the base item are %s", root.itemConfig(baseItem).config.femaleFrames)
-		infLg("[Armor Adapt]["..armAdt_entity.." Handler]: The mask of the base item is %s", root.itemConfig(baseItem).config.mask)
+	if armAdt_Config["show"..armAdt.entity.."BuildInfo"] == true then
+		infLg("[Armor Adapt]["..armAdt.entity.." Handler]: The tags of the base item are %s", root.itemConfig(baseItem).config.itemTags)
+		infLg("[Armor Adapt]["..armAdt.entity.." Handler]: The male frames of the base item are %s", root.itemConfig(baseItem).config.maleFrames)
+		infLg("[Armor Adapt]["..armAdt.entity.." Handler]: The female frames of the base item are %s", root.itemConfig(baseItem).config.femaleFrames)
 
-		infLg("[Armor Adapt]["..armAdt_entity.." Handler]: Adapted item tags are %s", adaptItem.parameters.armorAdapt_tags)
+		infLg("[Armor Adapt]["..armAdt.entity.." Handler]: Adapted item tags are %s", adaptItem.parameters.armorAdapt_tags)
 	end
 end

@@ -3,15 +3,14 @@ require "/scripts/armorAdapt/armorAdaptUtil.lua"
 require "/armorAdapt/armorAdaptBuilder.lua"
 local baseInit = init or function() end
 local baseUpdate = update or function() end
-local dfltSpc,dfltBdy,dfltNl = "standard", "Default", "null"
 function init()
 	baseInit()
 	armAdt_Config = root.assetJson("/scripts/armorAdapt/armorAdapt.config")
-	armAdt_MinDrtv = armAdt_Config.adaptDirectivesMin"
+	armAdt_MinDrtv = armAdt_Config.adaptDirectivesMin
 	eqpitm = npc.setItemSlot
 	inflg = sb.logInfo
 	stseffact = status.uniqueStatusEffectActive
-	
+	dfltSpc,dfltBdy,dfltNl = "standard", "Default", "null"
 	if armAdt_Config.showStartUp == true then
 		inflg("[Armor Adapt][Npc Handler]: Initializing Armor Adapt System")
 		inflg("[Armor Adapt][Npc Handler]: Starting equipment check for adaptable items.")
@@ -21,25 +20,27 @@ function init()
 	else
 		require("/scripts/armorAdapt/armorAdaptV2Util.lua")
 	end
-	
 	armAdt = {
-		updateFlag = true
-		initSpecies = npc.species()
-		entity = "Npc"
-		statusFolder = "none"
-		hideBody = "showBody"
-		flags = { 0, 0, 0, 0 }
-		slotTable = { "head", "headCosmetic", "chest", "chestCosmetic", "legs", "legsCosmetic", "back", "backCosmetic" }
-		classType = dfltSpc
-		classFolders = { dfltSpc, dfltSpc, dfltSpc, dfltSpc, dfltSpc, dfltSpc, dfltSpc, dfltSpc }
-		classStorage = {}
-		subTypeFolders = { dfltBdy, dfltBdy, dfltBdy, dfltBdy, dfltBdy, dfltBdy, dfltBdy, dfltBdy }
-		subTypeStorage = {}
-		currentArmor = {}
+		firstUpdate = true,
+		updateFlag = true,
+		initSpecies = npc.species(),
+		entity = "Npc",
+		statusFolder = "none",
+		spriteLibrary = "default",
+		frameOverrideFolder = "none",
+		hideBody = "showBody",
+		flags = { 0, 0, 0, 0 },
+		slotTable = { "head", "headCosmetic", "chest", "chestCosmetic", "legs", "legsCosmetic", "back", "backCosmetic" },
+		classType = dfltSpc,
+		classFolders = { dfltSpc, dfltSpc, dfltSpc, dfltSpc, dfltSpc, dfltSpc, dfltSpc, dfltSpc },
+		classStorage = {},
+		subTypeFolders = { dfltBdy, dfltBdy, dfltBdy, dfltBdy, dfltBdy, dfltBdy, dfltBdy, dfltBdy },
+		subTypeStorage = {},
+		currentArmor = {},
 		itemStorage = { dfltNl, dfltNl, dfltNl, dfltNl, dfltNl, dfltNl, dfltNl, dfltNl }	
 	}
 	armorAdapt.speciesConfig()
-	armAdt.classStorage = util.mergeTable(armAdt.classStorage, armAdt.classFolders)
+	armAdt.classStorage = util.mergeTable({}, armAdt.classFolders)
 	
 	status.clearPersistentEffects("rentekHolidayEffects")
 	status.removeEphemeralEffect("hotHolidayEvent")
@@ -52,7 +53,7 @@ function update(dt)
 	
 	armAdt.currentArmor = armorAdapt.generateNpcArmorTable()
 	armAdt_mismatch = true
-	armAdt_mismatch = armorAdapt.compareArmorTables(armAdt.currentArmor, armAdt.itemStorage)
+	armAdt_mismatch = armorAdapt.exemptionCheck(armorAdapt.compareArmorTables(armAdt.currentArmor, armAdt.itemStorage))
 	if type(armAdt_mismatch) == "table" then
 		armAdt.updateFlag = false
 	else
@@ -69,8 +70,7 @@ function update(dt)
 	end
 	
 	if armAdt.updateFlag == false then
-		armAdt_mismatch = armorAdapt.exemptionCheck(armAdt_mismatch)
-		armorAdapt.getSpeciesBodyTable(adaptSpecies)
+		armorAdapt.getSpeciesBodyTable(armAdt.classType)
 		
 		armAdt.statusFolder = "none"
 		armAdt.classFolders = util.mergeTable({}, armAdt.classStorage)
@@ -84,7 +84,7 @@ function update(dt)
 		end
 
 		armorAdapt.slotUpdate()
-		
+		armAdt.firstUpdate = false
 		armorAdapt_outfitErrorCheck(3)
 		armorAdapt_outfitErrorCheck(4)
 	end
