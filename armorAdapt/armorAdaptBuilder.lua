@@ -19,7 +19,7 @@ function build(directory, config, parameters, level, seed)
 		return config, parameters
 	else
 		config = config
-		if imgchk(parameters.mask)[1] ~= 43 then
+		if parameters.mask ~= nil and root.imageSize(parameters.mask)[1] ~= 43 then
 			parameters.mask = config.mask
 		end
 		local buildscripts = config.armorAdapt_buildscripts
