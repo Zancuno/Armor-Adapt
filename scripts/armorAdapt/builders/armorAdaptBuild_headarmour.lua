@@ -1,7 +1,7 @@
 armorAdapt = {}
 
 function armorAdapt.spriteBuild(directory, config, parameters, level, seed)
-	config2 = config
+	configItemName = config.itemName
 	config = util.mergeTable({ }, config)
 	config.armorAdapt_layers = {}
 	if parameters.armorAdapt_layers == nil or (type(parameters.armorAdapt_layers) == "table" and not next(parameters.armorAdapt_layers)) then
@@ -33,11 +33,11 @@ function armorAdapt.spriteBuild(directory, config, parameters, level, seed)
 		
 	if config["armorAdapt_intendedBody"] ~= nil and config["armorAdapt_intendedBody"].library == library and config["armorAdapt_intendedBody"].bodyClass == bodyClass and config["armorAdapt_intendedBody"].subType == subType then
 		config = config
-	elseif config["armorAdapt_custom"] ~= nil and config.armorAdapt_custom[library][bodyClass][subType] ~= nil then
+	elseif config["armorAdapt_custom"] ~= nil and config.armorAdapt_custom[library] ~= nil and config.armorAdapt_custom[library][bodyClass] ~= nil and config.armorAdapt_custom[library][bodyClass][subType] ~= nil then
 		config.maleFrames = config.armorAdapt_custom[library][bodyClass][subType][maleFrames]
 		config.femaleFrames = config.armorAdapt_custom[library][bodyClass][subType][femaleFrames]
 		parameters.mask = config.armorAdapt_custom[library][bodyClass][subType][mask]
-	elseif (parameters.itemTags ~= nil and parameters.itemTags[1] == "armorAdapted") or (parameters.armorAdapt_tags.subType ~= "null") then
+	elseif parameters.armorAdapt_tags.subType ~= "null" then
 		adtpath = "/items/armors/armorAdapt/default/"
 		config.maleFrames = armorAdapt.defaultCheck(maleFrames, adtpath, bodyClass, subType, "/headm.png", config.maleFrames)
 		config.femaleFrames = armorAdapt.defaultCheck(femaleFrames, adtpath, bodyClass, subType, "/headf.png", config.femaleFrames)
@@ -68,7 +68,7 @@ function armorAdapt.defaultCheck(parameterPath, adtpath, bodyClass, subType, ima
 	local imgchk = root.imageSize
 	local pathTable = {parameterPath, adtpath..bodyClass.."/"..subType..imageName, adtpath..bodyClass..imageName, defaultImage}
 	if _ENV.root["assetOrigin"] ~= nil then
-		pathTable[4] = root.itemConfig(config2.itemName).directory..defaultImage
+		pathTable[4] = root.itemConfig(configItemName).directory..defaultImage
 		for i = 1, #pathTable do
 			if root.assetOrigin(pathTable[i]) ~= nil then
 				imageString = pathTable[i]
@@ -76,7 +76,7 @@ function armorAdapt.defaultCheck(parameterPath, adtpath, bodyClass, subType, ima
 			end
 		end
 	elseif defaultImage == "mask.png" then
-		pathTable[4] = root.itemConfig(config2.itemName).directory..defaultImage
+		pathTable[4] = root.itemConfig(configItemName).directory..defaultImage
 		for i = 1, #pathTable do
 			if imgchk(pathTable[i])[1] == 43 then
 				imageString = pathTable[i]
@@ -84,7 +84,7 @@ function armorAdapt.defaultCheck(parameterPath, adtpath, bodyClass, subType, ima
 			end
 		end
 	else
-		pathTable[4] = root.itemConfig(config2.itemName).directory..defaultImage
+		pathTable[4] = root.itemConfig(configItemName).directory..defaultImage
 		for i = 1, #pathTable do
 			if imgchk(pathTable[i])[1] > 64 then
 				imageString = pathTable[i]

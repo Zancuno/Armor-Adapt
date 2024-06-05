@@ -25,9 +25,10 @@ function init()
 		updateFlag = true,
 		initSpecies = npc.species(),
 		entity = "Npc",
-		statusFolder = "none",
+		statusFolders = { "none", "none", "none", "none", "none", "none", "none", "none" },
 		spriteLibrary = "default",
 		frameOverrideFolder = "none",
+		subTypeScript = "none",
 		hideBody = "showBody",
 		flags = { 0, 0, 0, 0 },
 		slotTable = { "head", "headCosmetic", "chest", "chestCosmetic", "legs", "legsCosmetic", "back", "backCosmetic" },
@@ -66,6 +67,8 @@ function update(dt)
 	
 	if stseffact("armorAdapt_resetTrigger") and armAdt.flags[1] == 0 then
 		armAdt.updateFlag = false
+		armAdt_mismatch = { 1, 2, 3, 4, 5, 6, 7, 8 }
+		armAdt_mismatch = armorAdapt.exemptionCheck(armAdt_mismatch)
 		armAdt.flags[1] = 1
 	end
 	

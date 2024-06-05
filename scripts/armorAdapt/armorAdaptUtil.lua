@@ -40,7 +40,9 @@ function armorAdapt.exemptionCheck(mismatchTable)
 			end
 		end
 	end
-	if not next(mismatchTable) then
+	if mismatchTable == true then
+		return true
+	elseif not next(mismatchTable) then
 		return true
 	else	
 		return mismatchTable
@@ -81,7 +83,7 @@ end
 
 function armorAdapt.generateNpcArmorTable()
 	armAdt_npcArmor = {}
-	for k = 1, #armAdt_slotTable do
+	for k = 1, #armAdt.slotTable do
 		armAdt_npcArmor[k] = npc.getItemSlot(armAdt.slotTable[k])
 	end
 	return armAdt_npcArmor
@@ -95,44 +97,63 @@ function armorAdapt.showCompletionLog(item, bodyClass, subType)
 end
 
 function armorAdapt.transformativeEffects()
+	sb.logInfo("mismatchTable edit is %s", armAdt.subTypeFolders)
 	local armAdt_statusOverride = false
-	local ArmAdt_OverrideBackUp = {}
+	local armAdt_OverrideBackUp = {}
 	for transEffect, transSettings in pairs(armAdt_Config.armorAdaptTransformativeEffects) do
 		if stseffact(transSettings["effectName"]) then
 			local disguiseStop = false
-			if transSettings["setting"] == "overlay" and transSettings["singleFolder"] ~= nil then
-				statusOverlayFolder = transSettings["singleFolder"]
-			elseif transSettings["setting"] == "baseEdit" and transSettings["singleFolder"] ~= nil then
-				statusBaseFolder = transSettings["singleFolder"]
-			elseif transSettings["singleFolder"] ~= nil then
-				statusFolder = transSettings["singleFolder"]
-			end
 			for stknum = 8, 1, -2 do
-				if transSettings[stknum/2] == 1 then
+				armAdt.statusFolders[stknum] = "none"
+				armAdt.statusFolders[stknum-1] = "none"
+				sb.logInfo("mismatchTable edit is %s", armAdt.slotTable[stknum-1])
+				if transSettings["setting"] == "overlay" and transSettings["singleFolder"] ~= nil then
+					statusOverlayFolder = transSettings["singleFolder"]
+				elseif transSettings["setting"] == "baseEdit" and transSettings["singleFolder"] ~= nil then
+					statusBaseFolder = transSettings["singleFolder"]
+				end
+				if transSettings[armAdt.slotTable[stknum-1]] == 1 then
 					if transSettings["setting"] == "override" then
 						armAdt.subTypeFolders[stknum] = armAdt.subTypeStorage[stknum]
 						armAdt.subTypeFolders[stknum-1] = armAdt.subTypeStorage[stknum-1]
 					end
 					if transSettings["setting"] == "override" or transSettings["setting"] == "stack" then
-						armAdt.subTypeFolders[stknum] = armAdt.subTypeFolders[stknum]..transSettings["modifier"]
-						armAdt.subTypeFolders[stknum-1] = armAdt.subTypeFolders[stknum-1]..transSettings["modifier"]
-						if transSettings["setting"] == "override" then
-							armAdt_statusOverride = true
+						if transSettings["singleFolder"] ~= nil and transSettings["setting"] == "override" then
+							armAdt.statusFolders[stknum] = transSettings["singleFolder"]
+							armAdt.statusFolders[stknum-1] = transSettings["singleFolder"]
+						elseif transSettings["singleFolder"] ~= nil and transSettings["setting"] == "stack" then
+							if armAdt.statusFolders[stknum] ~= "none" then
+								armAdt.statusFolders[stknum] = armAdt.statusFolders[stknum]..transSettings["singleFolder"]
+								armAdt.statusFolders[stknum-1] = armAdt.statusFolders[stknum-1]..transSettings["singleFolder"]
+							else
+								armAdt.statusFolders[stknum] = transSettings["singleFolder"]
+								armAdt.statusFolders[stknum-1] = transSettings["singleFolder"]
+							end
+						else
+							armAdt.subTypeFolders[stknum] = armAdt.subTypeFolders[stknum]..transSettings["modifier"]
+							armAdt.subTypeFolders[stknum-1] = armAdt.subTypeFolders[stknum-1]..transSettings["modifier"]
+							if transSettings["setting"] == "override" then
+								armAdt_statusOverride = true
+							end
 						end
 					elseif (transSettings["setting"] == "classEdit" or transSettings["setting"] == "disguise") then
 						armAdt.classFolders[stknum] = transSettings["modifier"]
 						armAdt.classFolders[stknum-1] = transSettings["modifier"]
 						if transSettings["setting"] == "disguise" then
+							if transSettings["singleFolder"] ~= nil then
+								armAdt.statusFolders[stknum] = transSettings["singleFolder"]
+								armAdt.statusFolders[stknum-1] = transSettings["singleFolder"]
+							end
 							armAdt.subTypeFolders[stknum] = dfltBdy
 							armAdt.subTypeFolders[stknum-1] = dfltBdy
-							armAdt_hideBody = "hideBody"
+							armAdt.hideBody = "hideBody"
 							disguiseStop = true
 						end
 					end
 				end
 			end
 			if armAdt_statusOverride == true then
-				ArmAdt_OverrideBackUp = armAdt.subTypeFolders
+				armAdt_OverrideBackUp = armAdt.subTypeFolders
 			end
 		end
 		if disguiseStop == true then
@@ -140,6 +161,7 @@ function armorAdapt.transformativeEffects()
 		end
 	end
 	if armAdt_statusOverride == true then
-		armAdt.subTypeFolders = util.mergeTable({}, ArmAdt_OverrideBackUp)
+		armAdt.subTypeFolders = util.mergeTable({}, armAdt_OverrideBackUp)
 	end
+	sb.logInfo("mismatchTable edit is %s", armAdt.subTypeFolders)
 end

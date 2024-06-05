@@ -26,9 +26,10 @@ function init()
 		updateFlag = true,
 		initSpecies = player.species(),
 		entity = "Player",
-		statusFolder = "none",
+		statusFolders = { "none", "none", "none", "none", "none", "none", "none", "none" },
 		spriteLibrary = "default",
 		frameOverrideFolder = "none",
+		subTypeScript = "none",
 		hideBody = "showBody",
 		flags = { 0, 0, 0, 0 },
 		slotTable = { "head", "headCosmetic", "chest", "chestCosmetic", "legs", "legsCosmetic", "back", "backCosmetic" },
@@ -42,12 +43,13 @@ function init()
 	}
 	armorAdapt.speciesConfig()
 	armAdt.classStorage = util.mergeTable({}, armAdt.classFolders)
-
 	status.clearPersistentEffects("rentekHolidayEffects")
-	if _ENV.root["assetOrigin"] ~= nil then
+	if _ENV.root["assetOrigin"] == nil then
+		inflg("[Armor Adapt] Missing image errors will unfortunately plague the log due to image checking. If you want to clean the log of these errors, I recommend using Star Extensions or Open Starbound.")
+	elseif _ENV.root["assetOrigin"] ~= nil then
 		if armorAdabtBuilderVersion == nil or armorAdabtBuilderVersion ~= armAdt_Config.armorAdaptBuilderVersion then
 			player.radioMessage("armorAdaptBuilderCompatibility", 10)
-			sb.logError("[Armor Adapt]: A mod named %s has an outdated build script for Armor Adapt, please advise the developer to visit https://github.com/Zancuno/Armor-Adapt to get the updated file. [Star Extensions installed]", root.assetSourceMetadata(root.assetOrigin("/armorAdapt/armorAdaptBuilder.lua")).friendlyName)
+			sb.logError("[Armor Adapt]: A mod named %s has an outdated build script for Armor Adapt. The steam workshop link for this mod is %s. Please advise the developer to visit https://github.com/Zancuno/Armor-Adapt to get the updated file. [modified client installed has allowed this message]", root.assetSourcePaths(true)[root.assetOrigin("/armorAdapt/armorAdaptBuilder.lua")].friendlyName, root.assetSourcePaths(true)[root.assetOrigin("/armorAdapt/armorAdaptBuilder.lua")].link)
 		end
 	end
 end
@@ -69,14 +71,17 @@ function update(dt)
 		end
 	end
 	
-	if stseffact("armorAdapt_resetTrigger") and armAdt.flags[1] == 0 then
+	if status.uniqueStatusEffectActive("armorAdapt_resetTrigger") and armAdt.flags[1] == 0 then
 		armAdt.updateFlag = false
+		armAdt_mismatch = { 1, 2, 3, 4, 5, 6, 7, 8 }
+		armAdt_mismatch = armorAdapt.exemptionCheck(armAdt_mismatch)
 		armAdt.flags[1] = 1
 	end
 	
 	if armAdt.updateFlag == false then
 		armorAdapt.getSpeciesBodyTable(armAdt.classType)
 		
+		armAdt.hideBody = "showBody"
 		armAdt.statusFolder = "none"
 		armAdt.classFolders = util.mergeTable({}, armAdt.classStorage)
 		armAdt.subTypeFolders = util.mergeTable({}, armAdt.subTypeStorage)
@@ -105,7 +110,7 @@ end
 
 function armorAdapt_outfitErrorCheck(slotC)
 	if armAdt.currentArmor[slotC] ~= nil then
-		if rarmAdt.currentArmor[slotC].parameters.itemTags ~= nil then
+		if armAdt.currentArmor[slotC].parameters.itemTags ~= nil then
 			if armAdt.currentArmor[slotC].parameters.itemTags[5] == nil then
 				status.addEphemeralEffect("armorAdapt_resetBody")
 				player.radioMessage("armorAdaptOutfitError", 2)	

@@ -2,8 +2,8 @@ function armorAdapt.runArmorAdapt(baseItem, key, bodyClass, subType, adtlibrary)
 	local bldLg,rtCfg = armorAdapt.showBuildLog, root.itemConfig
 	baseName = baseItem.name
 	
-	if armAdt.statusFolder ~= "none" then
-		baseName = armAdt.statusFolder
+	if armAdt.statusFolders[key] ~= "none" then
+		baseName = armAdt.statusFolders[key]
 	end
 	nullCheck = "false"
 	if bodyClass == "null" then
@@ -22,7 +22,7 @@ function armorAdapt.runArmorAdapt(baseItem, key, bodyClass, subType, adtlibrary)
 		baseItem.parameters.itemTags = nil
 	end
 	
-	if key == 3 or key == 4 and baseItem.parameters.maleFrames ~= nil then
+	if (key == 3 and baseItem.parameters.maleFrames ~= nil) or (key == 4 and baseItem.parameters.maleFrames ~= nil) then
 		if string.find(baseItem.parameters.maleFrames.body, "armorAdapt") then
 			baseItem.parameters.maleFrames = nil
 			baseItem.parameters.femaleFrames = nil
@@ -57,8 +57,8 @@ end
 function armorAdapt.speciesConfig()
 	armAdtSpriteLibrary = "default"
 	
-	if pcall(root.assetJson("/species/"..armAdt.initSpecies..".species")["armorAdapt_settings"] ~= nil) then
-		speciesSettings = root.assetJson("/species/"..armAdt.initSpecies..".species:ArmorAdapt_settings")
+	if root.assetJson("/species/"..armAdt.initSpecies..".species")["armorAdapt_settings"] ~= nil then
+		speciesSettings = root.assetJson("/species/"..armAdt.initSpecies..".species:armorAdapt_settings")
 		armAdt.classType = armAdt.initSpecies
 		armAdt.classFolders[1] = speciesSettings.headFolder
 		armAdt.classFolders[2] = speciesSettings.headFolder
@@ -68,11 +68,14 @@ function armorAdapt.speciesConfig()
 		armAdt.classFolders[6] = speciesSettings.legFolder
 		armAdt.classFolders[7] = speciesSettings.backFolder
 		armAdt.classFolders[8] = speciesSettings.backFolder
-		if speciesSettings.spriteLibrary ~= "default" then
+		if speciesSettings.subTypeScript ~= nil then
+			armAdt.subTypeScript = speciesSettings.subTypeScript
+		end
+		if speciesSettings.spriteLibrary ~= nil then
 			armAdt.spriteLibrary = speciesSettings.spriteLibrary
 		end
 		if speciesSettings.outfitFrames ~= nil then
-			armAdpt.frameOverrideFolder = speciesSettings.outfitFrames
+			armAdt.frameOverrideFolder = speciesSettings.outfitFrames
 		end
 	else
 		armAdt.classType = dfltSpc
@@ -117,7 +120,10 @@ function armorAdapt.getSpeciesBodyTable(speciesCheck)
 		inflg("[Armor Adapt][Player Handler]: Species Recognized: %s", speciesCheck)
 		armAdt.flags[2] = 1
 	end
-	if armAdt_Config.adaptSpeciesSubTypeScripts[speciesCheck] ~= nil then
+	if armAdt.subTypeScript ~= "none" then
+		require(armAdt.subTypeScript)
+		armAdt.subTypeFolders = armorAdapt.speciesBodyTable()
+	elseif armAdt_Config.adaptSpeciesSubTypeScripts[speciesCheck] ~= nil then
 		require(armAdt_Config.adaptSpeciesSubTypeScripts[speciesCheck])
 		armAdt.subTypeFolders = armorAdapt.speciesBodyTable()
 	else 
