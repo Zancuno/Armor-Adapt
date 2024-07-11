@@ -1,14 +1,21 @@
 function armorAdapt.runArmorAdapt(baseItem, key, bodyClass, subType, adtlibrary)
+	--param build for items to be passed to the builder, returns to script that equips item
+
 	local bldLg,rtCfg = armorAdapt.showBuildLog, root.itemConfig
 	baseName = baseItem.name
 	
+	--checking if transformative effect is active and has dedicated folder
 	if armAdt.statusFolders[key] ~= "none" then
 		baseName = armAdt.statusFolders[key]
 	end
 	nullCheck = "false"
+	
+	--checking for animal species or species without limbs to assert blank images
 	if bodyClass == "null" then
 		nullCheck = "true"
 	end
+	
+	--adding armor adapt tags in case somehow missing to prevent script aborting
 	if baseItem.parameters.armorAdapt_tags == nil then
 		baseItem.parameters.armorAdapt_tags = { }
 		baseItem.parameters.armorAdapt_tags["bodyClass"] = "none"
@@ -18,10 +25,12 @@ function armorAdapt.runArmorAdapt(baseItem, key, bodyClass, subType, adtlibrary)
 	bodyClassCheck = baseItem.parameters.armorAdapt_tags.bodyClass
 	bodySubTypeCheck = baseItem.parameters.armorAdapt_tags.subType
 	
+	--checking for prior version item params and removing if found to clean them up
 	if baseItem.parameters.itemTags ~= nil and baseItem.parameters.itemTags[1] == "armorAdapted" then
 		baseItem.parameters.itemTags = nil
 	end
 	
+	--checking if prior image params exist to clean up for compatibility
 	if (key == 3 and baseItem.parameters.maleFrames ~= nil) or (key == 4 and baseItem.parameters.maleFrames ~= nil) then
 		if string.find(baseItem.parameters.maleFrames.body, "armorAdapt") then
 			baseItem.parameters.maleFrames = nil
@@ -34,6 +43,7 @@ function armorAdapt.runArmorAdapt(baseItem, key, bodyClass, subType, adtlibrary)
 		end
 	end
 	
+	--param building, will force fresh param build if first run
 	if armAdt.firstUpdate == false and itemTagTable ~= nil and bodyClassCheck == bodyClass and bodySubTypeCheck == subType then
 		adaptItem = baseItem
 		return adaptItem
@@ -48,6 +58,7 @@ function armorAdapt.runArmorAdapt(baseItem, key, bodyClass, subType, adtlibrary)
 		adaptItem.parameters.armorAdapt_tags["subType"] = subType
 		adaptItem.parameters.armorAdapt_tags["nullCheck"] = nullCheck
 		adaptItem.parameters.armorAdapt_tags["itemFolder"] = baseName
+		adaptItem.parameters.armorAdapt_tags["defaultSystem"] = armAdt.defaultSystem
 		bldLg(baseItem, adaptItem)
 		return adaptItem
 	end
@@ -55,8 +66,11 @@ function armorAdapt.runArmorAdapt(baseItem, key, bodyClass, subType, adtlibrary)
 end
 
 function armorAdapt.speciesConfig()
+	--building species body class settings
+	
 	armAdtSpriteLibrary = "default"
 	
+	--building body class settings from species file, has more settings to play with
 	if root.assetJson("/species/"..armAdt.initSpecies..".species")["armorAdapt_settings"] ~= nil then
 		speciesSettings = root.assetJson("/species/"..armAdt.initSpecies..".species:armorAdapt_settings")
 		armAdt.classType = armAdt.initSpecies
@@ -68,14 +82,27 @@ function armorAdapt.speciesConfig()
 		armAdt.classFolders[6] = speciesSettings.legFolder
 		armAdt.classFolders[7] = speciesSettings.backFolder
 		armAdt.classFolders[8] = speciesSettings.backFolder
+		
+		--checking species file for a script to generate sub type settings
 		if speciesSettings.subTypeScript ~= nil then
 			armAdt.subTypeScript = speciesSettings.subTypeScript
 		end
+		
+		--checking if species has opted into an alt library
 		if speciesSettings.spriteLibrary ~= nil then
 			armAdt.spriteLibrary = speciesSettings.spriteLibrary
 		end
+		
+		--checking if species has custom frames files to override outfits
 		if speciesSettings.outfitFrames ~= nil then
 			armAdt.frameOverrideFolder = speciesSettings.outfitFrames
+		end
+		
+		--checking if species uses default outfit
+		if speciesSettings.outfitDefaults ~= nil then
+			armAdt.defaultSystem = speciesSettings.outfitDefaults
+		else 
+			armAdt.defaultSystem = false
 		end
 	else
 		armAdt.classType = dfltSpc
@@ -89,6 +116,7 @@ function armorAdapt.speciesConfig()
 		armAdt.classFolders[8] = dfltSpc
 	end
 	
+	--backwards compatible building body class settings from armorAdapt.config, more restricted
 	v1Species = { 
 		animalSpecies = {armAdt.initSpecies, dfltNl, dfltNl, armAdt.initSpecies, dfltNl},
 		customBodySpecies = {armAdt.initSpecies, armAdt.initSpecies, armAdt.initSpecies, armAdt.initSpecies, armAdt.initSpecies},
@@ -116,20 +144,30 @@ function armorAdapt.speciesConfig()
 end
 
 function armorAdapt.getSpeciesBodyTable(speciesCheck)
+	--checks if a species has a script to build body sub type settings or provide defaults
+
 	if armAdt.flags[2] == 0 and (armAdt_Config.showPlayerSpecies == true) then
 		inflg("[Armor Adapt][Player Handler]: Species Recognized: %s", speciesCheck)
 		armAdt.flags[2] = 1
 	end
+	
+	--runs script from species file to build sub type seettings
 	if armAdt.subTypeScript ~= "none" then
 		require(armAdt.subTypeScript)
 		armAdt.subTypeFolders = armorAdapt.speciesBodyTable()
+		
+	--backwards compatible, checks armorAdapt.config for the script to build sub type settings	
 	elseif armAdt_Config.adaptSpeciesSubTypeScripts[speciesCheck] ~= nil then
 		require(armAdt_Config.adaptSpeciesSubTypeScripts[speciesCheck])
 		armAdt.subTypeFolders = armorAdapt.speciesBodyTable()
 	else 
 		armAdt.subTypeFolders = { "Default", "Default", "Default", "Default", "Default", "Default", "Default", "Default" }
 	end
-		armAdt.subTypeStorage = util.mergeTable({}, armAdt.subTypeFolders)
+	
+	--store a backup of settings
+	armAdt.subTypeStorage = util.mergeTable({}, armAdt.subTypeFolders)
+	
+	
 	if armAdt.flags[3] == 0 and (armAdt_Config["show"..armAdt.entity.."BodyType"] == true) then
 		inflg("[Armor Adapt]["..armAdt.entity.." Handler]: Sub Type Recognized: Your head type is %s, your chest type is %s, your leg type is %s, and your back type is %s", armAdt.subTypeFolders[1], armAdt.subTypeFolders[3], armAdt.subTypeFolders[5], armAdt.subTypeFolders[7])
 		armAdt.flags[3] = 1

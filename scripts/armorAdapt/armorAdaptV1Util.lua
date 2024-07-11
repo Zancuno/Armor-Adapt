@@ -1,6 +1,10 @@
 function armorAdapt.runArmorAdapt(baseItem, key, bodyClass, subType, adtlibrary)
+	--param build for items to be passed to the builder, legacy version. Returns to script that equips item
+	
 	local bldLg,rtCfg = armorAdapt.showBuildLog, root.itemConfig
 	adtPth = "/items/armors/armorAdapt/"
+	
+	--table of outfit slot settings
 	local keyTable = {
 		{"headf", "headm", "head"},
 		{"headf", "headm", "head"},
@@ -13,24 +17,32 @@ function armorAdapt.runArmorAdapt(baseItem, key, bodyClass, subType, adtlibrary)
 	}
 	baseName = baseItem.name
 	nullCheck = "false"
+	
+	--checking for animal species or species without limbs to assrt blank images, building path snippet accordingly
 	if bodyClass == "null" then
 		midPath = "default/null/Default/"
 		nullCheck = "true"
 	else
 		midPath = bodyClass.."/"..baseName.."/"..subType.."/"
 	end
+	
+	--checking if item tags exists prior, creates to not cause script abort
 	if not next(baseItem.parameters) or baseItem.parameters.itemTags == nil then
 		baseItem.parameters.itemTags = {}
 	end
 		itemTagTable = baseItem.parameters.itemTags
 		bodyClassCheck = baseItem.parameters.itemTags[2]
 		bodySubTypeCheck = baseItem.parameters.itemTags[3]
+		
+	--param building, will force fresh param build if first run
 	if armAdt.firstUpdate == false and itemTagTable ~= nil and bodyClassCheck == bodyClass and bodySubTypeCheck == subType then
 		adaptItem = baseItem
 		return adaptItem
 	elseif armAdt.firstUpdate == true or itemTagTable == nil or bodyClassCheck ~= bodyClass or bodySubTypeCheck ~= subType then
 		armorAdapt.showItemLog(baseItem)
 		local adaptItem = copy(baseItem)
+		
+		--legacy, constructing paths to feed into legacy builder
 		if keyTable[key][3] == "chest" then	
 				adaptItem.parameters.femaleFrames = { body = adtPth..midPath..keyTable[key][1]..".png", frontSleeve = adtPth..midPath.."fsleevef.png", backSleeve = adtPth..midPath.."bsleevef.png" }
 				adaptItem.parameters.maleFrames = { body = adtPth..midPath..keyTable[key][2]..".png", frontSleeve = adtPth..midPath.."fsleeve.png", backSleeve = adtPth..midPath.."bsleeve.png" }
@@ -46,6 +58,8 @@ function armorAdapt.runArmorAdapt(baseItem, key, bodyClass, subType, adtlibrary)
 end
 
 function armorAdapt.speciesConfig()
+	--building species body class settings, lacking species file check due to legacy
+	
 	v1Species = { 
 		animalSpecies = {armAdt.initSpecies, dfltNl, dfltNl, armAdt.initSpecies, dfltNl},
 		customBodySpecies = {armAdt.initSpecies, armAdt.initSpecies, armAdt.initSpecies, armAdt.initSpecies, armAdt.initSpecies},
@@ -73,17 +87,24 @@ function armorAdapt.speciesConfig()
 end
 
 function armorAdapt.getSpeciesBodyTable(speciesCheck)
+	--checks if a species has a script to build body sub type settings or provide defaults. Lacks ability to check species file due to legacy.
+
 	if armAdt.flags[2] == 0 and (armAdt_Config.showPlayerSpecies == true) then
 		inflg("[Armor Adapt][Player Handler]: Species Recognized: %s", speciesCheck)
 		armAdt.flags[2] = 1
 	end
+	
+	--runs script from armorAdapt.config if species has listed it
 	if armAdt_Config.adaptSpeciesSubTypeScripts[speciesCheck] ~= nil then
 		require(armAdt_Config.adaptSpeciesSubTypeScripts[speciesCheck])
 		armAdt.subTypeFolders = armorAdapt.speciesBodyTable()
 	else 
 		armAdt.subTypeFolders = { "Default", "Default", "Default", "Default", "Default", "Default", "Default", "Default" }
 	end
-		armAdt.subTypeStorage = util.mergeTable({}, armAdt.subTypeFolders)
+	
+	--store a backup of settings
+	armAdt.subTypeStorage = util.mergeTable({}, armAdt.subTypeFolders)
+	
 	if armAdt.flags[3] == 0 and (armAdt_Config["show"..armAdt.entity.."BodyType"] == true) then
 		inflg("[Armor Adapt]["..armAdt.entity.." Handler]: Sub Type Recognized: Your head type is %s, your chest type is %s, your leg type is %s, and your back type is %s", armAdt.subTypeFolders[1], armAdt.subTypeFolders[3], armAdt.subTypeFolders[5], armAdt.subTypeFolders[7])
 		armAdt.flags[3] = 1

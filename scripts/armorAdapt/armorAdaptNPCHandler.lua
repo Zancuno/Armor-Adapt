@@ -1,25 +1,38 @@
 require "/scripts/util.lua"
 require "/scripts/armorAdapt/armorAdaptUtil.lua"
 require "/armorAdapt/armorAdaptBuilder.lua"
+
+--hooking functons of other scripts sharing _ENV
 local baseInit = init or function() end
 local baseUpdate = update or function() end
+
 function init()
 	baseInit()
 	armAdt_Config = root.assetJson("/scripts/armorAdapt/armorAdapt.config")
+	
+	--minimum length of directives to cause skipping
 	armAdt_MinDrtv = armAdt_Config.adaptDirectivesMin
+	
+	--function shortening for scripts
 	eqpitm = npc.setItemSlot
 	inflg = sb.logInfo
 	stseffact = status.uniqueStatusEffectActive
+	
 	dfltSpc,dfltBdy,dfltNl = "standard", "Default", "null"
+	
 	if armAdt_Config.showStartUp == true then
 		inflg("[Armor Adapt][Npc Handler]: Initializing Armor Adapt System")
 		inflg("[Armor Adapt][Npc Handler]: Starting equipment check for adaptable items.")
 	end
-	if armorAdaptVersionNumber == nil or armorAdaptVersionNumber ~= armAdt_Config.armorAdaptBuilderVersion then
+	
+	--build script version check, loads appropriate functions for the version on builder
+	if armorAdabtBuilderVersion == nil or armorAdabtBuilderVersion ~= armAdt_Config.armorAdaptBuilderVersion then
 		require("/scripts/armorAdapt/armorAdaptV1Util.lua")
 	else
 		require("/scripts/armorAdapt/armorAdaptV2Util.lua")
 	end
+	
+	--var table to avoid overriding values
 	armAdt = {
 		firstUpdate = true,
 		updateFlag = true,
@@ -40,9 +53,12 @@ function init()
 		currentArmor = {},
 		itemStorage = { dfltNl, dfltNl, dfltNl, dfltNl, dfltNl, dfltNl, dfltNl, dfltNl }	
 	}
+	
+	--get species body class settings
 	armorAdapt.speciesConfig()
 	armAdt.classStorage = util.mergeTable({}, armAdt.classFolders)
 	
+	--remove holiday event effects that may linger
 	status.clearPersistentEffects("rentekHolidayEffects")
 	status.removeEphemeralEffect("hotHolidayEvent")
 end

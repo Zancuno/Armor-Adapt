@@ -2,75 +2,83 @@ armorAdapt = {}
 
 function armorAdapt.spriteBuild(directory, config, parameters, level, seed)
 	configItemName = config.itemName
+	intendedBody = config["armorAdapt_intendedBody"] or nil
+	armAdtCustom = config["armorAdapt_custom"] or nil
+	pathTable = {}
+	
+	--common buildscript table merge to prevent re-assertion of original config
 	config = util.mergeTable({ }, config)
-	config.armorAdapt_layers = {}
-	if parameters.armorAdapt_layers == nil or (type(parameters.armorAdapt_layers) == "table" and not next(parameters.armorAdapt_layers)) then
-		parameters.armorAdapt_layers = {}
-		parameters.armorAdapt_layers.chest = {}
-		parameters.armorAdapt_layers.barm = {}
-		parameters.armorAdapt_layers.farm = {}
-	end
-	config.armorAdapt_tags = true
+	
+	--creating parameters if non existant prior
 	if parameters.armorAdapt_tags == nil or not next(parameters.armorAdapt_tags) then
-		parameters.armorAdapt_tags = {library = "null", hideBool = "null", bodyClass = "null", subType = "null", nullcheck = "false", itemFolder = "null"}
+		parameters.armorAdapt_tags = {
+			library = "default", 
+			bodyClass = "standard", 
+			subType = "Default", 
+			hideBool = "showBody", 
+			nullcheck = "false", 
+			itemFolder = "null", 
+			defaultSystem = false
+		}
 	end
-	library = parameters.armorAdapt_tags.library
-	hideBool = parameters.armorAdapt_tags.hideBool
-	bodyClass = parameters.armorAdapt_tags.bodyClass
-	subType = parameters.armorAdapt_tags.subType
-	itemFolder = parameters.armorAdapt_tags.itemFolder
-	if library == "default" then
-		librarySeg = "armorAdapt"
-	else
-		librarySeg = library
-	end
-	if parameters.armorAdapt_tags["nullCheck"] ~= "false" then
-		basePath = "/items/armors/"..librarySeg.."/default/null/Default/"
-	else
-		basePath = "/items/armors/"..librarySeg.."/"..bodyClass.."/"..itemFolder.."/"..subType.."/"
-	end
-	maleFrames = { body = basePath.."chestm.png", frontSleeve = basePath.."fsleeve.png", backSleeve = basePath.."bsleeve.png" }
-	femaleFrames = { body = basePath.."chestf.png", frontSleeve = basePath.."fsleevef.png", backSleeve = basePath.."bsleevef.png" }
-
-	if config["armorAdapt_intendedBody"] ~= nil and config["armorAdapt_intendedBody"].library == library and config["armorAdapt_intendedBody"].bodyClass == bodyClass and config["armorAdapt_intendedBody"].subType == subType then
+	--storing parameters in custom var names to prevent overriding with other buildscripts
+	AAlibrary = parameters.armorAdapt_tags.library
+	AAbodyClass = parameters.armorAdapt_tags.bodyClass
+	AAsubType = parameters.armorAdapt_tags.subType
+	
+	AAhideBool = parameters.armorAdapt_tags.hideBool
+	AAitemFolder = parameters.armorAdapt_tags.itemFolder
+	AAdefaultSys = parameters.armorAdapt_tags.defaultSystem
+	
+	--checking to see if species settings match intended body of item original images to avoid further checks
+	if intendedBody ~= nil and 
+	intendedBody["library"] == AAlibrary and 
+	intendedBody["bodyClass"] == AAbodyClass and 
+	intendedBody["subType"] == AAsubType then
+	
 		config = config
-	elseif config["armorAdapt_custom"] ~= nil and config.armorAdapt_custom[library] ~= nil and config.armorAdapt_custom[library][bodyClass] ~= nil and config.armorAdapt_custom[library][bodyClass][subType] ~= nil then
-		config.maleFrames = config.armorAdapt_custom[library][bodyClass][subType][maleFrames]
-		config.femaleFrames = config.armorAdapt_custom[library][bodyClass][subType][femaleFrames]
-	elseif parameters.armorAdapt_tags.subType ~= "null" then
-		adtpath = "/items/armors/armorAdapt/default/"
-		config.maleFrames.body = armorAdapt.defaultCheck(maleFrames.body, adtpath, bodyClass, subType, "/chestm.png", config.maleFrames.body)
-		config.maleFrames.frontSleeve = armorAdapt.defaultCheck(maleFrames.frontSleeve, adtpath, bodyClass, subType, "/fsleeve.png", config.maleFrames.frontSleeve)
-		config.maleFrames.backSleeve = armorAdapt.defaultCheck(maleFrames.backSleeve, adtpath, bodyClass, subType, "/bsleeve.png", config.maleFrames.backSleeve)
-		config.femaleFrames.body = armorAdapt.defaultCheck(femaleFrames.body, adtpath, bodyClass, subType, "/chestf.png", config.femaleFrames.body)
-		config.femaleFrames.frontSleeve = armorAdapt.defaultCheck(femaleFrames.frontSleeve, adtpath, bodyClass, subType, "/fsleevef.png", config.femaleFrames.frontSleeve)
-		config.femaleFrames.backSleeve = armorAdapt.defaultCheck(femaleFrames.backSleeve, adtpath, bodyClass, subType, "/bsleevef.png", config.femaleFrames.backSleeve)
+	
+	--intended body mismatch so checking item for preset image paths that match species settings
+	elseif armAdtCustom ~= nil and 
+	armAdtCustom[AAlibrary] ~= nil and 
+	armAdtCustom[AAlibrary][AAbodyClass] ~= nil and 
+	armAdtCustom[AAlibrary][AAbodyClass][AAsubType] ~= nil then
+	
+		config.maleFrames = armAdtCustom[AAlibrary][AAbodyClass][AAsubType]["maleFrames"]
+		config.femaleFrames = armAdtCustom[AAlibrary][AAbodyClass][AAsubType]["femaleFrames"]
+	
+	--no preset image paths for species settings in item so checking if custom folder paths exist, if not original images
+	elseif AAitemFolder ~= "null") then
 
-		if (parameters.itemTags ~= nil and parameters.itemTags[6] ~= nil and parameters.itemTags[6] == "hideBody") or (parameters.armorAdapt_tags == "hideBody") then
+		--null check is only true for animal species or species missing limbs, this is a forced invisibility of items
+		if parameters.armorAdapt_tags.nullcheck == true then
+			config.maleFrames = "/items/armors/armorAdapt/default/null/default/back.png"
+			config.femaleFrames = "/items/armors/armorAdapt/default/null/default/back.png"
+			config.maleFrames = "/items/armors/armorAdapt/default/null/default/back.png"
+			config.femaleFrames = "/items/armors/armorAdapt/default/null/default/back.png"
+			config.maleFrames = "/items/armors/armorAdapt/default/null/default/back.png"
+			config.femaleFrames = "/items/armors/armorAdapt/default/null/default/back.png"
+		else
+			config.maleFrames.body = armorAdapt.defaultCheck(armorAdapt.constructPaths("/chestm.png", config.maleFrames.body))
+			config.femaleFrames.body = armorAdapt.defaultCheck(armorAdapt.constructPaths("/chestf.png", config.femaleFrames.body))
+			config.maleFrames.frontSleeve = armorAdapt.defaultCheck(armorAdapt.constructPaths("/fsleeve.png", config.maleFrames.frontSleeve))
+			config.femaleFrames.frontSleeve = armorAdapt.defaultCheck(armorAdapt.constructPaths("/fsleevef.png", config.femaleFrames.frontSleeve))
+			config.maleFrames.backSleeve = armorAdapt.defaultCheck(armorAdapt.constructPaths("/bsleeve.png", config.maleFrames.backSleeve))
+			config.femaleFrames.backSleeve = armorAdapt.defaultCheck(armorAdapt.constructPaths("/bsleevef.png", config.femaleFrames.backSleeve))
+		end
+		
+		if AAhideBools == "hideBody" then
 			config.hideBody = true
 		end
-	--[[
-		config.maleFrames.body = armorAdapt.directivesBuild(armorAdapt.defaultCheck(maleFrames.body, adtpath, bodyClass, subType, "/chestm.png", config.maleFrames.body), parameters.armorAdapt_layers.chest, "male")
-		config.maleFrames.frontSleeve = armorAdapt.directivesBuild(armorAdapt.defaultCheck(maleFrames.frontSleeve, adtpath, bodyClass, subType, "/fsleeve.png", config.maleFrames.frontSleeve), parameters.armorAdapt_layers.farm, "male")
-		config.maleFrames.backSleeve = armorAdapt.directivesBuild(armorAdapt.defaultCheck(maleFrames.backSleeve, adtpath, bodyClass, subType, "/bsleeve.png", config.maleFrames.backSleeve), parameters.armorAdapt_layers.barm, "male")
-		config.femaleFrames.body = armorAdapt.directivesBuild(armorAdapt.defaultCheck(femaleFrames.body, adtpath, bodyClass, subType, "/chestf.png", config.femaleFrames.body), parameters.armorAdapt_layers.chest, "female")
-		config.femaleFrames.frontSleeve = armorAdapt.directivesBuild(armorAdapt.defaultCheck(femaleFrames.frontSleeve, adtpath, bodyClass, subType, "/fsleevef.png", config.femaleFrames.frontSleeve), parameters.armorAdapt_layers.farm, "female")
-		config.femaleFrames.backSleeve = armorAdapt.directivesBuild(armorAdapt.defaultCheck(femaleFrames.backSleeve, adtpath, bodyClass, subType, "/bsleevef.png", config.femaleFrames.backSleeve), parameters.armorAdapt_layers.barm, "female")
-
-		if (parameters.itemTags ~= nil and parameters.itemTags[6] ~= nil and parameters.itemTags[6] == "hideBody") or (parameters.armorAdapt_tags == "hideBody") then
-			config.hideBody = true
-		end
-	]]--
 	end
 
 	return config, parameters
 end
 
-function armorAdapt.defaultCheck(parameterPath, adtpath, bodyClass, subType, imageName, defaultImage)
+function armorAdapt.defaultCheck()
+	--checking if images exist, if modified client use assetOrigin to prevent errors, otherwise will spam log with missing image errors as it checks
 	local imgchk = root.imageSize
-	local pathTable = {parameterPath, adtpath..bodyClass.."/"..subType..imageName, adtpath..bodyClass..imageName, defaultImage}
 	if _ENV.root["assetOrigin"] ~= nil then
-		pathTable[4] = root.itemConfig(configItemName).directory..defaultImage
 		for i = 1, #pathTable do
 			if root.assetOrigin(pathTable[i]) ~= nil then
 				imageString = pathTable[i]
@@ -78,7 +86,6 @@ function armorAdapt.defaultCheck(parameterPath, adtpath, bodyClass, subType, ima
 			end
 		end
 	else
-		pathTable[4] = root.itemConfig(configItemName).directory..defaultImage
 		for i = 1, #pathTable do
 			if imgchk(pathTable[i])[1] > 64 then
 				imageString = pathTable[i]
@@ -89,41 +96,26 @@ function armorAdapt.defaultCheck(parameterPath, adtpath, bodyClass, subType, ima
 	
 	return imageString
 end
---[[
-function armorAdapt.directivesBuild(imageString, layers, gender)
-	if layers[gender].frameOverride ~= nil then
-		base = layers[gender].frameOverride
+
+function armorAdapt.constructPaths(partImage, originalImage)
+	--creating a queue table of image paths for defaultCheck to run through. Non standard library adds a check before defaulting to normal library if failed. Species that use default outfits or if transformation effects are active add 2 more checks for matching images. All else fails original image is at end of list which should always succeed unless is empty.
+	pathTable= {}
+	if AAlibrary ~= "default" then
+		pathTable[1] = "/items/armors/"..AAlibrary.."/"..bodyClass.."/"..AAitemFolder.."/"..AAsubType..partImage
+		
+		if AAdefaultSys == true or AAitemFolder ~= configItemName then
+			table.insert(pathTable, "/items/armors/default/"..bodyClass.."_"..AAlibrary.."/"..AAsubType..partImage)
+			table.insert(pathTable, "/items/armors/default/"..bodyClass.."_"..AAlibrary..partImage)
+		end
+		
+		table.insert(pathTable, "/items/armors/armorAdapt/"..bodyClass.."/"..AAitemFolder.."/"..AAsubType..partImage)	
 	else
-		base = nil
-	end
-	if next(layers) then
-		if next(layers["base"])then
-			for  i = 1, #layers["base"] do
-				local mid = "?"
-				if layers["base"][gender][i][2] ~= nil then
-					mid = "?addmask="..layers["base"][gender][i][2].."?"
-				else
-					mid = "?"
-				end
-				if base == nil then
-					base = layers["base"][gender][i][1]
-				else
-					base = base..mid.."blendscreen"..layers["base"][gender][i][1]..";-2;-2"
-				end
-			end
-		end
-		if base ~= nil then
-			imageString = base.."?blendscreen="..imageString..";-2;-2"
-		end
-		if next(layers["overlay"]) then
-			for  g = 1, #layers["overlay"] do
-				if layers["overlay"][gender][i][2] ~= nil then
-					imageString = imageString.."?addmask="..layers["overlay"][gender][i][2].."?blendscreen="..layers["overlay"][gender][i][1]..";-2;-2"
-				else
-					imageString = imageString.."?blendscreen="..layers["overlay"][gender][i][1]..";-2;-2"
-				end
-			end
+		pathTable[1] = "/items/armors/armorAdapt/"..bodyClass.."/"..AAitemFolder.."/"..AAsubType..partImage
+		
+		if AAdefaultSys == true or AAitemFolder ~= configItemName then
+			table.insert(pathTable, "/items/armors/default/"..bodyClass.."/"..AAsubType..partImage)
+			table.insert(pathTable, "/items/armors/default/"..bodyClass..partImage)
 		end
 	end
-	return imageString
-end]]--
+	table.insert(pathTable, root.itemConfig(configItemName).directory..originalImage)
+end
