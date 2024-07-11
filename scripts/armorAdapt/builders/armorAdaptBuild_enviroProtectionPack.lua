@@ -48,7 +48,7 @@ function armorAdapt.spriteBuild(directory, config, parameters, level, seed)
 		config.femaleFrames = armAdtCustom[AAlibrary][AAbodyClass][AAsubType]["femaleFrames"]
 	
 	--no preset image paths for species settings in item so checking if custom folder paths exist, if not original images
-	elseif AAitemFolder ~= "null") then
+	elseif AAitemFolder ~= "null" then
 
 		--null check is only true for animal species or species missing limbs, this is a forced invisibility of items
 		if parameters.armorAdapt_tags.nullcheck == true then
@@ -93,20 +93,20 @@ function armorAdapt.constructPaths(partImage, originalImage)
 	--creating a queue table of image paths for defaultCheck to run through. Non standard library adds a check before defaulting to normal library if failed. Species that use default outfits or if transformation effects are active add 2 more checks for matching images. All else fails original image is at end of list which should always succeed unless is empty.
 	pathTable= {}
 	if AAlibrary ~= "default" then
-		pathTable[1] = "/items/armors/"..AAlibrary.."/"..bodyClass.."/"..AAitemFolder.."/"..AAsubType..partImage
+		pathTable[1] = "/items/armors/"..AAlibrary.."/"..AAbodyClass.."/"..AAitemFolder.."/"..AAsubType..partImage
 		
 		if AAdefaultSys == true or AAitemFolder ~= configItemName then
-			table.insert(pathTable, "/items/armors/default/"..bodyClass.."_"..AAlibrary.."/"..AAsubType..partImage)
-			table.insert(pathTable, "/items/armors/default/"..bodyClass.."_"..AAlibrary..partImage)
+			table.insert(pathTable, "/items/armors/default/"..AAbodyClass.."_"..AAlibrary.."/"..AAsubType..partImage)
+			table.insert(pathTable, "/items/armors/default/"..AAbodyClass.."_"..AAlibrary..partImage)
 		end
 		
-		table.insert(pathTable, "/items/armors/armorAdapt/"..bodyClass.."/"..AAitemFolder.."/"..AAsubType..partImage)	
+		table.insert(pathTable, "/items/armors/armorAdapt/"..AAbodyClass.."/"..AAitemFolder.."/"..AAsubType..partImage)	
 	else
-		pathTable[1] = "/items/armors/armorAdapt/"..bodyClass.."/"..AAitemFolder.."/"..AAsubType..partImage
+		pathTable[1] = "/items/armors/armorAdapt/"..AAbodyClass.."/"..AAitemFolder.."/"..AAsubType..partImage
 		
 		if AAdefaultSys == true or AAitemFolder ~= configItemName then
-			table.insert(pathTable, "/items/armors/default/"..bodyClass.."/"..AAsubType..partImage)
-			table.insert(pathTable, "/items/armors/default/"..bodyClass..partImage)
+			table.insert(pathTable, "/items/armors/default/"..AAbodyClass.."/"..AAsubType..partImage)
+			table.insert(pathTable, "/items/armors/default/"..AAbodyClass..partImage)
 		end
 	end
 	table.insert(pathTable, root.itemConfig(configItemName).directory..originalImage)

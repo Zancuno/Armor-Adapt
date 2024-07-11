@@ -48,7 +48,7 @@ function armorAdapt.spriteBuild(directory, config, parameters, level, seed)
 		config.femaleFrames = armAdtCustom[AAlibrary][AAbodyClass][AAsubType]["femaleFrames"]
 		
 	--no preset image paths for species settings in item so checking if custom folder paths exist, if not original images
-	elseif AAitemFolder ~= "null") then
+	elseif AAitemFolder ~= "null" then
 		
 		--null check is only true for animal species or species missing limbs, this is a forced invisibility of items
 		if parameters.armorAdapt_tags.nullcheck == true then
