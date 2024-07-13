@@ -128,18 +128,20 @@ function armorAdapt.speciesConfig()
 		customHeadSpecies = {armAdt.initSpecies, armAdt.initSpecies, dfltSpc, dfltSpc, dfltSpc},
 		vanillaBodySpecies = {dfltSpc, dfltSpc, dfltSpc, dfltSpc, dfltSpc}
 	}
-	for _, spcEntry in ipairs(v1Species) do
-		if armAdt_Config[spcEntry][armAdt.initSpecies] then
-			armAdt.classType = v1Species[spcEntry][1]
-			armAdt.classFolders[1] = v1Species[spcEntry][2]
-			armAdt.classFolders[2] = v1Species[spcEntry][2]
-			armAdt.classFolders[3] = v1Species[spcEntry][3]
-			armAdt.classFolders[4] = v1Species[spcEntry][3]
-			armAdt.classFolders[5] = v1Species[spcEntry][4]
-			armAdt.classFolders[6] = v1Species[spcEntry][4]
-			armAdt.classFolders[7] = v1Species[spcEntry][5]
-			armAdt.classFolders[8] = v1Species[spcEntry][5]
-		end	
+	for spcEntry, spcSet in pairs(v1Species) do
+		for _, spcList in ipairs(armAdt_Config[spcEntry]) do
+			if spcList == armAdt.initSpecies then
+				armAdt.classType = v1Species[spcEntry][1]
+				armAdt.classFolders[1] = v1Species[spcEntry][2]
+				armAdt.classFolders[2] = v1Species[spcEntry][2]
+				armAdt.classFolders[3] = v1Species[spcEntry][3]
+				armAdt.classFolders[4] = v1Species[spcEntry][3]
+				armAdt.classFolders[5] = v1Species[spcEntry][4]
+				armAdt.classFolders[6] = v1Species[spcEntry][4]
+				armAdt.classFolders[7] = v1Species[spcEntry][5]
+				armAdt.classFolders[8] = v1Species[spcEntry][5]
+			end	
+		end
 	end
 end
 
