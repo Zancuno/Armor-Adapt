@@ -59,6 +59,7 @@ function armorAdapt.runArmorAdapt(baseItem, key, bodyClass, subType, adtlibrary)
 		adaptItem.parameters.armorAdapt_tags["nullCheck"] = nullCheck
 		adaptItem.parameters.armorAdapt_tags["itemFolder"] = baseName
 		adaptItem.parameters.armorAdapt_tags["defaultSystem"] = armAdt.defaultSystem
+		adaptItem.parameters.armorAdapt_tags["genderOverride"] = armAdt.genderOverride
 		bldLg(baseItem, adaptItem)
 		return adaptItem
 	end
@@ -103,6 +104,13 @@ function armorAdapt.speciesConfig()
 			armAdt.defaultSystem = speciesSettings.outfitDefaults
 		else 
 			armAdt.defaultSystem = false
+		end
+		
+		--checking if species is neutral or only one gender. Forces only "male" or "female" frames is set accordingly
+		if speciesSettings.outfitGenderOverride ~= nil then
+			armAdt.genderOverride = speciesSettings.outfitGenderOverride
+		else
+			armAdt.genderOverride = "null"
 		end
 	else
 		armAdt.classType = dfltSpc

@@ -18,7 +18,8 @@ function armorAdapt.spriteBuild(directory, config, parameters, level, seed)
 			hideBool = "showBody", 
 			nullcheck = "false", 
 			itemFolder = "null", 
-			defaultSystem = false
+			defaultSystem = false,
+			genderOverride = "null"
 		}
 	end
 	--storing parameters in custom var names to prevent overriding with other buildscripts
@@ -67,6 +68,13 @@ function armorAdapt.spriteBuild(directory, config, parameters, level, seed)
 		end
 	end
 
+	--for species with a neutral body shape or are a singular gender. To auto force the frames on both "genders" the game forces.
+	if parameters.armorAdapt_tags.genderOverride == "male" then
+		config.femaleFrames = config.maleFrames
+	elseif parameters.armorAdapt_tags.genderOverride == "female" then
+		config.maleFrames = config.femaleFrames
+	end
+	
 	return config, parameters
 end
 
