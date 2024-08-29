@@ -1,0 +1,23 @@
+{
+	"itemName" : "armAdt_chest",
+	"inventoryIcon" : "icons.png:chest",
+	"maxStack" : 1,
+	"rarity" : "Essential",
+	"category" : "chestarmour",
+	"description" : "Be one with your inner nature.",
+	"shortdescription" : "No Gear",
+	"tooltipKind" : "armor",
+	"builder" : "/armorAdapt/armorAdaptBuilder2.lua",
+	"maleFrames" : {
+	"body" : "chestm.png",
+	"backSleeve" : "bsleeve.png",
+	"frontSleeve" : "fsleeve.png"
+	},
+
+	"femaleFrames" : {
+	"body" : "chestf.png",
+	"backSleeve" : "bsleeve.png",
+	"frontSleeve" : "fsleeve.png"
+	},
+	"armorAdaptDummy" : true
+}

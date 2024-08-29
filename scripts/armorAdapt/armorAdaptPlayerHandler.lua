@@ -26,23 +26,14 @@ function init()
 		inflg("[Armor Adapt][Player Handler]: Starting equipment check for adaptable items.")
 	end
 	
-	--build script version check, loads appropriate functions for the version on builder
-	if armorAdabtBuilderVersion == nil or armorAdabtBuilderVersion ~= armAdt_Config.armorAdaptBuilderVersion then
-		require("/scripts/armorAdapt/armorAdaptV1Util.lua")
-	else
-		require("/scripts/armorAdapt/armorAdaptV2Util.lua")
-	end
-	
 	--var table to avoid overriding values
 	armAdt = {
-		firstUpdate = true,
 		updateFlag = true,
 		initSpecies = player.species(),
 		entity = "Player",
 		statusFolders = { "none", "none", "none", "none", "none", "none", "none", "none" },
 		spriteLibrary = "default",
 		frameOverrideFolder = "none",
-		subTypeScript = "none",
 		hideBody = "showBody",
 		flags = { 0, 0, 0, 0 },
 		slotTable = { "head", "headCosmetic", "chest", "chestCosmetic", "legs", "legsCosmetic", "back", "backCosmetic" },
@@ -63,15 +54,15 @@ function init()
 	status.clearPersistentEffects("rentekHolidayEffects")
 	
 	--modified client check and also out of date detector for build script if modified client
-	if _ENV.root["assetOrigin"] == nil then
+	if root["assetOrigin"] == nil then
 	
 		inflg("[Armor Adapt] Missing image errors will unfortunately plague the log due to image checking. If you want to clean the log of these errors, I recommend using Star Extensions or Open Starbound.")
 		
-	elseif _ENV.root["assetOrigin"] ~= nil then
+	elseif root["assetOrigin"] then
 		if armorAdabtBuilderVersion == nil or armorAdabtBuilderVersion ~= armAdt_Config.armorAdaptBuilderVersion then
 		
 			player.radioMessage("armorAdaptBuilderCompatibility", 10)
-			sb.logError("[Armor Adapt]: A mod named %s has an outdated build script for Armor Adapt. The steam workshop link for this mod is %s. Please advise the developer to visit https://github.com/Zancuno/Armor-Adapt to get the updated file. [modified client installed has allowed this message]", 
+			sb.logError("[Armor Adapt]: A mod named %s has an outdated build script for Armor Adapt. The steam workshop link for this mod is %s. Please advise the developer to remove the builder from their files and items. It is no longer needed and will just fill the item with unnecessary bloat. [modified client installed has allowed this message]", 
 			root.assetSourcePaths(true)[root.assetOrigin("/armorAdapt/armorAdaptBuilder.lua")].friendlyName,
 			root.assetSourcePaths(true)[root.assetOrigin("/armorAdapt/armorAdaptBuilder.lua")].link)
 		end
@@ -81,9 +72,14 @@ end
 function update(dt)
 	baseUpdate(dt)
 
+	--getting equipment list
 	armAdt.currentArmor = armorAdapt.generatePlayerArmorTable()
 	armAdt_mismatch = true
+	
+	--checking outfits against a stored table for mismatch, exempting select items
 	armAdt_mismatch = armorAdapt.exemptionCheck(armorAdapt.compareArmorTables(armAdt.currentArmor, armAdt.itemStorage))
+	
+	--checking flag conditions to reset or turn update on
 	if type(armAdt_mismatch) == "table" then
 		armAdt.updateFlag = false
 	else
@@ -94,7 +90,8 @@ function update(dt)
 		end
 	end
 	
-	if status.uniqueStatusEffectActive("armorAdapt_resetTrigger") and armAdt.flags[1] == 0 then
+	--checking to see if transformative status effects have forced update
+	if stseffact("armorAdapt_resetTrigger") and armAdt.flags[1] == 0 then
 		armAdt.updateFlag = false
 		armAdt_mismatch = { 1, 2, 3, 4, 5, 6, 7, 8 }
 		armAdt_mismatch = armorAdapt.exemptionCheck(armAdt_mismatch)
@@ -102,42 +99,31 @@ function update(dt)
 	end
 	
 	if armAdt.updateFlag == false then
+	
+		--script is alive, getting body sub type settings
 		armorAdapt.getSpeciesBodyTable(armAdt.classType)
 		
 		armAdt.hideBody = "showBody"
-		armAdt.statusFolder = "none"
+		armAdt.statusFolders = { "none", "none", "none", "none", "none", "none", "none", "none" }
 		armAdt.classFolders = util.mergeTable({}, armAdt.classStorage)
-		armAdt.subTypeFolders = util.mergeTable({}, armAdt.subTypeStorage)
 		
+		--changing body class, body sub type, and or item settings if transformative effects are active
 		armorAdapt.transformativeEffects()
 		
-		if armAdt.flags[4] == 0 and (armAdt_Config.showPlayerArmor == true) then
-			inflg("[Armor Adapt][Player Handler]: The player currently has these items equipped: Head %s, Cosmetic head %s, chest %s, cosmetic chest %s, legs %s, cosmetic legs %s, back %s, and cosmetic back %s", armAdt.currentArmor[1], armAdt.currentArmor[2], armAdt.currentArmor[3], armAdt.currentArmor[4], armAdt.currentArmor[5], armAdt.currentArmor[6], armAdt.currentArmor[7], armAdt.currentArmor[8])
-			armAdt.flags[4] = 1
-		end
+		armorAdapt.showEquippedLog()
 		
+		--equipping modified items in outfit slots and or updating stored table to prevent looping
 		armorAdapt.slotUpdate()
-		armAdt.firstUpdate = false
-		armorAdapt_outfitErrorCheck(3)
-		armorAdapt_outfitErrorCheck(4)
 	end
 end
 
 function uninit()
-	baseUnInit()
+	baseUnInit()	
+	armorCheck = armorAdapt.generatePlayerArmorTable()
+	armorAdapt.postCleanup(armorCheck)
+
 	if armAdt_Config.showShutDown == true then
 		inflg("[Armor Adapt][Player Handler] Shutting Down: Thank you for using Armor Adapt.")
 	end
 	status.removeEphemeralEffect("hotHolidayEvent")
-end
-
-function armorAdapt_outfitErrorCheck(slotC)
-	if armAdt.currentArmor[slotC] ~= nil then
-		if armAdt.currentArmor[slotC].parameters.itemTags ~= nil then
-			if armAdt.currentArmor[slotC].parameters.itemTags[5] == nil then
-				status.addEphemeralEffect("armorAdapt_resetBody")
-				player.radioMessage("armorAdaptOutfitError", 2)	
-			end
-		end
-	end
 end

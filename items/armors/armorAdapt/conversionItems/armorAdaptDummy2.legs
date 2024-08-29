@@ -1,0 +1,14 @@
+{
+	"itemName" : "armAdt_legsCosmetic",
+	"inventoryIcon" : "icons.png:pants",
+	"maxStack" : 1,
+	"rarity" : "Essential",
+	"category" : "legarmour",
+	"description" : "Feel that earth beneath your vary feet.",
+	"shortdescription" : "No Pants",
+	"tooltipKind" : "armor",
+	"builder" : "/armorAdapt/armorAdaptBuilder2.lua",
+	"maleFrames" : "pants.png",
+	"femaleFrames" : "pants.png",
+	"armorAdaptDummy" : true
+}

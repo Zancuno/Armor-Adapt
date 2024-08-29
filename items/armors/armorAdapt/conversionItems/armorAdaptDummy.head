@@ -1,0 +1,15 @@
+{
+	"itemName" : "armAdt_head",
+	"inventoryIcon" : "icons.png:head",
+	"maxStack" : 1,
+	"rarity" : "Essential",
+	"category" : "headarmour",
+	"description" : "Be proud of your fluffy ears!",
+	"shortdescription" : "No Hat",
+	"tooltipKind" : "armor",
+	"builder" : "/armorAdapt/armorAdaptBuilder2.lua",
+	"maleFrames" : "head.png",
+	"femaleFrames" : "head.png",
+	"mask" : "mask.png",
+	"armorAdaptDummy" : true
+}

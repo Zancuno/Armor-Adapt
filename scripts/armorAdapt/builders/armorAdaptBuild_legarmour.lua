@@ -9,6 +9,7 @@ function armorAdapt.spriteBuild(directory, config, parameters, level, seed)
 	--common buildscript table merge to prevent re-assertion of original config
 	config = util.mergeTable({ }, config)
 	
+	config.inventoryIcon = config.iconPath
 	--creating parameters if non existant prior
 	if parameters.armorAdapt_tags == nil or not next(parameters.armorAdapt_tags) then
 		parameters.armorAdapt_tags = {
@@ -60,7 +61,7 @@ function armorAdapt.spriteBuild(directory, config, parameters, level, seed)
 			config.femaleFrames = armorAdapt.defaultCheck(armorAdapt.constructPaths("/pantsf.png", config.femaleFrames))
 		end
 		
-		if AAhideBools == "hideBody" then
+		if AAhideBool == "hideBody" then
 			config.hideBody = true
 		end
 	end
@@ -104,8 +105,8 @@ function armorAdapt.constructPaths(partImage, originalImage)
 		pathTable[1] = "/items/armors/"..AAlibrary.."/"..AAbodyClass.."/"..AAitemFolder.."/"..AAsubType..partImage
 		
 		if AAdefaultSys == true or AAitemFolder ~= configItemName then
-			table.insert(pathTable, "/items/armors/default/"..AAbodyClass.."_"..AAlibrary.."/"..AAsubType..partImage)
-			table.insert(pathTable, "/items/armors/default/"..AAbodyClass.."_"..AAlibrary..partImage)
+			table.insert(pathTable, "/items/armors/armorAdapt/default/"..AAbodyClass.."_"..AAlibrary.."/"..AAsubType..partImage)
+			table.insert(pathTable, "/items/armors/armorAdapt/default/"..AAbodyClass.."_"..AAlibrary..partImage)
 		end
 		
 		table.insert(pathTable, "/items/armors/armorAdapt/"..AAbodyClass.."/"..AAitemFolder.."/"..AAsubType..partImage)	
@@ -113,8 +114,8 @@ function armorAdapt.constructPaths(partImage, originalImage)
 		pathTable[1] = "/items/armors/armorAdapt/"..AAbodyClass.."/"..AAitemFolder.."/"..AAsubType..partImage
 		
 		if AAdefaultSys == true or AAitemFolder ~= configItemName then
-			table.insert(pathTable, "/items/armors/default/"..AAbodyClass.."/"..AAsubType..partImage)
-			table.insert(pathTable, "/items/armors/default/"..AAbodyClass..partImage)
+			table.insert(pathTable, "/items/armors/armorAdapt/default/"..AAbodyClass.."/"..AAsubType..partImage)
+			table.insert(pathTable, "/items/armors/armorAdapt/default/"..AAbodyClass..partImage)
 		end
 	end
 	table.insert(pathTable, root.itemConfig(configItemName).directory..originalImage)

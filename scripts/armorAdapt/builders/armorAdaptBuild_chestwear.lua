@@ -5,10 +5,11 @@ function armorAdapt.spriteBuild(directory, config, parameters, level, seed)
 	intendedBody = config["armorAdapt_intendedBody"] or nil
 	armAdtCustom = config["armorAdapt_custom"] or nil
 	pathTable = {}
-	
+	played = false
 	--common buildscript table merge to prevent re-assertion of original config
 	config = util.mergeTable({ }, config)
-	
+
+	config.inventoryIcon = config.iconPath
 	--creating parameters if non existant prior
 	if parameters.armorAdapt_tags == nil or not next(parameters.armorAdapt_tags) then
 		parameters.armorAdapt_tags = {
@@ -30,7 +31,7 @@ function armorAdapt.spriteBuild(directory, config, parameters, level, seed)
 	AAhideBool = parameters.armorAdapt_tags.hideBool
 	AAitemFolder = parameters.armorAdapt_tags.itemFolder
 	AAdefaultSys = parameters.armorAdapt_tags.defaultSystem
-	
+
 	--checking to see if species settings match intended body of item original images to avoid further checks
 	if intendedBody ~= nil and 
 	intendedBody["library"] == AAlibrary and 
@@ -44,9 +45,9 @@ function armorAdapt.spriteBuild(directory, config, parameters, level, seed)
 	armAdtCustom[AAlibrary] ~= nil and 
 	armAdtCustom[AAlibrary][AAbodyClass] ~= nil and 
 	armAdtCustom[AAlibrary][AAbodyClass][AAsubType] ~= nil then
-	
-		config.maleFrames = armAdtCustom[AAlibrary][AAbodyClass][AAsubType]["maleFrames"]
-		config.femaleFrames = armAdtCustom[AAlibrary][AAbodyClass][AAsubType]["femaleFrames"]
+
+		config.maleFrames = armorAdapt.pathBuild(armAdtCustom[AAlibrary][AAbodyClass][AAsubType]["maleFrames"])
+		config.femaleFrames = armorAdapt.pathBuild(armAdtCustom[AAlibrary][AAbodyClass][AAsubType]["femaleFrames"])
 	
 	--no preset image paths for species settings in item so checking if custom folder paths exist, if not original images
 	elseif AAitemFolder ~= "null" then
@@ -68,7 +69,7 @@ function armorAdapt.spriteBuild(directory, config, parameters, level, seed)
 			config.femaleFrames.backSleeve = armorAdapt.defaultCheck(armorAdapt.constructPaths("/bsleevef.png", config.femaleFrames.backSleeve))
 		end
 		
-		if AAhideBools == "hideBody" then
+		if AAhideBool == "hideBody" then
 			config.hideBody = true
 		end
 	end
@@ -112,8 +113,8 @@ function armorAdapt.constructPaths(partImage, originalImage)
 		pathTable[1] = "/items/armors/"..AAlibrary.."/"..AAbodyClass.."/"..AAitemFolder.."/"..AAsubType..partImage
 		
 		if AAdefaultSys == true or AAitemFolder ~= configItemName then
-			table.insert(pathTable, "/items/armors/default/"..AAbodyClass.."_"..AAlibrary.."/"..AAsubType..partImage)
-			table.insert(pathTable, "/items/armors/default/"..AAbodyClass.."_"..AAlibrary..partImage)
+			table.insert(pathTable, "/items/armors/armorAdapt/default/"..AAbodyClass.."_"..AAlibrary.."/"..AAsubType..partImage)
+			table.insert(pathTable, "/items/armors/armorAdapt/default/"..AAbodyClass.."_"..AAlibrary..partImage)
 		end
 		
 		table.insert(pathTable, "/items/armors/armorAdapt/"..AAbodyClass.."/"..AAitemFolder.."/"..AAsubType..partImage)	
@@ -121,9 +122,41 @@ function armorAdapt.constructPaths(partImage, originalImage)
 		pathTable[1] = "/items/armors/armorAdapt/"..AAbodyClass.."/"..AAitemFolder.."/"..AAsubType..partImage
 		
 		if AAdefaultSys == true or AAitemFolder ~= configItemName then
-			table.insert(pathTable, "/items/armors/default/"..AAbodyClass.."/"..AAsubType..partImage)
-			table.insert(pathTable, "/items/armors/default/"..AAbodyClass..partImage)
+			table.insert(pathTable, "/items/armors/armorAdapt/default/"..AAbodyClass.."/"..AAsubType..partImage)
+			table.insert(pathTable, "/items/armors/armorAdapt/default/"..AAbodyClass..partImage)
 		end
 	end
 	table.insert(pathTable, root.itemConfig(configItemName).directory..originalImage)
+end
+
+function armorAdapt.pathBuild(frameTable)
+	--checking for directory shortcuts and adjusting image path as needed, <itemDir> for item directory and <(itemName)> of the linked item's item directory.
+
+	if string.find(frameTable["body"], ":") then
+		local shortDir = string.sub(frameTable["body"], 1, string.find(frameTable["body"], ":")-1)
+		if shortDir == "itemDir" then
+			frameTable["body"] = string.gsub(frameTable["body"], shortDir..":", root.itemConfig(configItemName).directory)
+		elseif AAitemFolder ~= "null" then
+			frameTable["body"] = string.gsub(frameTable["body"], shortDir..":", root.itemConfig(shortDir).directory)
+		end
+	end
+
+	if string.find(frameTable["frontSleeve"], ":") then
+		local shortDir = string.sub(frameTable["frontSleeve"], 1, string.find(frameTable["frontSleeve"], ":")-1)
+		if shortDir == "itemDir" then
+			frameTable["frontSleeve"] = string.gsub(frameTable["frontSleeve"], shortDir..":", root.itemConfig(configItemName).directory)
+		elseif AAitemFolder ~= "null" then
+			frameTable["frontSleeve"] = string.gsub(frameTable["frontSleeve"], shortDir..":", root.itemConfig(shortDir).directory)
+		end
+	end
+	
+	if string.find(frameTable["backSleeve"], ":") then
+		local shortDir = string.sub(frameTable["backSleeve"], 1, string.find(frameTable["backSleeve"], ":")-1)
+		if shortDir == "itemDir" then
+			frameTable["backSleeve"] = string.gsub(frameTable["backSleeve"], shortDir..":", root.itemConfig(configItemName).directory)
+		elseif AAitemFolder ~= "null" then
+			frameTable["backSleeve"] = string.gsub(frameTable["backSleeve"], shortDir..":", root.itemConfig(shortDir).directory)
+		end
+	end
+return frameTable
 end

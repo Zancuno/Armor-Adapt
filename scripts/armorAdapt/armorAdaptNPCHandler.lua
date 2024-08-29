@@ -1,10 +1,10 @@
 require "/scripts/util.lua"
 require "/scripts/armorAdapt/armorAdaptUtil.lua"
-require "/armorAdapt/armorAdaptBuilder.lua"
 
 --hooking functons of other scripts sharing _ENV
 local baseInit = init or function() end
 local baseUpdate = update or function() end
+local baseUninit = uninit or function() end
 
 function init()
 	baseInit()
@@ -25,23 +25,14 @@ function init()
 		inflg("[Armor Adapt][Npc Handler]: Starting equipment check for adaptable items.")
 	end
 	
-	--build script version check, loads appropriate functions for the version on builder
-	if armorAdabtBuilderVersion == nil or armorAdabtBuilderVersion ~= armAdt_Config.armorAdaptBuilderVersion then
-		require("/scripts/armorAdapt/armorAdaptV1Util.lua")
-	else
-		require("/scripts/armorAdapt/armorAdaptV2Util.lua")
-	end
-	
 	--var table to avoid overriding values
 	armAdt = {
-		firstUpdate = true,
 		updateFlag = true,
 		initSpecies = npc.species(),
 		entity = "Npc",
 		statusFolders = { "none", "none", "none", "none", "none", "none", "none", "none" },
 		spriteLibrary = "default",
 		frameOverrideFolder = "none",
-		subTypeScript = "none",
 		hideBody = "showBody",
 		flags = { 0, 0, 0, 0 },
 		slotTable = { "head", "headCosmetic", "chest", "chestCosmetic", "legs", "legsCosmetic", "back", "backCosmetic" },
@@ -63,14 +54,17 @@ function init()
 	status.removeEphemeralEffect("hotHolidayEvent")
 end
 
-
-
 function update(dt)
 	baseUpdate(dt)
 	
+	--getting equipment list
 	armAdt.currentArmor = armorAdapt.generateNpcArmorTable()
 	armAdt_mismatch = true
+	
+	--checking outfits against a stored table for mismatch, exempting select items
 	armAdt_mismatch = armorAdapt.exemptionCheck(armorAdapt.compareArmorTables(armAdt.currentArmor, armAdt.itemStorage))
+	
+	--checking flag conditions to reset or turn update on
 	if type(armAdt_mismatch) == "table" then
 		armAdt.updateFlag = false
 	else
@@ -81,6 +75,7 @@ function update(dt)
 		end
 	end
 	
+	--checking to see if transformative status effects have forced update
 	if stseffact("armorAdapt_resetTrigger") and armAdt.flags[1] == 0 then
 		armAdt.updateFlag = false
 		armAdt_mismatch = { 1, 2, 3, 4, 5, 6, 7, 8 }
@@ -89,32 +84,26 @@ function update(dt)
 	end
 	
 	if armAdt.updateFlag == false then
+	
+		--script is alive, getting body sub type settings
 		armorAdapt.getSpeciesBodyTable(armAdt.classType)
 		
-		armAdt.statusFolder = "none"
+		armAdt.hideBody = "showBody"
+		armAdt.statusFolders = { "none", "none", "none", "none", "none", "none", "none", "none" }
 		armAdt.classFolders = util.mergeTable({}, armAdt.classStorage)
-		armAdt.subTypeFolders = util.mergeTable({}, armAdt.subTypeStorage)
 		
+		--changing body class, body sub type, and or item settings if transformative effects are active
 		armorAdapt.transformativeEffects()
 		
-		if armAdt.flags[4] == 0 and (armAdt_Config.showNpcArmor == true) then
-			inflg("[Armor Adapt][Npc Handler]: The NPC currently has these items equipped: Head %s, Cosmetic head %s, chest %s, cosmetic chest %s, legs %s, cosmetic legs %s, back %s, and cosmetic back %s", armAdt.currentArmor[1], armAdt.currentArmor[2], armAdt.currentArmor[3], armAdt.currentArmor[4], armAdt.currentArmor[5], armAdt.currentArmor[6], armAdt.currentArmor[7], armAdt.currentArmor[8])
-			armAdt.flags[4] = 1
-		end
+		armorAdapt.showEquippedLog()
 
+		--equipping modified items in outfit slots and or updating stored table to prevent looping
 		armorAdapt.slotUpdate()
-		armAdt.firstUpdate = false
-		armorAdapt_outfitErrorCheck(3)
-		armorAdapt_outfitErrorCheck(4)
 	end
 end
 
-function armorAdapt_outfitErrorCheck(slotC)
-	if armAdt.currentArmor[slotC] ~= nil then
-		if root.itemConfig(armAdt.currentArmor[slotC]).parameters.itemTags ~= nil then
-			if root.itemConfig(armAdt.currentArmor[slotC]).parameters.itemTags[5] == nil then
-				status.addEphemeralEffect("armorAdapt_resetBody")
-			end
-		end
-	end
+function uninit()
+	baseUnInit()
+	armorcheck = armorAdapt.generateNpcArmorTable()
+	armorAdapt.postCleanup(armorCheck)
 end

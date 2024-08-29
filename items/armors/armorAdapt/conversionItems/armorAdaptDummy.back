@@ -1,0 +1,14 @@
+{
+	"itemName" : "armAdt_back",
+	"inventoryIcon" : "backpackicon.png",
+	"rarity" : "Essential",
+	"Category" : "backwear",
+	"description" : "A pack to keep your goods.",
+	"shortdescription" : "Backpack",
+	"tooltipKind" : "back",
+	"builder" : "/armorAdapt/armorAdaptBuilder2.lua",
+	"maleFrames" : "back.png",
+	"femaleFrames" : "back.png",
+	"maxStack" : 1,
+	"armorAdaptDummy" : true
+}
